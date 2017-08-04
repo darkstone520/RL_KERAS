@@ -10,6 +10,7 @@ import tensorflow as tf
 import numpy as np
 import random
 import gym
+import matplotlib.pyplot as plt
 
 EPISODES = 50000
 
@@ -61,42 +62,65 @@ class DQNAgent:
         a = K.placeholder(shape=(None,), dtype='int32')
         y = K.placeholder(shape=(None,), dtype='float32')
 
+        # history에서 예측한 q value
         prediction = self.model.output
 
+        # history에서 취한 action을 one_hot
+        # action이 0일 때 [1,0,0]
         a_one_hot = K.one_hot(a, self.action_size)
+
+        # [1,0,0] * [0.32113, 0.1123, 0.00123] = [0.32113,0,0]과 같이 된다.
+        # 위의 sum하면 0.32113
         q_value = K.sum(prediction * a_one_hot, axis=1)
+        # target(reward + dicount_factor * np.max(model.predict(next_history)) )으로 받은 값이 y
+        # 즉 정답인 y - q_value만큼의 오차가 발생하는데 현재 q_value의 값이 잘 못 되었을 경우 오차가 크게 발생
+        # 위에서 q_value는 우리가 예측한 값이다. (q hat)
         error = K.abs(y - q_value)
+
 
         quadratic_part = K.clip(error, 0.0, 1.0)
         linear_part = error - quadratic_part
         loss = K.mean(0.5 * K.square(quadratic_part) + linear_part)
 
         optimizer = RMSprop(lr=0.00025, epsilon=0.01)
+        # updates는 list
         updates = optimizer.get_updates(self.model.trainable_weights, [], loss)
         train = K.function([self.model.input, a, y], [loss], updates=updates)
+        """Instantiates a Keras function.
 
+            # Arguments
+                inputs: List of placeholder tensors.
+                outputs: List of output tensors.
+                updates: List of update ops.
+                **kwargs: Passed to `tf.Session.run`.
+
+            # Returns
+                Output values as Numpy arrays.
+
+            # Raises
+                ValueError: if invalid kwargs are passed in.
+            """
         return train
 
     # 상태가 입력, 큐함수가 출력인 인공신경망 생성
     def build_model(self):
         model = Sequential()
-        model.add(Conv2D(32, (8, 8), strides=(4, 4), activation='relu',
-                         input_shape=self.state_size))
-        model.add(Conv2D(64, (4, 4), strides=(2, 2), activation='relu'))
-        model.add(Conv2D(64, (3, 3), strides=(1, 1), activation='relu'))
+        model.add(Conv2D(32, (8, 8), strides=(4, 4), activation='relu', input_shape=self.state_size, kernel_initializer='he_normal'))
+        model.add(Conv2D(64, (4, 4), strides=(2, 2), activation='relu', kernel_initializer='he_normal'))
+        model.add(Conv2D(64, (3, 3), strides=(1, 1), activation='relu', kernel_initializer='he_normal'))
         model.add(Flatten())
-        model.add(Dense(512, activation='relu'))
+        model.add(Dense(512, activation='relu', kernel_initializer='he_normal'))
         model.add(Dense(self.action_size))
         model.summary()
         return model
 
     # 타겟 모델을 모델의 가중치로 업데이트
+    # 타겟 모델을 만드는 이유 -> 학습과 동시에 target값으 구하면 target model 자체가 수시로 흔들리기 때문에 학습이 되지 않는다. (non-stationary)
     def update_target_model(self):
         self.target_model.set_weights(self.model.get_weights())
 
     # 입실론 탐욕 정책으로 행동 선택
     def get_action(self, history):
-        history = np.float32(history / 255.0)
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
         else:
@@ -108,35 +132,52 @@ class DQNAgent:
         self.memory.append((history, action, reward, next_history, dead))
 
     # 리플레이 메모리에서 무작위로 추출한 배치로 모델 학습
+    # 랜덤 미니배치를 쓰는 이유 -> sample data들의 correlations를 제거할 수 있음
     def train_model(self):
         if self.epsilon > self.epsilon_end:
             self.epsilon -= self.epsilon_decay_step
 
         mini_batch = random.sample(self.memory, self.batch_size)
 
-        history = np.zeros((self.batch_size, self.state_size[0],
-                            self.state_size[1], self.state_size[2]))
-        next_history = np.zeros((self.batch_size, self.state_size[0],
-                                 self.state_size[1], self.state_size[2]))
-        target = np.zeros((self.batch_size,))
-        action, reward, dead = [], [], []
+        # shape = (batch_size, 84, 84, 4)
+        # agent.append_sample(history, action, reward, next_history, dead)
+        history = np.vstack([x[0] for x in mini_batch])
+        action = np.array([x[1] for x in mini_batch])
+        reward = np.array([x[2] for x in mini_batch])
+        next_history = np.vstack([x[3] for x in mini_batch])
+        dead = np.array([x[4] for x in mini_batch])
 
-        for i in range(self.batch_size):
-            history[i] = np.float32(mini_batch[i][0] / 255.)
-            next_history[i] = np.float32(mini_batch[i][3] / 255.)
-            action.append(mini_batch[i][1])
-            reward.append(mini_batch[i][2])
-            dead.append(mini_batch[i][4])
+        target = reward + self.discount_factor * np.max(self.target_model.predict(next_history),axis=-1) * ~dead
 
-        target_value = self.target_model.predict(next_history)
+        #print(reward)
+        #print(np.max(self.model.predict(history),axis=-1))
+        #print(dead)
+        #print(target)
 
-        for i in range(self.batch_size):
-            if dead[i]:
-                target[i] = reward[i]
-            else:
-                target[i] = reward[i] + self.discount_factor * \
-                                        np.amax(target_value[i])
+        # reward
+        #                                                13번째
+        # [0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  1.  0.  0.  0.  0.  0.
+        #  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.  0.]
 
+        # 모델이 예측한  max Q value * 0.99 곱한 값
+        # [0.10333048  0.13567154  0.11365376  0.10544886  0.11376774  0.10947491
+        #  0.09684324  0.10063805  0.11025954  0.11438356  0.11261801  0.1120755
+        #  <0.09465584>  0.137052    0.11423227  0.10483754  0.13442372  0.10209396
+        #  0.1023718   0.10295425  0.11089235  0.11386036  0.10653776  0.0947252
+        #  0.10454454  0.10452821  0.10982917  0.09662293  0.09869094  0.10803009
+        #  0.11695433  0.1101466]
+
+        # 게임 종료 여부
+        # [False False False False False False False False False False False False
+        #  False False False False False False False False False False False False
+        #  False False False False False False False False]
+
+        # target 값
+        # [0.10333048  0.13567154  0.11365376  0.10544886  0.11376774  0.10947491
+        #  0.09684324  0.10063805  0.11025954  0.11438356  0.11261801  0.1120755
+        #  <1.09465584>  0.137052    0.11423227  0.10483754  0.13442372  0.10209396
+
+        # loss = (정답-예측)^2
         loss = self.optimizer([history, action, target])
         self.avg_loss += loss[0]
 
@@ -163,15 +204,39 @@ class DQNAgent:
 
 
 # 학습속도를 높이기 위해 흑백화면으로 전처리
+# 흑백으로 바꾼 후 255를 곱해서 연산이 빠르도록 int값으로 바꿈
 def pre_processing(observe):
-    processed_observe = np.uint8(
-        resize(rgb2gray(observe), (84, 84), mode='constant') * 255)
+    processed_observe = np.float32(
+        resize(rgb2gray(observe), (84, 84), mode='constant'))
     return processed_observe
 
+
+def plot_image(image):
+    """Plot an image
+
+    If an image is a grayscale image,
+    plot in `gray` cmap.
+    Otherwise, regular RGB plot
+    .
+
+    Args:
+        image (2-D or 3-D array): (H, W) or (H, W, C)
+    """
+    image = np.squeeze(image)
+    shape = image.shape
+
+    if len(shape) == 2:
+        plt.imshow(image, cmap="gray")
+
+    else:
+        plt.imshow(image)
+
+    plt.show()
 
 if __name__ == "__main__":
     # 환경과 DQN 에이전트 생성
     env = gym.make('BreakoutDeterministic-v4')
+    env = gym.wrappers.Monitor(env, directory="gym-results/", force=True)
     agent = DQNAgent(action_size=3)
 
     scores, episodes, global_step = [], [], 0
@@ -187,9 +252,16 @@ if __name__ == "__main__":
             observe, _, _, _ = env.step(1)
 
         state = pre_processing(observe)
+        # state, shape = (84,84)
+        # [[0 0 0..., 0 0 0]
+        #  [0 0 0..., 0 0 0]
+        #  ...
+        #  [0 0 0..., 0 0 0]
+        #  [0 0 0..., 0 0 0]]
+
+        # history, shape = (84,84,4), 4에 해당하는 축으로 이미지를 쌓아야 하므로 axis=2가된다. 또는 가장 안쪽의 축 -1
         history = np.stack((state, state, state, state), axis=2)
         history = np.reshape([history], (1, 84, 84, 4))
-
         while not done:
             if agent.render:
                 env.render()
@@ -211,15 +283,24 @@ if __name__ == "__main__":
             # 각 타임스텝마다 상태 전처리
             next_state = pre_processing(observe)
             next_state = np.reshape([next_state], (1, 84, 84, 1))
+            # netxt_state를 history[:,:,:,0] 번째 인덱스에 넣게 됨
+            # 가장 최신의 state를 history axis=3의 index 0부터 시작하게 한다.
             next_history = np.append(next_state, history[:, :, :, :3], axis=3)
 
             agent.avg_q_max += np.amax(
-                agent.model.predict(np.float32(history / 255.))[0])
+                agent.model.predict(np.float32(history))[0])
+
+            # 가장 최근의 저장된 state를 ( history[:,:,:,0] ) 확인
+            #plot_image(next_history[:,:,:,0])
+
+            # print(agent.model.predict(np.float32(history / 255.)))  # [[-0.03298247  0.01585374 -0.00639954]]
+            # print(np.amax(agent.model.predict(np.float32(history / 255.))[0])) # 0.0164134
 
             if start_life > info['ale.lives']:
                 dead = True
                 start_life = info['ale.lives']
 
+            # 1이 넘는 reward도 1로 취급 (보상의 차이가 크면 학습이 어려움)
             reward = np.clip(reward, -1., 1.)
             # 샘플 <s, a, r, s'>을 리플레이 메모리에 저장 후 학습
             agent.append_sample(history, action, reward, next_history, dead)
