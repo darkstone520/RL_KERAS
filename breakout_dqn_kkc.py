@@ -121,6 +121,7 @@ class DQNAgent:
 
     # 입실론 탐욕 정책으로 행동 선택
     def get_action(self, history):
+        history = np.float32(history / 255.0)
         if np.random.rand() <= self.epsilon:
             return random.randrange(self.action_size)
         else:
@@ -141,10 +142,10 @@ class DQNAgent:
 
         # shape = (batch_size, 84, 84, 4)
         # agent.append_sample(history, action, reward, next_history, dead)
-        history = np.vstack([x[0] for x in mini_batch])
+        history = np.vstack([x[0]/255. for x in mini_batch])
         action = np.array([x[1] for x in mini_batch])
         reward = np.array([x[2] for x in mini_batch])
-        next_history = np.vstack([x[3] for x in mini_batch])
+        next_history = np.vstack([x[3]/255. for x in mini_batch])
         dead = np.array([x[4] for x in mini_batch])
 
         target = reward + self.discount_factor * np.max(self.target_model.predict(next_history),axis=-1) * ~dead
@@ -206,8 +207,8 @@ class DQNAgent:
 # 학습속도를 높이기 위해 흑백화면으로 전처리
 # 흑백으로 바꾼 후 255를 곱해서 연산이 빠르도록 int값으로 바꿈
 def pre_processing(observe):
-    processed_observe = np.float32(
-        resize(rgb2gray(observe), (84, 84), mode='constant'))
+    processed_observe = np.uint8(
+        resize(rgb2gray(observe), (84, 84), mode='constant') * 255)
     return processed_observe
 
 
@@ -288,7 +289,7 @@ if __name__ == "__main__":
             next_history = np.append(next_state, history[:, :, :, :3], axis=3)
 
             agent.avg_q_max += np.amax(
-                agent.model.predict(np.float32(history))[0])
+                agent.model.predict(np.float32(history/255.))[0])
 
             # 가장 최근의 저장된 state를 ( history[:,:,:,0] ) 확인
             #plot_image(next_history[:,:,:,0])
