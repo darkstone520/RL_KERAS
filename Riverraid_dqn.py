@@ -27,8 +27,8 @@ class DQNAgent:
         self.exploration_steps = 1000000.
         self.epsilon_dacay_step = (self.epsilon_start - self.epsilon_end) / self.exploration_steps
         self.batch_size = 32
-        self.train_start = 100#50000
-        self.target_update_frequency = 10
+        self.train_start = 50000
+        self.target_update_frequency = 10000
         self.replay_memory = deque(maxlen=400000)
         self.discount_factor = 0.99
         self.no_op_steps = 30
