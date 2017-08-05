@@ -47,11 +47,11 @@ class DQNAgent:
         self.summary_placeholders, self.update_ops, self.summary_op = \
             self.setup_summary()
         self.summary_writer = tf.summary.FileWriter(
-            'summary/breakout_dqn', self.sess.graph)
+            'summary/Riverraid_dqn', self.sess.graph)
         self.sess.run(tf.global_variables_initializer())
 
         if self.load_model:
-            self.train_model.load_weights("./save_model/breakout_dqn.h5")
+            self.train_model.load_weights("./save_model/Riverraid_dqn.h5")
 
 
     def build_model(self):
