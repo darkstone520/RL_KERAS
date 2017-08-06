@@ -30,8 +30,8 @@ class DQNAgent:
         self.epsilon_decay_step = (self.epsilon_start - self.epsilon_end) \
                                   / self.exploration_steps
         self.batch_size = 32
-        self.train_start = 2000#50000
-        self.update_target_rate = 1000#10000
+        self.train_start = 50000
+        self.update_target_rate = 10000
         self.discount_factor = 0.99
         # 리플레이 메모리, 최대 크기 400000
         self.memory = deque(maxlen=400000)
