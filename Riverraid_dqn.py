@@ -150,10 +150,10 @@ class DQNAgent:
 
         target = reward + self.discount_factor * np.max(self.target_model.predict(next_history),axis=-1) * ~dead
 
-        print(reward)
-        print(np.max(self.model.predict(history),axis=-1))
-        print(dead)
-        print(target)
+        # print(reward)
+        # print(np.max(self.model.predict(history),axis=-1))
+        # print(dead)
+        # print(target)
 
         # reward
         #                                                13번째
