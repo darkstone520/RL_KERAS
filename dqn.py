@@ -50,7 +50,6 @@ class DQN:
             f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
             f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
             f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-
             w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=tf.contrib.layers.xavier_initializer())
             w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
 
@@ -74,7 +73,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, momentum=0.95, epsilon=0.1)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
