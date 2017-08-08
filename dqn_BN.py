@@ -2,6 +2,7 @@
 import numpy as np
 import tensorflow as tf
 import os
+from tensorflow.contrib.layers import variance_scaling_initializer
 
 
 class DQN:
@@ -45,11 +46,11 @@ class DQN:
             self.Y = tf.placeholder('float', [None])
             self.a = tf.placeholder('int64', [None])
 
-            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=tf.contrib.layers.xavier_initializer())
-            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
+            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=variance_scaling_initializer())
+            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=variance_scaling_initializer())
+            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=variance_scaling_initializer())
+            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=variance_scaling_initializer())
+            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=variance_scaling_initializer())
 
             c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
             BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
@@ -72,7 +73,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.95)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
@@ -122,5 +123,6 @@ class DQN:
         sess = tf.get_default_session()
         path = os.path.join(self.checkpoint_dir, "{}_{}_model.ckpt".format(self.net_name,episode))
         self.saver.save(sess, path)
+
 
 
