@@ -39,19 +39,28 @@ class DQN:
         self.sess.run(tf.global_variables_initializer())
 
 
-    def _build_network(self, h_size=512, l_rate=0.00025) -> None:
+    def _build_network(self, h_size=512, l_rate=0.00020) -> None:
 
         with tf.variable_scope(self.net_name):
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
             self.Y = tf.placeholder('float', [None])
             self.a = tf.placeholder('int64', [None])
 
-            #tf.contrib.layers.xavier_initializer()
+            ###########################################################
+            #######      variance_scaling_initializer의 파라미터     #####
+            ###########################################################
+            # To get Convolutional Architecture for Fast Feature Embedding, use:
+            # factor=1.0 mode='FAN_IN' uniform=True
+            # To get Delving Deep into Rectifiers, use (Default):
+            # factor=2.0 mode='FAN_IN' uniform=False
+            # To get Understanding the difficulty of training deep feedforward neural networks, use:
+            # factor=1.0,mode='FAN_AVG',uniform=True
+
             f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=variance_scaling_initializer(factor=1.0,mode='FAN_IN',uniform=True))
             f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=variance_scaling_initializer(factor=1.0,mode='FAN_IN',uniform=True))
             f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=variance_scaling_initializer(factor=1.0,mode='FAN_IN',uniform=True))
-            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=variance_scaling_initializer(factor=2.0,mode='FAN_IN',uniform=False))
-            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=variance_scaling_initializer(factor=2.0,mode='FAN_IN',uniform=False))
+            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=variance_scaling_initializer())
+            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=variance_scaling_initializer())
 
             c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
             BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
@@ -60,10 +69,12 @@ class DQN:
             c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
             BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
 
-            l1 = tf.contrib.layers.flatten(BN_3)
-            l2 = tf.nn.relu(tf.matmul(l1, w1))
+            flatted_data = tf.contrib.layers.flatten(BN_3)
+            l1 = tf.contrib.layers.flatten(flatted_data)
 
+            l2 = tf.nn.relu(tf.matmul(l1, w1))
             self.Qpred = tf.matmul(l2, w2)
+
 
         a_one_hot = tf.one_hot(self.a, self.output_size, 1.0, 0.0)
         q_val = tf.reduce_sum(tf.multiply(self.Qpred, a_one_hot), reduction_indices=1)
