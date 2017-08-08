@@ -47,11 +47,11 @@ class DQN:
             self.a = tf.placeholder('int64', [None])
 
             # He 초기화tf.contrib.layers.xavier_initializer_conv2d()
-            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=variance_scaling_initializer())
-            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=variance_scaling_initializer())
-            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=variance_scaling_initializer())
-            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=variance_scaling_initializer())
-            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=variance_scaling_initializer())
+            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
+            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
+            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
+            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=tf.contrib.layers.xavier_initializer())
+            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
 
             c1 = tf.nn.relu(tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID"))
             c2 = tf.nn.relu(tf.nn.conv2d(c1, f2, strides=[1, 2, 2, 1], padding="VALID"))
