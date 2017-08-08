@@ -2,8 +2,6 @@
 import numpy as np
 import tensorflow as tf
 import os
-from tensorflow.contrib.layers import variance_scaling_initializer
-
 
 class DQN:
 
@@ -73,7 +71,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.99)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
