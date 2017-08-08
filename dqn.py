@@ -2,7 +2,6 @@
 import numpy as np
 import tensorflow as tf
 import os
-from tensorflow.contrib.layers import variance_scaling_initializer
 
 
 class DQN:
