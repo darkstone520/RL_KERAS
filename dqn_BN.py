@@ -60,9 +60,12 @@ class DQN:
             BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
 
             l1 = tf.contrib.layers.flatten(BN_3)
-            l2 = tf.nn.relu(tf.matmul(l1, w1))
+            l2 = tf.matmul(l1, w1)
+            BN_4 = tf.contrib.layers.batch_norm(inputs=l2, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
 
-            self.Qpred = tf.matmul(l2, w2)
+            #l2 = tf.nn.relu(tf.matmul(l1, w1))
+
+            self.Qpred = tf.matmul(BN_4, w2)
 
         a_one_hot = tf.one_hot(self.a, self.output_size, 1.0, 0.0)
         q_val = tf.reduce_sum(tf.multiply(self.Qpred, a_one_hot), reduction_indices=1)
