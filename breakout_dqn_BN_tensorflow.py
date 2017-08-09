@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 from collections import deque
-import dqn_BN
+import dqn_BN_tunning
 import matplotlib.pyplot as plt
 import gym
 from typing import List
@@ -18,9 +18,9 @@ OUTPUT_SIZE = 3  # 1, 2, 3
 HISTORY_SIZE = 4
 DISCOUNT_RATE = 0.99
 REPLAY_MEMORY = 400000
-TRAIN_START = 50000
+TRAIN_START = 5000
 BATCH_SIZE = 32
-TARGET_UPDATE_FREQUENCY = 10000
+TARGET_UPDATE_FREQUENCY = 1000
 MAX_EPISODES = 50000
 START_EXPLORATION = 1.0
 FINAL_EXPLORATION = 0.1
@@ -95,9 +95,9 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
 
-        mainDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
+        mainDQN = dqn_BN_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
         print("mainDQN 생성")
-        targetDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
+        targetDQN = dqn_BN_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
         print("targetDQN 생성")
         sess.run(tf.global_variables_initializer())
         e = 1.0
@@ -204,6 +204,7 @@ if __name__ == "__main__":
         # 1000 에피소드마다 모델 저장
             if episode % 1000 == 0:
                 mainDQN.save(episode)
+                targetDQN.save(episode)
 
 
 
