@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 from collections import deque
-import dqn_BN_tunning
+import dqn_BN
 import matplotlib.pyplot as plt
 import gym
 from typing import List
@@ -86,7 +86,7 @@ def get_copy_var_ops(*, dest_scope_name: str, src_scope_name: str) -> List[tf.Op
 
     return op_holder
 
-def two_consecutive_frame_skip(done, env, info, skip_count, action):
+def two_consecutive_frame_skip(done, env, info, skip_count, real_action):
     """
     딥마인드 frame skip 방식. 연속된 2개의 프레임만 저장하고 이후 2개는 스킵, 이 과정을 반복한다.
     :param done: 게임이 종료되었으면 스킵하지 않는다.
@@ -99,7 +99,7 @@ def two_consecutive_frame_skip(done, env, info, skip_count, action):
         skip_count += 1
         if done == False  :
             for _ in range(2):
-                _, _, done, info = env.step(action)
+                _, _, done, info = env.step(real_action)
 
                 if done:
                     return True, info, skip_count
@@ -117,9 +117,9 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
 
-        mainDQN = dqn_BN_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
+        mainDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
         print("mainDQN 생성")
-        targetDQN = dqn_BN_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
+        targetDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
         print("targetDQN 생성")
         sess.run(tf.global_variables_initializer())
         e = 1.0
