@@ -191,7 +191,7 @@ if __name__ == "__main__":
                 else:
                     history = next_history
 
-            done, info = three_frame_skip(done, env, real_action)
+                done, info = three_frame_skip(done, env, real_action)
 
             if done:
                 # 각 에피소드 당 학습 정보를 기록
