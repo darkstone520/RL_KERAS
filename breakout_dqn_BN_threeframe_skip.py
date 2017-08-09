@@ -93,9 +93,9 @@ def three_frame_skip(done, env, info, real_action):
             _, _, done, info = env.step(real_action)
 
             if done:
-                return True, info
-        return False, info
-    return True, info
+                return True, info, env
+        return False, info, env
+    return True, info, env
 
 if __name__ == "__main__":
 
@@ -191,7 +191,7 @@ if __name__ == "__main__":
                 else:
                     history = next_history
 
-                done, info = three_frame_skip(done, env, real_action)
+                done, info, env = three_frame_skip(done, env, real_action)
 
             if done:
                 # 각 에피소드 당 학습 정보를 기록
