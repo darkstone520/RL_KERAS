@@ -9,7 +9,7 @@ from typing import List
 from skimage.transform import resize
 from skimage.color import rgb2gray
 
-env = gym.make('BreakoutDeterministic-v0')
+env = gym.make('Breakout-v0')
 env = gym.wrappers.Monitor(env, directory="gym-results/", force=True)
 
 # Constants defining our neural network
