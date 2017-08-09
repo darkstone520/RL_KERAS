@@ -125,8 +125,9 @@ if __name__ == "__main__":
             step = 0
             total_reward, start_life  = 0, 5
 
-            for _ in range(random.randint(1, np.random.randint(1,30))):
-                state, _, _, _ = env.step(1)
+            # strocastic 환경에서는 빼준다
+            # for _ in range(random.randint(1, np.random.randint(1,30))):
+            #     state, _, _, _ = env.step(1)
 
 
             state = pre_processing(state)
