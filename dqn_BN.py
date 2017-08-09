@@ -39,7 +39,7 @@ class DQN:
         self.sess.run(tf.global_variables_initializer())
 
 
-    def _build_network(self, h_size=512, l_rate=0.00020) -> None:
+    def _build_network(self, h_size=512, l_rate=0.00025) -> None:
 
         with tf.variable_scope(self.net_name):
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
@@ -69,8 +69,7 @@ class DQN:
             c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
             BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
 
-            flatted_data = tf.contrib.layers.flatten(BN_3)
-            l1 = tf.contrib.layers.flatten(flatted_data)
+            l1 = tf.contrib.layers.flatten(BN_3)
 
             l2 = tf.nn.relu(tf.matmul(l1, w1))
             self.Qpred = tf.matmul(l2, w2)
