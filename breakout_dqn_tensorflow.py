@@ -31,28 +31,6 @@ EPISODE_LIST = []
 TOTAL_REWARD_LIST = []
 
 
-def check_memory(func):
-    """
-    사용방법
-    체크하고자 하는 함수에 @check_memory 를 달아준다.
-    :param func:
-    :return:
-    """
-    def result_print(*args, **kwargs):
-        proc1 = psutil.Process(os.getpid())
-        mem1 = proc1.memory_info()
-        before_start = mem1[0]
-        start_time = time.time()
-        proc = psutil.Process(os.getpid())
-        func(*args, **kwargs)
-        end_time = time.time()
-        print(round((end_time - start_time) / 60, 5), "분")
-        proc = psutil.Process(os.getpid())
-        mem = proc.memory_info()
-        after_start = mem[0]
-        print('memory use : ', after_start - before_start)
-
-    return result_print
 
 def plot_image(image):
     """Plot an image
