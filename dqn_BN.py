@@ -63,11 +63,11 @@ class DQN:
             w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=variance_scaling_initializer())
 
             c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
-            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
+            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=True, decay=0.99, epsilon=0.001)
             c2 = tf.nn.conv2d(BN_1,f2, strides=[1, 2, 2, 1], padding="VALID")
-            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
+            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=True, decay=0.99, epsilon=0.001)
             c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
-            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=True, decay=0.95, epsilon=0.001)
+            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=True, decay=0.99, epsilon=0.001)
 
             l1 = tf.contrib.layers.flatten(BN_3)
 
@@ -84,7 +84,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_max(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.95, decay=0.)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.90, decay=0.99)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
