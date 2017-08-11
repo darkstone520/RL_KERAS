@@ -45,7 +45,6 @@ class DQN:
             self.Y = tf.placeholder('float', [None])
             self.a = tf.placeholder('int64', [None])
 
-            # He 초기화tf.contrib.layers.xavier_initializer_conv2d()
             f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
             f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
             f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
@@ -72,7 +71,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.95, decay=0.)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
