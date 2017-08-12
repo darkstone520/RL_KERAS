@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 from collections import deque
-import dqn_BN
+import dqn_BN_tunning
 import matplotlib.pyplot as plt
 import gym
 from typing import List
@@ -97,9 +97,9 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
 
-        mainDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
+        mainDQN = dqn_BN_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
         print("mainDQN 생성")
-        targetDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
+        targetDQN = dqn_BN_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
         print("targetDQN 생성")
         sess.run(tf.global_variables_initializer())
         e = 1.0
