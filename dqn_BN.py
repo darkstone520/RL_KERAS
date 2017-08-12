@@ -4,7 +4,6 @@ import tensorflow as tf
 import os
 from tensorflow.contrib.layers import variance_scaling_initializer
 
-# reduce_max, RMSP momentum = 0.95
 class DQN:
 
     def __init__(self, session: tf.Session, input_dim, output_size: int, name: str="main", checkpoint_dir="checkpoint") -> None:
@@ -41,6 +40,11 @@ class DQN:
 
     def _build_network(self, h_size=512, l_rate=0.00025) -> None:
 
+        if self.net_name == 'target':
+            self.is_training = False
+        else:
+            self.is_training = True
+
         with tf.variable_scope(self.net_name):
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
             self.Y = tf.placeholder('float', [None])
@@ -56,18 +60,18 @@ class DQN:
             # To get Understanding the difficulty of training deep feedforward neural networks, use:
             # factor=1.0,mode='FAN_AVG',uniform=True
 
-            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=variance_scaling_initializer(factor=1.0,mode='FAN_IN',uniform=True))
-            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=variance_scaling_initializer(factor=1.0,mode='FAN_IN',uniform=True))
-            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=variance_scaling_initializer(factor=1.0,mode='FAN_IN',uniform=True))
-            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=variance_scaling_initializer())
-            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=variance_scaling_initializer())
+            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
+            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
+            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
+            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=tf.contrib.layers.xavier_initializer())
+            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
 
             c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
-            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=True, decay=0.99, epsilon=0.001)
+            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
             c2 = tf.nn.conv2d(BN_1,f2, strides=[1, 2, 2, 1], padding="VALID")
-            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=True, decay=0.99, epsilon=0.001)
+            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
             c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
-            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=True, decay=0.99, epsilon=0.001)
+            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
 
             l1 = tf.contrib.layers.flatten(BN_3)
 
@@ -84,7 +88,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_max(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.90, decay=0.99)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.90, decay=0., centered=True)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):

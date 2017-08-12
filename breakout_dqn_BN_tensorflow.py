@@ -17,8 +17,8 @@ INPUT_DIM = [84,84,4]
 OUTPUT_SIZE = 3  # 1, 2, 3
 HISTORY_SIZE = 4
 DISCOUNT_RATE = 0.99
-REPLAY_MEMORY = 500000
-TRAIN_START = 50000
+REPLAY_MEMORY = 600000
+TRAIN_START = 10000
 BATCH_SIZE = 32
 TARGET_UPDATE_FREQUENCY = 10000
 MAX_EPISODES = 50000
@@ -179,6 +179,7 @@ if __name__ == "__main__":
 
                 if dead:
                     dead = False
+                    reward = -1
                 else:
                     history = next_history
 
