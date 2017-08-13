@@ -25,7 +25,7 @@ TARGET_UPDATE_FREQUENCY = 5000
 MAX_EPISODES = 50000
 START_EXPLORATION = 1.0
 FINAL_EXPLORATION = 0.1
-EXPLORATION = 1000000
+EXPLORATION = 3000000
 E_VALUE = []
 EPISODE_LIST = []
 TOTAL_REWARD_LIST = []
@@ -169,7 +169,7 @@ if __name__ == "__main__":
                     dead = True
                     start_life = info['ale.lives']
 
-                reward = np.clip(reward, 0., 1.)
+                reward = np.clip(reward, -1., 1.)
 
                 # Save the experience to our buffer
                 replay_buffer.append((history, action, reward, next_history, dead))
