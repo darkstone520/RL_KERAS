@@ -88,7 +88,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_max(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.90, decay=0., centered=True)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.6, decay=0., centered=True)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
