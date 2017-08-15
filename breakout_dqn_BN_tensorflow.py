@@ -113,7 +113,7 @@ if __name__ == "__main__":
             done = False            # 게임 종료 여부
             dead = False            # 죽었는지 여부
             state = env.reset()     # 게임 시작을 위해 env 환경 초기화
-            state, _, _, info = env.step(1)
+            state , _, _, info = env.step(1)
             step, total_reward, start_life = 0, 0, info['ale.lives']
 
             # BreakoutDeterministic-v4의 경우 공이 좌 또는 우로만 진행, 벽에 붙어서 학습하는 경우를 방지하기 위해
