@@ -118,8 +118,7 @@ class DQN:
 
     def save(self, episode) -> None :
         print("model save")
-        sess = tf.get_default_session()
         path = os.path.join(self.checkpoint_dir, "{}_{}_model.ckpt".format(self.net_name,episode))
-        self.saver.save(sess, path)
+        self.saver.save(self.session, path)
 
 
