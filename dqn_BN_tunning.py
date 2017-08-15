@@ -1,7 +1,6 @@
 import numpy as np
 import tensorflow as tf
 import os
-from tensorflow.contrib.layers import variance_scaling_initializer
 
 
 class DQN:
@@ -46,6 +45,7 @@ class DQN:
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
             self.Y = tf.placeholder('float', [None])
             self.a = tf.placeholder('int64', [None])
+
             if self.net_name == 'main':
                 self.training = True
             else:
@@ -60,12 +60,11 @@ class DQN:
                                        name="conv",
                                        kernel_initializer=conv2d_initializer,
                                        bias_initializer=conv2d_initializer,
-                                       activation=None
                                        )
                 net = tf.contrib.layers.batch_norm(inputs=net,
                                                    activation_fn=tf.nn.relu,
                                                    is_training=self.training,
-                                                   decay=0.,
+                                                   decay=0.999,
                                                    epsilon=0.001)
 
             with tf.variable_scope("layer2"):
@@ -75,13 +74,12 @@ class DQN:
                                        strides=(2, 2),
                                        name="conv",
                                        kernel_initializer=conv2d_initializer,
-                                       bias_initializer=conv2d_initializer,
-                                       activation=None)
+                                       bias_initializer=conv2d_initializer)
 
                 net = tf.contrib.layers.batch_norm(inputs=net,
                                                    activation_fn=tf.nn.relu,
                                                    is_training=self.training,
-                                                   decay=0.,
+                                                   decay=0.999,
                                                    epsilon=0.001)
 
             with tf.variable_scope("layer3"):
@@ -91,13 +89,12 @@ class DQN:
                                        strides=(1, 1),
                                        name="conv",
                                        kernel_initializer=conv2d_initializer,
-                                       bias_initializer=conv2d_initializer,
-                                       activation=None
+                                       bias_initializer=conv2d_initializer
                                        )
                 net = tf.contrib.layers.batch_norm(inputs=net,
                                                    activation_fn=tf.nn.relu,
                                                    is_training=self.training,
-                                                   decay=0.,
+                                                   decay=0.999,
                                                    epsilon=0.001)
 
             with tf.variable_scope("fc1"):
@@ -107,13 +104,7 @@ class DQN:
                                       kernel_initializer=xavier,
                                       bias_initializer=xavier,
                                       name='dense',
-                                      activation=None)
-
-                net = tf.contrib.layers.batch_norm(inputs=net,
-                                                   activation_fn=tf.nn.relu,
-                                                   is_training=self.training,
-                                                   decay=0.,
-                                                   epsilon=0.001)
+                                      activation=tf.nn.relu)
 
             with tf.variable_scope("fc2"):
                 net = tf.layers.dense(inputs=net,
@@ -168,6 +159,12 @@ class DQN:
         states = np.vstack([x[0] / 255. for x in train_batch])
         actions = np.array([x[1] for x in train_batch])
         rewards = np.array([x[2] for x in train_batch])
+
+        # reward가 모두 0이 아닌 경우 min,max 정규화한다.
+        if np.mean(rewards) != 0:
+            rewards -= np.min(rewards)
+            rewards /= np.max(rewards) - np.min(rewards)
+
         next_states = np.vstack([x[3] / 255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
         X = states
@@ -179,9 +176,8 @@ class DQN:
 
     def save(self, episode) -> None:
         print("model save")
-        sess = tf.get_default_session()
         path = os.path.join(self.checkpoint_dir, "{}_{}_model.ckpt".format(self.net_name, episode))
-        self.saver.save(sess, path)
+        self.saver.save(self.session, path)
 
 
 
