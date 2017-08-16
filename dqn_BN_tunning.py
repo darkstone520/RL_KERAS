@@ -111,8 +111,7 @@ class DQN:
                                       units=self.output_size,
                                       kernel_initializer=xavier,
                                       name='dense',
-                                      bias_initializer=xavier,
-                                      activation=tf.nn.relu)
+                                      bias_initializer=xavier)
 
             self.Qpred = net
 
@@ -125,7 +124,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, decay=0.99, momentum=0.9)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, decay=0., momentum=0.9)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
