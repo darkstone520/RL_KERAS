@@ -163,7 +163,7 @@ class DQN:
         # reward가 모두 0이 아닌 경우 min,max 정규화한다.
         if np.sum(rewards !=0) != 0:
             rewards -= np.min(rewards)
-            rewards /= np.max(rewards) - np.min(rewards)
+            rewards /= (np.max(rewards) - np.min(rewards))
 
         next_states = np.vstack([x[3] / 255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
