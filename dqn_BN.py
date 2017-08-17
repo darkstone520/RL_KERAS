@@ -57,11 +57,11 @@ class DQN:
             w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
 
             c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
-            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.999)
+            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
             c2 = tf.nn.conv2d(BN_1,f2, strides=[1, 2, 2, 1], padding="VALID")
-            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.999)
+            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
             c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
-            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.999)
+            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
 
             l1 = tf.contrib.layers.flatten(BN_3)
 
@@ -78,7 +78,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_max(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.9, decay=0.999)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.9, decay=0.)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
@@ -117,9 +117,9 @@ class DQN:
 
         # reward 정규화
         # reward가 모두 0이 아닌 경우 min,max 정규화한다.
-        if np.sum(rewards != 0) != 0:
-            rewards -= np.min(rewards)
-            rewards /= (np.max(rewards) - np.min(rewards))
+        # if np.sum(rewards != 0) != 0:
+        #     rewards -= np.min(rewards)
+        #     rewards /= (np.max(rewards) - np.min(rewards))
 
         next_states = np.vstack([x[3]/255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
