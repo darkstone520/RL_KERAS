@@ -64,6 +64,8 @@ class DQN:
                 self.training = False
             net = self.X
 
+
+
             with tf.variable_scope("layer1"):
                 net = tf.layers.conv2d(net,
                                        filters=32,
@@ -129,6 +131,8 @@ class DQN:
                                       )
             self.Qpred = net
 
+
+
         a_one_hot = tf.one_hot(self.a, self.output_size, 1.0, 0.0)
         q_val = tf.reduce_sum(tf.multiply(self.Qpred, a_one_hot), reduction_indices=1)
 
@@ -139,7 +143,12 @@ class DQN:
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
         optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, decay=0., momentum=0.9)
-        self.train = optimizer.minimize(self.loss)
+
+        update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(update_ops):
+          self.train = optimizer.minimize(self.loss)
+
+
 
     def setup_summary(self):
         episode_total_reward = tf.Variable(0.)
