@@ -108,7 +108,7 @@ if __name__ == "__main__":
         sess.run(copy_ops)
 
         # Episode 시작
-        for episode in range(1,MAX_EPISODES):
+        for episode in range(MAX_EPISODES):
 
             done = False            # 게임 종료 여부
             dead = False            # 죽었는지 여부
