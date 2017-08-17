@@ -50,16 +50,6 @@ class DQN:
             self.Y = tf.placeholder('float', [None])
             self.a = tf.placeholder('int64', [None])
 
-            ###########################################################
-            #######      variance_scaling_initializer의 파라미터     #####
-            ###########################################################
-            # To get Convolutional Architecture for Fast Feature Embedding, use:
-            # factor=1.0 mode='FAN_IN' uniform=True
-            # To get Delving Deep into Rectifiers, use (Default):
-            # factor=2.0 mode='FAN_IN' uniform=False
-            # To get Understanding the difficulty of training deep feedforward neural networks, use:
-            # factor=1.0,mode='FAN_AVG',uniform=True
-
             f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
             f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
             f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
@@ -67,11 +57,11 @@ class DQN:
             w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
 
             c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
-            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
+            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.999)
             c2 = tf.nn.conv2d(BN_1,f2, strides=[1, 2, 2, 1], padding="VALID")
-            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
+            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.999)
             c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
-            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
+            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.999)
 
             l1 = tf.contrib.layers.flatten(BN_3)
 
@@ -88,7 +78,7 @@ class DQN:
         linear_part = error - quadratic_part
         self.loss = tf.reduce_max(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.6, decay=0., centered=True)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.9, decay=0.999)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
@@ -124,6 +114,13 @@ class DQN:
         states = np.vstack([x[0]/255. for x in train_batch])
         actions = np.array([x[1] for x in train_batch])
         rewards = np.array([x[2] for x in train_batch])
+
+        # reward 정규화
+        # reward가 모두 0이 아닌 경우 min,max 정규화한다.
+        if np.sum(rewards != 0) != 0:
+            rewards -= np.min(rewards)
+            rewards /= (np.max(rewards) - np.min(rewards))
+
         next_states = np.vstack([x[3]/255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
         X = states
