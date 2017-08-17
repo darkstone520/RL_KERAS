@@ -1,12 +1,13 @@
-
 import numpy as np
 import tensorflow as tf
+import tensorflow.contrib.slim as slim
 import os
 from tensorflow.contrib.layers import variance_scaling_initializer
 
-class DQN:
 
-    def __init__(self, session: tf.Session, input_dim, output_size: int, name: str="main", checkpoint_dir="checkpoint") -> None:
+class DQN:
+    def __init__(self, session: tf.Session, input_dim, output_size: int, name: str = "main",
+                 checkpoint_dir="checkpoint") -> None:
 
         self.session = session
         self.input_dim = input_dim
@@ -26,7 +27,6 @@ class DQN:
                 print("No model is found")
                 os.makedirs(checkpoint_dir, exist_ok=True)
 
-
         # 텐서보드 설정
         self.sess = tf.InteractiveSession()
 
@@ -37,37 +37,97 @@ class DQN:
             'summary/breakout_dqn', self.sess.graph)
         self.sess.run(tf.global_variables_initializer())
 
-
     def _build_network(self, h_size=512, l_rate=0.00025) -> None:
 
-        if self.net_name == 'target':
-            self.is_training = False
-        else:
-            self.is_training = True
+        # initializer 선택
+        conv2d_initializer = tf.contrib.layers.xavier_initializer_conv2d()
+        xavier = tf.contrib.layers.xavier_initializer()
+
+        ###########################################################
+        #######      variance_scaling_initializer  파라미터     #####
+        ###########################################################
+        # To get Convolutional Architecture for Fast Feature Embedding, use:
+        # factor=1.0 mode='FAN_IN' uniform=True
+        # To get Delving Deep into Rectifiers, use (Default=he_normal):
+        # factor=2.0 mode='FAN_IN' uniform=False
+        # To get Understanding the difficulty of training deep feedforward neural networks, use:
+        # factor=1.0,mode='FAN_AVG',uniform=True
 
         with tf.variable_scope(self.net_name):
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
             self.Y = tf.placeholder('float', [None])
             self.a = tf.placeholder('int64', [None])
 
-            f1 = tf.get_variable("f1", shape=[8, 8, 4, 32], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-            f2 = tf.get_variable("f2", shape=[4, 4, 32, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-            f3 = tf.get_variable("f3", shape=[3, 3, 64, 64], initializer=tf.contrib.layers.xavier_initializer_conv2d())
-            w1 = tf.get_variable("w1", shape=[7 * 7 * 64, h_size], initializer=tf.contrib.layers.xavier_initializer())
-            w2 = tf.get_variable("w2", shape=[h_size, self.output_size], initializer=tf.contrib.layers.xavier_initializer())
+            if self.net_name == 'main':
+                self.training = True
+            else:
+                self.training = False
+            net = self.X
 
-            c1 = tf.nn.conv2d(self.X, f1, strides=[1, 4, 4, 1], padding="VALID")
-            BN_1 = tf.contrib.layers.batch_norm(inputs=c1, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
-            c2 = tf.nn.conv2d(BN_1,f2, strides=[1, 2, 2, 1], padding="VALID")
-            BN_2 = tf.contrib.layers.batch_norm(inputs=c2, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
-            c3 = tf.nn.conv2d(BN_2, f3, strides=[1, 1, 1, 1], padding='VALID')
-            BN_3 = tf.contrib.layers.batch_norm(inputs=c3, activation_fn=tf.nn.relu, is_training=self.is_training, decay=0.)
+            with tf.variable_scope("layer1"):
+                net = tf.layers.conv2d(net,
+                                       filters=32,
+                                       kernel_size=(8, 8),
+                                       strides=(4, 4),
+                                       name="conv",
+                                       kernel_initializer=conv2d_initializer
+                                       )
 
-            l1 = tf.contrib.layers.flatten(BN_3)
+                net = slim.batch_norm(net,
+                                      activation_fn=tf.nn.relu,
+                                      is_training=self.training
+                                      )
 
-            l2 = tf.nn.relu(tf.matmul(l1, w1))
-            self.Qpred = tf.matmul(l2, w2)
+            with tf.variable_scope("layer2"):
+                net = tf.layers.conv2d(net,
+                                       filters=64,
+                                       kernel_size=(4, 4),
+                                       strides=(2, 2),
+                                       name="conv",
+                                       kernel_initializer=conv2d_initializer
+                                       )
 
+                net = slim.batch_norm(net,
+                                      activation_fn=tf.nn.relu,
+                                      is_training=self.training
+                                      )
+
+            with tf.variable_scope("layer3"):
+                net = tf.layers.conv2d(net,
+                                       filters=64,
+                                       kernel_size=(3, 3),
+                                       strides=(1, 1),
+                                       name="conv",
+                                       kernel_initializer=conv2d_initializer
+                                       )
+
+                net = slim.batch_norm(net,
+                                      activation_fn=tf.nn.relu,
+                                      is_training=self.training
+                                      )
+
+
+            with tf.variable_scope("fc1"):
+                net = tf.contrib.layers.flatten(net)
+                net = tf.layers.dense(inputs=net,
+                                      units=h_size,
+                                      kernel_initializer=xavier,
+                                      name='dense'
+                                      )
+
+                net = slim.batch_norm(net,
+                                      activation_fn=tf.nn.relu,
+                                      is_training=self.training
+                                      )
+
+
+            with tf.variable_scope("fc2"):
+                net = tf.layers.dense(inputs=net,
+                                      units=self.output_size,
+                                      kernel_initializer=xavier,
+                                      name='dense'
+                                      )
+            self.Qpred = net
 
         a_one_hot = tf.one_hot(self.a, self.output_size, 1.0, 0.0)
         q_val = tf.reduce_sum(tf.multiply(self.Qpred, a_one_hot), reduction_indices=1)
@@ -76,9 +136,9 @@ class DQN:
         error = tf.abs(self.Y - q_val)
         quadratic_part = tf.clip_by_value(error, 0.0, 1.0)
         linear_part = error - quadratic_part
-        self.loss = tf.reduce_max(0.5 * tf.square(quadratic_part) + linear_part)
+        self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
 
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, momentum=0.9, decay=0.)
+        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, decay=0., momentum=0.9)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
@@ -101,40 +161,36 @@ class DQN:
         summary_op = tf.summary.merge_all()
         return summary_placeholders, update_ops, summary_op
 
-
     def predict(self, state: np.ndarray) -> np.ndarray:
 
         return self.session.run(self.Qpred, feed_dict={self.X: state})
-
 
     def replay_train(self, targetDQN, train_batch: list) -> float:
 
         DISCOUNT_RATE = 0.99
 
-        states = np.vstack([x[0]/255. for x in train_batch])
+        states = np.vstack([x[0] / 255. for x in train_batch])
         actions = np.array([x[1] for x in train_batch])
         rewards = np.array([x[2] for x in train_batch])
 
-        # reward 정규화
         # reward가 모두 0이 아닌 경우 min,max 정규화한다.
-        if np.sum(rewards != 0) != 0:
+        if np.sum(rewards !=0) != 0:
             rewards -= np.min(rewards)
             rewards /= (np.max(rewards) - np.min(rewards))
 
-        next_states = np.vstack([x[3]/255. for x in train_batch])
+        next_states = np.vstack([x[3] / 255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
         X = states
         Q_target = rewards + DISCOUNT_RATE * np.max(targetDQN.predict(next_states), axis=-1) * ~dead
 
         # self.avg_loss += self.session.run(self.train, feed_dict={self.X: X, self.Y: Q_target, self.a :actions })
-        loss, _ = self.session.run([self.loss, self.train], feed_dict={self.X: X, self.Y: Q_target, self.a :actions })
+        loss, _ = self.session.run([self.loss, self.train], feed_dict={self.X: X, self.Y: Q_target, self.a: actions})
         self.avg_loss += loss
 
-    def save(self, episode) -> None :
+    def save(self, episode) -> None:
         print("model save")
-        sess = tf.get_default_session()
-        path = os.path.join(self.checkpoint_dir, "{}_{}_model.ckpt".format(self.net_name,episode))
-        self.saver.save(sess, path)
+        path = os.path.join(self.checkpoint_dir, "{}_{}_model.ckpt".format(self.net_name, episode))
+        self.saver.save(self.session, path)
 
 
 
