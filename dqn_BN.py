@@ -34,7 +34,7 @@ class DQN:
         self.summary_placeholders, self.update_ops, self.summary_op = \
             self.setup_summary()
         self.summary_writer = tf.summary.FileWriter(
-            'summary/breakout_dqn', self.sess.graph)
+            'summary/dqn', self.sess.graph)
         self.sess.run(tf.global_variables_initializer())
 
     def _build_network(self, h_size=512, l_rate=0.00025) -> None:
