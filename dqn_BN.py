@@ -78,7 +78,6 @@ class DQN:
                 net = slim.batch_norm(net,
                                       activation_fn=tf.nn.relu,
                                       is_training=self.training,
-                                      param_initializers=xavier
                                       )
 
             with tf.variable_scope("layer2"):
@@ -87,13 +86,11 @@ class DQN:
                                        kernel_size=(4, 4),
                                        strides=(2, 2),
                                        name="conv",
-                                       kernel_initializer=conv2d_initializer,
                                        )
 
                 net = slim.batch_norm(net,
                                       activation_fn=tf.nn.relu,
                                       is_training=self.training,
-                                      param_initializers=xavier
                                       )
 
             with tf.variable_scope("layer3"):
@@ -108,7 +105,6 @@ class DQN:
                 net = slim.batch_norm(net,
                                       activation_fn=tf.nn.relu,
                                       is_training=self.training,
-                                      param_initializers=xavier
                                       )
 
 
@@ -118,7 +114,7 @@ class DQN:
                                       units=h_size,
                                       kernel_initializer=xavier,
                                       name='dense',
-                                      activation='relu'
+                                      activation=tf.nn.relu
                                       )
 
 
