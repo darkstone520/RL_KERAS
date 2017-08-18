@@ -117,7 +117,8 @@ class DQN:
                 net = tf.layers.dense(inputs=net,
                                       units=h_size,
                                       kernel_initializer=xavier,
-                                      name='dense'
+                                      name='dense',
+                                      activation='relu'
                                       )
 
 
