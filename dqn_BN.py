@@ -72,11 +72,11 @@ class DQN:
                                        kernel_size=(8, 8),
                                        strides=(4, 4),
                                        name="conv",
-                                       kernel_initializer=conv2d_initializer
+                                       kernel_initializer=conv2d_initializer,
+                                       activation=tf.nn.relu
                                        )
 
                 net = slim.batch_norm(net,
-                                      activation_fn=tf.nn.relu,
                                       is_training=self.training,
                                       )
 
@@ -86,10 +86,10 @@ class DQN:
                                        kernel_size=(4, 4),
                                        strides=(2, 2),
                                        name="conv",
+                                       activation=tf.nn.relu
                                        )
 
                 net = slim.batch_norm(net,
-                                      activation_fn=tf.nn.relu,
                                       is_training=self.training,
                                       )
 
@@ -99,13 +99,9 @@ class DQN:
                                        kernel_size=(3, 3),
                                        strides=(1, 1),
                                        name="conv",
-                                       kernel_initializer=conv2d_initializer
+                                       kernel_initializer=conv2d_initializer,
+                                       activation=tf.nn.relu
                                        )
-
-                net = slim.batch_norm(net,
-                                      activation_fn=tf.nn.relu,
-                                      is_training=self.training,
-                                      )
 
 
             with tf.variable_scope("fc1"):
