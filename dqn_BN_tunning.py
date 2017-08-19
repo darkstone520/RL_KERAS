@@ -41,6 +41,9 @@ class DQN:
         conv2d_initializer = tf.contrib.layers.xavier_initializer_conv2d()
         xavier = tf.contrib.layers.xavier_initializer()
 
+
+
+
         with tf.variable_scope(self.net_name):
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
             self.Y = tf.placeholder('float', [None])
@@ -59,7 +62,6 @@ class DQN:
                                        strides=(4, 4),
                                        name="conv",
                                        kernel_initializer=conv2d_initializer,
-                                       bias_initializer=conv2d_initializer,
                                        )
                 net = tf.contrib.layers.batch_norm(inputs=net,
                                                    activation_fn=tf.nn.relu,
@@ -73,8 +75,8 @@ class DQN:
                                        kernel_size=(4, 4),
                                        strides=(2, 2),
                                        name="conv",
-                                       kernel_initializer=conv2d_initializer,
-                                       bias_initializer=conv2d_initializer)
+                                       kernel_initializer=conv2d_initializer
+                                       )
 
                 net = tf.contrib.layers.batch_norm(inputs=net,
                                                    activation_fn=tf.nn.relu,
@@ -89,7 +91,6 @@ class DQN:
                                        strides=(1, 1),
                                        name="conv",
                                        kernel_initializer=conv2d_initializer,
-                                       bias_initializer=conv2d_initializer
                                        )
                 net = tf.contrib.layers.batch_norm(inputs=net,
                                                    activation_fn=tf.nn.relu,
@@ -102,7 +103,6 @@ class DQN:
                 net = tf.layers.dense(inputs=net,
                                       units=h_size,
                                       kernel_initializer=xavier,
-                                      bias_initializer=xavier,
                                       name='dense',
                                       activation=tf.nn.relu)
 
@@ -110,9 +110,8 @@ class DQN:
                 net = tf.layers.dense(inputs=net,
                                       units=self.output_size,
                                       kernel_initializer=xavier,
-                                      name='dense',
-                                      bias_initializer=xavier)
-
+                                      name='dense'
+                                      )
             self.Qpred = net
 
         a_one_hot = tf.one_hot(self.a, self.output_size, 1.0, 0.0)
