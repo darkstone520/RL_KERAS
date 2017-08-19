@@ -16,12 +16,12 @@ env = gym.wrappers.Monitor(env, directory="gym-results/", force=True)
 
 
 INPUT_DIM = [84,84,4]            # 신경망 INPUT DIM으로 frame 사이즈 (84,84) 4개(HISTORY_SIZE)를 1개의 state로 사용
-OUTPUT_SIZE = 7                  # 각 게임의 Action 갯수
+OUTPUT_SIZE = 4                  # 각 게임의 Action 갯수
 HISTORY_SIZE = 4                 # 신경망에 frame 화면을 몇 개씩 보여줄 것인지 설정
 REPLAY_MEMORY = 400000           # 게임을 진행하면서 샘플데이터(history, action, reward, next_history, dead)를 쌓아 놓을 que의 길이
 TRAIN_START = 50000              # 샘플데이터가 몇개 쌓였을 때 Train을 시작할 지 정하는 변수
 BATCH_SIZE = 32                  # 미니배치에서 사용할 배치사이즈 설정
-TARGET_UPDATE_FREQUENCY = 15000  # 몇 Frame 마다 Target 신경망을 업데이트 할 지 정하는 변수
+TARGET_UPDATE_FREQUENCY = 10000  # 몇 Frame 마다 Target 신경망을 업데이트 할 지 정하는 변수
 MAX_EPISODES = 50000             # 게임을 플레이 할 최대 EPISODE
 START_EXPLORATION = 1.0          # Epsilon 시작 값 (Exploration and Exploit Greedy 설정 관련 변수)
 FINAL_EXPLORATION = 0.1          # Epsilon 마지막 값 (Exploration and Exploit Greedy 설정 관련 변수)
@@ -145,12 +145,6 @@ if __name__ == "__main__":
                     real_action = 4
                 elif action == 3:
                     real_action = 5
-                elif action == 4:
-                    real_action = 12
-                elif action == 5:
-                    real_action = 13
-                elif action == 6:
-                    real_action = 14
 
 
                 # 위에서 발생한 action을 게임환경에서 움직이게 하고 반환된 state, reward, done, info 값을 저장함
@@ -181,16 +175,10 @@ if __name__ == "__main__":
                 # 목숨이 1개밖에 없는 게임의 경우 done이 되었을 때 dead 처리하기 위함
                 if done:
                     dead = True
-                    reward = - 1
-
-                if reward >= 60 and reward < 80:
-                    reward = 1
-
-                elif reward >= 80:
-                    reward = 1.2
+                    reward = -1
 
                 # DQN에서 train 시 reward를 정규화할 것이기 때문에 clip 해줄 필요가 없음
-                reward = np.clip(reward, -1., 1.2)
+                reward = np.clip(reward, -1., 1)
 
 
                 # 경험 리플레이 메모리에 데이터를 쌓음
