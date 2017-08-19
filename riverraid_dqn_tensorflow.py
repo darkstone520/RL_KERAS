@@ -176,6 +176,11 @@ if __name__ == "__main__":
                     dead = True
                     reward = -1
 
+
+                if reward == 80:
+                    reward = -1
+
+
                 # DQN에서 train 시 reward를 정규화할 것이기 때문에 clip 해줄 필요가 없음
                 reward = np.clip(reward, -1., 1)
 
