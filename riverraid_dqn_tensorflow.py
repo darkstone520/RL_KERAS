@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 from collections import deque
-import dqn_tunning
+import dqn_BN
 import matplotlib.pyplot as plt
 import gym
 from typing import List
@@ -21,7 +21,7 @@ HISTORY_SIZE = 4                 # 신경망에 frame 화면을 몇 개씩 보�
 REPLAY_MEMORY = 400000           # 게임을 진행하면서 샘플데이터(history, action, reward, next_history, dead)를 쌓아 놓을 que의 길이
 TRAIN_START = 50000              # 샘플데이터가 몇개 쌓였을 때 Train을 시작할 지 정하는 변수
 BATCH_SIZE = 32                  # 미니배치에서 사용할 배치사이즈 설정
-TARGET_UPDATE_FREQUENCY = 10000  # 몇 Frame 마다 Target 신경망을 업데이트 할 지 정하는 변수
+TARGET_UPDATE_FREQUENCY = 15000  # 몇 Frame 마다 Target 신경망을 업데이트 할 지 정하는 변수
 MAX_EPISODES = 50000             # 게임을 플레이 할 최대 EPISODE
 START_EXPLORATION = 1.0          # Epsilon 시작 값 (Exploration and Exploit Greedy 설정 관련 변수)
 FINAL_EXPLORATION = 0.1          # Epsilon 마지막 값 (Exploration and Exploit Greedy 설정 관련 변수)
@@ -89,9 +89,9 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
 
-        mainDQN = dqn_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
+        mainDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
         print("mainDQN 생성")
-        targetDQN = dqn_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
+        targetDQN = dqn_BN.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
         print("targetDQN 생성")
         sess.run(tf.global_variables_initializer())
         e = 1.0
