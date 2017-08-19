@@ -146,12 +146,8 @@ class DQN:
         min = np.min(rewards)
         max = np.max(rewards)
         if np.sum(rewards != 0) != 0:
-            print(rewards)
             rewards -= min
             rewards /= (max - min)
-            print("max : ", max)
-            print("min : ", min)
-            print(rewards)
 
         next_states = np.vstack([x[3] / 255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])

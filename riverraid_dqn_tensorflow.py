@@ -176,12 +176,10 @@ if __name__ == "__main__":
                 if start_life > info['ale.lives']:
                     dead = True
                     start_life = info['ale.lives']
-                    reward = -100
 
                 # 목숨이 1개밖에 없는 게임의 경우 done이 되었을 때 dead 처리하기 위함
                 if done:
                     dead = True
-                    reward = -100
 
                 # DQN에서 train 시 reward를 정규화할 것이기 때문에 clip 해줄 필요가 없음
                 #reward = np.clip(reward, -1., 1.)
