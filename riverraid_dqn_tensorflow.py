@@ -146,9 +146,8 @@ if __name__ == "__main__":
                 elif action == 3:
                     real_action = 5
 
-
                 # 위에서 발생한 action을 게임환경에서 움직이게 하고 반환된 state, reward, done, info 값을 저장함
-                next_state, reward, done, info = env.step(action)
+                next_state, reward, done, info = env.step(real_action)
                 global_step += 1           # action 한번에 step 한번
                 step += 1                  # action 한번에 step 한번
 
