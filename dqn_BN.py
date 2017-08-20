@@ -43,15 +43,6 @@ class DQN:
         conv2d_initializer = tf.contrib.layers.xavier_initializer_conv2d()
         xavier = tf.contrib.layers.xavier_initializer()
 
-        ###########################################################
-        #######      variance_scaling_initializer  파라미터     #####
-        ###########################################################
-        # To get Convolutional Architecture for Fast Feature Embedding, use:
-        # factor=1.0 mode='FAN_IN' uniform=True
-        # To get Delving Deep into Rectifiers, use (Default=he_normal):
-        # factor=2.0 mode='FAN_IN' uniform=False
-        # To get Understanding the difficulty of training deep feedforward neural networks, use:
-        # factor=1.0,mode='FAN_AVG',uniform=True
 
         with tf.variable_scope(self.net_name):
             self.X = tf.placeholder(tf.float32, [None, *self.input_dim], name="input_x")
@@ -174,9 +165,11 @@ class DQN:
         rewards = np.array([x[2] for x in train_batch])
 
         # reward가 모두 0이 아닌 경우 min,max 정규화한다.
-        if np.sum(rewards !=0) != 0:
-            rewards -= np.min(rewards)
-            rewards /= (np.max(rewards) - np.min(rewards))
+        # min = np.min(rewards)
+        # max = np.max(rewards)
+        # if np.sum(rewards !=0) != 0:
+        #     rewards -= min
+        #     rewards /= (max-min)
 
         next_states = np.vstack([x[3] / 255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
