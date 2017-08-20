@@ -49,7 +49,7 @@ def pre_processing(observe):
         resize(rgb2gray(observe), (84, 84), mode='constant') * 255)
     return processed_observe
 
-def crop_image(image, height_range=(47, 230), width_range=(0,160)):
+def crop_image(image, height_range=(47, 230)):
     """Crops top and bottom
 
     Args:
@@ -61,8 +61,7 @@ def crop_image(image, height_range=(47, 230), width_range=(0,160)):
         image (3-D array): Numpy image (max_H - min_H, W, C)
     """
     h_beg, h_end = height_range
-    w_beg, w_end = width_range
-    return image[h_beg:h_end, w_beg:w_end]
+    return image[h_beg:h_end, ...]
 
 # MainDQN의 weight 값을 TargetDQN에 복사하는 함수
 def get_copy_var_ops(*, dest_scope_name: str, src_scope_name: str) -> List[tf.Operation]:
@@ -110,7 +109,7 @@ if __name__ == "__main__":
             state , _, _, info = env.step(1)
             step, total_reward, start_life = 0, 0, info['ale.lives']
 
-            for _ in range(55):
+            for _ in range(random.randint(1, np.random.randint(1,30))):
                 state, _, _, _ = env.step(1)
 
 
@@ -152,6 +151,7 @@ if __name__ == "__main__":
                 global_step += 1           # action 한번에 step 한번
                 step += 1                  # action 한번에 step 한번
 
+
                 #plot_image(next_state)
                 next_state = pre_processing(next_state)                            # raw image data를 다시한번 전처리
                 #plot_image(next_state)
@@ -176,10 +176,16 @@ if __name__ == "__main__":
                 if done:
                     dead = True
 
+                if reward > 0 and reward <= 20:
+                    reward = 1
+                elif reward > 20:
+                    reward = 1.2
+                elif reward < 0:
+                    reward = 0
 
 
                 # DQN에서 train 시 reward를 정규화할 것이기 때문에 clip 해줄 필요가 없음
-                #reward = np.clip(reward, -1., 1)
+                reward = np.clip(reward, 0., 1.2)
 
 
                 # 경험 리플레이 메모리에 데이터를 쌓음
