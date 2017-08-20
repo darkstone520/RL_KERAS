@@ -109,7 +109,7 @@ if __name__ == "__main__":
             state , _, _, info = env.step(1)
             step, total_reward, start_life = 0, 0, info['ale.lives']
 
-            for _ in range(random.randint(1, np.random.randint(1,30))):
+            for _ in range(random.randint(1, np.random.randint(60,120))):
                 state, _, _, _ = env.step(1)
 
 
