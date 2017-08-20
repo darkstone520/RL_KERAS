@@ -138,7 +138,7 @@ if __name__ == "__main__":
                 # 12: 왼쪽대각선전진+발사, 13: 전진(천천히) + 발사,
                 # 14: 오른쪽대각선전진+발사
                 if action == 0:
-                    real_action = 1
+                    real_action = 13
                 elif action == 1:
                     real_action = 3
                 elif action == 2:
