@@ -25,7 +25,7 @@ TARGET_UPDATE_FREQUENCY = 10000  # 몇 Frame 마다 Target 신경망을 업데�
 MAX_EPISODES = 50000             # 게임을 플레이 할 최대 EPISODE
 START_EXPLORATION = 1.0          # Epsilon 시작 값 (Exploration and Exploit Greedy 설정 관련 변수)
 FINAL_EXPLORATION = 0.1          # Epsilon 마지막 값 (Exploration and Exploit Greedy 설정 관련 변수)
-EXPLORATION = 1300000            # Epsilon 시작부터 마지막 값까지 몇개의 step(time_step, frame, action)으로 줄여나갈 지 정하는 변수
+EXPLORATION = 1500000            # Epsilon 시작부터 마지막 값까지 몇개의 step(time_step, frame, action)으로 줄여나갈 지 정하는 변수
 
 
 
@@ -178,7 +178,7 @@ if __name__ == "__main__":
 
 
                 if reward == 80:
-                    reward = -1
+                    reward = 0
 
 
                 # DQN에서 train 시 reward를 정규화할 것이기 때문에 clip 해줄 필요가 없음
