@@ -128,7 +128,7 @@ if __name__ == "__main__":
 
                 # Epsilon이 1보다 작아지는 순간부터 랜덤의 확률로 random action 또는 모델 predict action을 취함
                 if np.random.rand() < e:
-                    action = np.random.choice(np.arange(4))
+                    action = np.random.choice(np.arange(3))
                 else:
                     # Choose an action by greedily from the Q-network
                     action = np.argmax(mainDQN.predict(history/255.))
@@ -151,6 +151,7 @@ if __name__ == "__main__":
 
 
                 next_state = pre_processing(next_state)                            # raw image data를 다시한번 전처리
+                #plot_image(next_state)
                 next_state = np.reshape([next_state], (1, 84, 84, 1))              # hisotry로 저장하기 위해 shape 변환
                 next_history = np.append(next_state, history[:, :, :, :3], axis=3) # new frame이 old frame을 밀어냄
 
