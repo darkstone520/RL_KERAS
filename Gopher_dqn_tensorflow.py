@@ -176,10 +176,14 @@ if __name__ == "__main__":
                 if done:
                     dead = True
 
+                if reward ==20:
+                    reward = 0.8
 
+                if reward > 20:
+                    reward = 1
 
                 # DQN에서 train 시 reward를 정규화할 것이기 때문에 clip 해줄 필요가 없음
-                #reward = np.clip(reward, -1., 1)
+                reward = np.clip(reward, 0., 1)
 
 
                 # 경험 리플레이 메모리에 데이터를 쌓음
