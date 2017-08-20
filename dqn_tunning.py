@@ -106,8 +106,8 @@ class DQN:
         quadratic_part = tf.clip_by_value(error, 0.0, 1.0)
         linear_part = error - quadratic_part
         self.loss = tf.reduce_mean(0.5 * tf.square(quadratic_part) + linear_part)
-        #optimizer = tf.train.MomentumOptimizer(learning_rate=l_rate, momentum=0.9)
-        optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, decay=0., momentum=0.9)
+        optimizer = tf.train.MomentumOptimizer(learning_rate=l_rate, momentum=0.9)
+        #optimizer = tf.train.RMSPropOptimizer(learning_rate=l_rate, epsilon=0.01, decay=0., momentum=0.9)
         self.train = optimizer.minimize(self.loss)
 
     def setup_summary(self):
@@ -142,12 +142,12 @@ class DQN:
         actions = np.array([x[1] for x in train_batch])
         rewards = np.array([x[2] for x in train_batch])
 
-        # reward가 모두 0이 아닌 경우 min,max 정규화한다.
-        # min = np.min(rewards)
-        # max = np.max(rewards)
-        # if np.sum(rewards != 0) != 0:
-        #     rewards -= min
-        #     rewards /= (max - min)
+        #reward가 모두 0이 아닌 경우 min,max 정규화한다.
+        min = np.min(rewards)
+        max = np.max(rewards)
+        if np.sum(rewards != 0) != 0:
+            rewards -= min
+            rewards /= (max - min)
 
         next_states = np.vstack([x[3] / 255. for x in train_batch])
         dead = np.array([x[4] for x in train_batch])
