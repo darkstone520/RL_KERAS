@@ -171,9 +171,9 @@ if __name__ == "__main__":
                 step += 1                  # action 한번에 step 한번
 
 
-                plot_image(next_state)
+                #plot_image(next_state)
                 next_state = pre_processing(next_state)                            # raw image data를 다시한번 전처리
-                plot_image(next_state)
+                #plot_image(next_state)
                 next_state = np.reshape([next_state], (1, 84, 84, 1))              # hisotry로 저장하기 위해 shape 변환
                 next_history = np.append(next_state, history[:, :, :, :3], axis=3) # new frame이 old frame을 밀어냄
                 total_reward += reward
