@@ -94,6 +94,10 @@ class DQN:
                                        activation=tf.nn.relu
                                        )
 
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      )
+
 
             with tf.variable_scope("fc1"):
                 net = tf.contrib.layers.flatten(net)
@@ -103,6 +107,7 @@ class DQN:
                                       name='dense',
                                       activation=tf.nn.relu
                                       )
+
 
 
             with tf.variable_scope("fc2"):
