@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 from collections import deque
-import dqn_tunning
+import dqn_deepmind
 import matplotlib.pyplot as plt
 import gym
 from typing import List
@@ -25,7 +25,7 @@ TARGET_UPDATE_FREQUENCY = 10000  # 몇 Frame 마다 Target 신경망을 업데�
 MAX_EPISODES = 50000             # 게임을 플레이 할 최대 EPISODE
 START_EXPLORATION = 1.0          # Epsilon 시작 값 (Exploration and Exploit Greedy 설정 관련 변수)
 FINAL_EXPLORATION = 0.1          # Epsilon 마지막 값 (Exploration and Exploit Greedy 설정 관련 변수)
-EXPLORATION = 1300000            # Epsilon 시작부터 마지막 값까지 몇개의 step(time_step, frame, action)으로 줄여나갈 지 정하는 변수
+EXPLORATION = 1000000            # Epsilon 시작부터 마지막 값까지 몇개의 step(time_step, frame, action)으로 줄여나갈 지 정하는 변수
 
 
 
@@ -95,9 +95,9 @@ if __name__ == "__main__":
 
     with tf.Session() as sess:
 
-        mainDQN = dqn_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
+        mainDQN = dqn_deepmind.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="main", )
         print("mainDQN 생성")
-        targetDQN = dqn_tunning.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
+        targetDQN = dqn_deepmind.DQN(sess, INPUT_DIM, OUTPUT_SIZE, name="target")
         print("targetDQN 생성")
         sess.run(tf.global_variables_initializer())
         e = 1.0
@@ -171,8 +171,9 @@ if __name__ == "__main__":
                 step += 1                  # action 한번에 step 한번
 
 
-
+                plot_image(next_state)
                 next_state = pre_processing(next_state)                            # raw image data를 다시한번 전처리
+                plot_image(next_state)
                 next_state = np.reshape([next_state], (1, 84, 84, 1))              # hisotry로 저장하기 위해 shape 변환
                 next_history = np.append(next_state, history[:, :, :, :3], axis=3) # new frame이 old frame을 밀어냄
                 total_reward += reward
@@ -192,7 +193,7 @@ if __name__ == "__main__":
                     start_life = info['ale.lives']
 
 
-                reward = np.clip(reward, 0., 1.)
+                reward = np.clip(reward, -1., 1.)
 
                 # 경험 리플레이 메모리에 데이터를 쌓음
                 replay_buffer.append((history, action, reward, next_history, dead))
