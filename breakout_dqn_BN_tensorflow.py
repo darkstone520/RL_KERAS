@@ -2,7 +2,7 @@ import numpy as np
 import tensorflow as tf
 import random
 from collections import deque
-import dqn_BN_tunning
+import dqn_BN
 import matplotlib.pyplot as plt
 import gym
 from typing import List
