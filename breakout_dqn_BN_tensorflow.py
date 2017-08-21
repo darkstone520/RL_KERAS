@@ -25,7 +25,7 @@ TARGET_UPDATE_FREQUENCY = 5000  # 몇 Frame 마다 Target 신경망을 업데이
 MAX_EPISODES = 50000             # 게임을 플레이 할 최대 EPISODE
 START_EXPLORATION = 1.0          # Epsilon 시작 값 (Exploration and Exploit Greedy 설정 관련 변수)
 FINAL_EXPLORATION = 0.1          # Epsilon 마지막 값 (Exploration and Exploit Greedy 설정 관련 변수)
-EXPLORATION = 650000            # Epsilon 시작부터 마지막 값까지 몇개의 step(time_step, frame, action)으로 줄여나갈 지 정하는 변수
+EXPLORATION = 750000            # Epsilon 시작부터 마지막 값까지 몇개의 step(time_step, frame, action)으로 줄여나갈 지 정하는 변수
 
 
 
