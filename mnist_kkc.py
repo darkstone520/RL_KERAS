@@ -115,9 +115,6 @@ class Model:
                                       activation=tf.nn.relu
                                       )
 
-                net = tf.layers.dropout(inputs=net,
-                                        rate=0.5,
-                                        training=self.training)
 
             # Logits (no activation) Layer: L5 Final FC 625 inputs -> 10 outputs
             self.logits = tf.layers.dense(inputs=net, units=10)
@@ -149,7 +146,7 @@ class Model:
 sess = tf.Session()
 
 models = []
-num_models = 2
+num_models = 5
 for m in range(num_models):
     models.append(Model(sess, "model" + str(m)))
 
