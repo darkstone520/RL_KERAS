@@ -25,6 +25,10 @@ class Model:
         self.name = name
         self._build_net()
 
+    def BN(self, input, training, scale, name, activation_fn=tf.nn.relu, decay=0.99):
+        return tf.contrib.layers.batch_norm(input, decay=decay, scale=scale, is_training=training,
+                                            updates_collections=None, scope=name, activation_fn=activation_fn)
+
     def _build_net(self):
 
         with tf.variable_scope(self.name):
@@ -54,10 +58,7 @@ class Model:
                                          kernel_initializer=conv_init
                                          )
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      activation_fn=tf.nn.relu
-                                      )
+                self.BN(net, self.training, scale=True, name="Conv1_BN")
 
                 net = tf.layers.max_pooling2d(inputs=net,
                                                 pool_size=[2, 2],
@@ -75,10 +76,8 @@ class Model:
                                          kernel_initializer=conv_init
                                          )
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      activation_fn=tf.nn.relu
-                                      )
+                self.BN(net, self.training, scale=True, name="Conv2_BN")
+
 
                 net = tf.layers.max_pooling2d(inputs=net,
                                                 pool_size=[2, 2],
@@ -86,6 +85,9 @@ class Model:
                                                 strides=2
                                                 )
 
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      )
 
             # Convolutional Layer #3 and Pooling Layer #3
             with tf.variable_scope("Conv3"):
@@ -96,18 +98,14 @@ class Model:
                                          kernel_initializer=conv_init,
                                          )
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      activation_fn=tf.nn.relu
-                                      )
+                self.BN(net, self.training, scale=True, name="Conv3_BN")
+
 
                 net = tf.layers.max_pooling2d(inputs=net,
                                                 pool_size=[2, 2],
                                                 padding="SAME",
                                                 strides=2
                                                 )
-
-
 
             # Dense Layer with Relu
             with tf.variable_scope("Dense1"):
