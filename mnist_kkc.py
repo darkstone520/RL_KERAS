@@ -61,10 +61,9 @@ class Model:
                                                 strides=2
                                                 )
 
-                net = tf.layers.dropout(inputs=net,
-                                             rate=0.7,
-                                             training=self.training
-                                             )
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      )
 
             # Convolutional Layer #2 and Pooling Layer #2
             with tf.variable_scope("Conv2"):
@@ -82,10 +81,9 @@ class Model:
                                                 strides=2
                                                 )
 
-                net = tf.layers.dropout(inputs=net,
-                                             rate=0.7,
-                                             training=self.training
-                                             )
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      )
 
             # Convolutional Layer #3 and Pooling Layer #3
             with tf.variable_scope("Conv3"):
@@ -103,10 +101,9 @@ class Model:
                                                 strides=2
                                                 )
 
-                net = tf.layers.dropout(inputs=net,
-                                             rate=0.7,
-                                             training=self.training
-                                             )
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      )
 
             # Dense Layer with Relu
             with tf.variable_scope("Dense1"):
@@ -116,9 +113,9 @@ class Model:
                                          kernel_initializer=he_normal,
                                          activation=tf.nn.relu)
 
-                net = tf.layers.dropout(inputs=net,
-                                             rate=0.5,
-                                             training=self.training)
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      )
 
             # Logits (no activation) Layer: L5 Final FC 625 inputs -> 10 outputs
             self.logits = tf.layers.dense(inputs=net, units=10)
