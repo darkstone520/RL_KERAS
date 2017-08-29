@@ -86,9 +86,6 @@ class Model:
                                                 strides=2
                                                 )
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      )
 
             # Convolutional Layer #3 and Pooling Layer #3
             with tf.variable_scope("Conv3"):
