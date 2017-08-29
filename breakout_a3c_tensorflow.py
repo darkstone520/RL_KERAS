@@ -270,19 +270,18 @@ class Agent(threading.Thread):
             rewards.append(r)
             deads.append(dead)
 
-
             if dead:
-                dead = False
-
-
-            if r == -1 or r == 1 or done:
                 time_step += 1
 
-                if time_step >= 5 or done:
+                if time_step >= 5 or dead:
                     self.train(states, actions, rewards, deads)
                     self.sess.run(self.global_to_local)
                     states, actions, rewards, deads = [], [], [], []
                     time_step = 0
+
+
+            if dead:
+                dead = False
 
         self.print(total_reward)
 
@@ -315,7 +314,6 @@ class Agent(threading.Thread):
         }
 
         values = self.sess.run(self.local.values, feed)
-
         rewards = discount_reward(rewards, deads, gamma=0.99)
         rewards = np.clip(rewards, 0., 1.)
         advantage = rewards - values
