@@ -110,11 +110,14 @@ class Model:
             with tf.variable_scope("Dense1"):
                 net = tf.reshape(net, [-1, 128 * 4 * 4])
                 net = tf.layers.dense(inputs=net,
-                                         units=625,
-                                         kernel_initializer=he_normal
+                                      units=625,
+                                      kernel_initializer=he_normal,
+                                      activation=tf.nn.relu
                                       )
 
-                self.BN(net, self.training, scale=True, name="Dense_BN")
+                net = tf.layers.dropout(inputs=net,
+                                        rate=0.5,
+                                        training=self.training)
 
             # Logits (no activation) Layer: L5 Final FC 625 inputs -> 10 outputs
             self.logits = tf.layers.dense(inputs=net, units=10)
@@ -174,8 +177,7 @@ print('Learning Finished!')
 test_size = len(mnist.test.labels)
 predictions = np.zeros(test_size * 10).reshape(test_size, 10)
 for m_idx, m in enumerate(models):
-    print(m_idx, 'Accuracy:', m.get_accuracy(
-        mnist.test.images, mnist.test.labels))
+    print(m_idx, 'Accuracy:', m.get_accuracy(mnist.test.images, mnist.test.labels))
     p = m.predict(mnist.test.images)
     predictions += p
 
