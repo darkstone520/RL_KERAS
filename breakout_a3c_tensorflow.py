@@ -243,6 +243,7 @@ class Agent(threading.Thread):
         while not done:
 
             a = self.choose_action(history)
+            time_step += 1
 
             if a == 0:
                 real_action = 1
@@ -270,14 +271,11 @@ class Agent(threading.Thread):
             rewards.append(r)
             deads.append(dead)
 
-            if dead:
-                time_step += 1
-
-                if time_step >= 5 or dead:
-                    self.train(states, actions, rewards, deads)
-                    self.sess.run(self.global_to_local)
-                    states, actions, rewards, deads = [], [], [], []
-                    time_step = 0
+            if time_step >= 20 or dead:
+                self.train(states, actions, rewards, deads)
+                self.sess.run(self.global_to_local)
+                states, actions, rewards, deads = [], [], [], []
+                time_step = 0
 
 
             if dead:
