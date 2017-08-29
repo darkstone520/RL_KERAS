@@ -114,7 +114,7 @@ class Model:
                                          kernel_initializer=he_normal
                                       )
 
-                self.BN(net, self.training, scale=True, name="Conv3_BN")
+                self.BN(net, self.training, scale=True, name="Dense_BN")
 
             # Logits (no activation) Layer: L5 Final FC 625 inputs -> 10 outputs
             self.logits = tf.layers.dense(inputs=net, units=10)
