@@ -254,6 +254,8 @@ class Agent(threading.Thread):
 
             s2, r, done, info = self.env.step(real_action)
 
+            r = np.clip(r, 0., 1.)
+
             if start_lives > info['ale.lives']:
                 start_lives -= 1
                 dead = True
@@ -302,7 +304,6 @@ class Agent(threading.Thread):
     def train(self, states, actions, rewards, deads):
         states = np.array(states)
         states = np.reshape([states], (-1,84,84,4))
-        print(states.shape)
         actions = np.array(actions)
         rewards = np.array(rewards)
         deads = np.array(deads)
@@ -313,7 +314,6 @@ class Agent(threading.Thread):
 
         values = self.sess.run(self.local.values, feed)
         rewards = discount_reward(rewards, deads, gamma=0.99)
-        rewards = np.clip(rewards, 0., 1.)
         advantage = rewards - values
         advantage -= np.mean(advantage)
         advantage /= np.std(advantage) + 1e-8
