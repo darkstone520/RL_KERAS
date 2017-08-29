@@ -3,7 +3,6 @@
 import tensorflow as tf
 import numpy as np
 import tensorflow.contrib.slim as slim
-
 from tensorflow.examples.tutorials.mnist import input_data
 
 tf.set_random_seed(777)  # reproducibility
@@ -112,9 +111,10 @@ class Model:
                 net = tf.reshape(net, [-1, 128 * 4 * 4])
                 net = tf.layers.dense(inputs=net,
                                          units=625,
-                                         kernel_initializer=he_normal,
-                                         activation=tf.nn.relu)
+                                         kernel_initializer=he_normal
+                                      )
 
+                self.BN(net, self.training, scale=True, name="Conv3_BN")
 
             # Logits (no activation) Layer: L5 Final FC 625 inputs -> 10 outputs
             self.logits = tf.layers.dense(inputs=net, units=10)
