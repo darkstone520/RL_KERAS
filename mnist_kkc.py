@@ -113,9 +113,6 @@ class Model:
                                          kernel_initializer=he_normal,
                                          activation=tf.nn.relu)
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      )
 
             # Logits (no activation) Layer: L5 Final FC 625 inputs -> 10 outputs
             self.logits = tf.layers.dense(inputs=net, units=10)
