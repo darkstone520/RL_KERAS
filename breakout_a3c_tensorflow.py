@@ -4,6 +4,7 @@ import numpy as np
 import threading
 import gym
 import os
+import random
 from skimage.transform import resize
 from skimage.color import rgb2gray
 
@@ -240,7 +241,12 @@ class Agent(threading.Thread):
         _, _, _, info = self.env.step(1)
         start_lives = info['ale.lives']
 
+        for _ in range(random.randint(1, 30)):
+            observe = next_observe
+            next_observe, _, _, _ = self.env.step(1)
+
         while not done:
+
 
             a = self.choose_action(history)
             time_step += 1
@@ -340,7 +346,7 @@ def main():
     coord = tf.train.Coordinator()
     monitor_dir = "monitors"
 
-    n_threads = 8
+    n_threads = 12
     input_shape = [84, 84, 4]
     output_dim = 3  # {1, 2, 3}
     global_network = A3CNetwork(name="global",
