@@ -229,10 +229,11 @@ class Agent(threading.Thread):
         actions = []
         rewards = []
         deads = []
+        info = None
         s = self.env.reset()
 
         for _ in range(random.randint(1, 30)):
-            s, _, _, _ = self.env.step(1)
+            s, _, _, info = self.env.step(1)
 
         s = pre_processing(s)
         history = np.stack((s, s, s, s), axis=2)
@@ -242,10 +243,7 @@ class Agent(threading.Thread):
         dead = False
         total_reward = 0
         time_step = 0
-        states, _, _, info = self.env.step(1)
         start_lives = info['ale.lives']
-
-
 
 
         while not done:
