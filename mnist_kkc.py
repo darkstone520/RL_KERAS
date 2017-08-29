@@ -51,9 +51,13 @@ class Model:
                                          filters=32,
                                          kernel_size=[3, 3],
                                          padding="SAME",
-                                         kernel_initializer=conv_init,
-                                         activation=tf.nn.relu
+                                         kernel_initializer=conv_init
                                          )
+
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      activation_fn=tf.nn.relu
+                                      )
 
                 net = tf.layers.max_pooling2d(inputs=net,
                                                 pool_size=[2, 2],
@@ -61,9 +65,6 @@ class Model:
                                                 strides=2
                                                 )
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      )
 
             # Convolutional Layer #2 and Pooling Layer #2
             with tf.variable_scope("Conv2"):
@@ -71,9 +72,13 @@ class Model:
                                          filters=64,
                                          kernel_size=[3, 3],
                                          padding="SAME",
-                                         kernel_initializer=conv_init,
-                                         activation=tf.nn.relu
+                                         kernel_initializer=conv_init
                                          )
+
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      activation_fn=tf.nn.relu
+                                      )
 
                 net = tf.layers.max_pooling2d(inputs=net,
                                                 pool_size=[2, 2],
@@ -92,8 +97,12 @@ class Model:
                                          kernel_size=[3, 3],
                                          padding="SAME",
                                          kernel_initializer=conv_init,
-                                         activation=tf.nn.relu
                                          )
+
+                net = slim.batch_norm(net,
+                                      is_training=self.training,
+                                      activation_fn=tf.nn.relu
+                                      )
 
                 net = tf.layers.max_pooling2d(inputs=net,
                                                 pool_size=[2, 2],
@@ -101,9 +110,7 @@ class Model:
                                                 strides=2
                                                 )
 
-                net = slim.batch_norm(net,
-                                      is_training=self.training,
-                                      )
+
 
             # Dense Layer with Relu
             with tf.variable_scope("Dense1"):
