@@ -305,7 +305,8 @@ class Agent(threading.Thread):
 
         action = self.sess.run(self.local.action_prob, feed)
         action = np.squeeze(action)
-
+        print(np.arange(self.output_dim))
+        print(action)
         return np.random.choice(np.arange(self.output_dim), p=action)
 
     def train(self, states, actions, rewards, deads):
@@ -347,7 +348,7 @@ def main():
     coord = tf.train.Coordinator()
     monitor_dir = "monitors"
 
-    n_threads = 12
+    n_threads = 8
     input_shape = [84, 84, 4]
     output_dim = 3  # {1, 2, 3}
     global_network = A3CNetwork(name="global",
