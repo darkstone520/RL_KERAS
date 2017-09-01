@@ -68,7 +68,7 @@ print('Learning Started!')
 # train my model
 for epoch in range(TRAIN_EPOCHS):
     avg_cost_list = np.zeros(len(models))
-    total_batch = round(int(len(TEST_DATA) / BATCH_SIZE))
+    total_batch = round(int(len(TRAIN_DATA_X) / BATCH_SIZE))
     for i in range(total_batch):
         # train each model
         for m_idx, m in enumerate(models):
