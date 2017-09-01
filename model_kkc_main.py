@@ -19,7 +19,7 @@ def plot_image(image):
     plt.show()
 
 def loadInputData():
-
+    print("Loading Data")
     with open(__DATA_PATH + "cat_dog_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
@@ -29,6 +29,7 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 def readData(lines):
+    print("Reading Data")
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.uint8)
     data, label = data[:,:-1], data[:,-1]
@@ -48,9 +49,7 @@ TRAIN_DATA, TEST_DATA = loadInputData()
 TRAIN_DATA_X, TRAIN_DATA_Y = readData(TRAIN_DATA)
 TEST_DATA_X, TEST_DATA_Y = readData(TEST_DATA)
 
-
-
-
+print("session open")
 # initialize
 sess = tf.Session()
 
