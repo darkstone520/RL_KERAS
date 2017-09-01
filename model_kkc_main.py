@@ -1,11 +1,8 @@
 from model_kkc import Model
 import tensorflow as tf
 import numpy as np
-import time
 import matplotlib.pyplot as plt
-from PIL import ImageGrab
 import random
-import math
 
 def plot_image(image):
     """image array를 plot으로 보여주는 함수

@@ -1,8 +1,4 @@
-# Lab 11 MNIST and Deep learning CNN
-# https://www.tensorflow.org/tutorials/layers
 import tensorflow as tf
-import numpy as np
-from tensorflow.examples.tutorials.mnist import input_data
 
 
 class Model:
