@@ -26,7 +26,7 @@ def loadInputData():
         lines = random.sample(lines, len(lines))
         train_last_index = round(TRAIN_RATE*len(lines))
         file.close()
-        return lines[:train_last_index], lines[train_last_index:]
+        yield lines[:train_last_index], lines[train_last_index:]
 
 def readData(lines):
     print("Reading Data")
