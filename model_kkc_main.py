@@ -31,7 +31,8 @@ def loadInputData():
 def readData(lines):
     print("line seperating")
     # data = [line.split(',')[:-1] for line in lines]
-    data = [line.split(',').__delitem__(-1) for line in lines]
+    data = (line.split(',')[:-1] for line in lines)
+
     print("array 변환중")
     # data = np.loadtxt(data, dtype=np.uint8)
     data = np.array(data, dtype=np.uint8)
