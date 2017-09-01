@@ -29,7 +29,6 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 def readData(lines):
-    print("Reading Data")
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.uint8)
     data, label = data[:,:-1], data[:,-1]
@@ -45,9 +44,13 @@ TRAIN_RATE = 0.8
 NUM_MODELS = 5
 LEARNING_RATE = 0.0001
 
-TRAIN_DATA, TEST_DATA = loadInputData()
-TRAIN_DATA_X, TRAIN_DATA_Y = readData(TRAIN_DATA)
-TEST_DATA_X, TEST_DATA_Y = readData(TEST_DATA)
+TRAIN_DATA_X, TEST_DATA_X = loadInputData()
+
+print("Train Reading Data")
+TRAIN_DATA_X, TRAIN_DATA_Y = readData(TRAIN_DATA_X)
+
+print("Test Reading Data")
+TEST_DATA_X, TEST_DATA_Y = readData(TEST_DATA_X)
 
 print("session open")
 # initialize
