@@ -66,26 +66,26 @@ for m in range(num_models):
 
 sess.run(tf.global_variables_initializer())
 
-# print('Learning Started!')
-#
-# # train my model
-# for epoch in range(1):#range(TRAIN_EPOCHS):
-#     avg_cost_list = np.zeros(len(models))
-#     total_batch = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
-#
-#     for i in range(total_batch):
-#         BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
-#         print("Batch Data Reading {}".format(i))
-#         TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
-#
-#         # train each model
-#         for m_idx, m in enumerate(models):
-#             c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
-#             avg_cost_list[m_idx] += c / total_batch
-#
-#     print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
-#
-# print('Learning Finished!')
+print('Learning Started!')
+
+# train my model
+for epoch in range(1):#range(TRAIN_EPOCHS):
+    avg_cost_list = np.zeros(len(models))
+    total_batch = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
+
+    for i in range(total_batch):
+        BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
+        print("Batch Data Reading {}".format(i))
+        TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
+
+        # train each model
+        for m_idx, m in enumerate(models):
+            c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
+            avg_cost_list[m_idx] += c / total_batch
+
+    print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
+
+print('Learning Finished!')
 START_BATCH_INDEX = 0
 TEST_EPHOCS=1
 print('Testing Started!')
@@ -93,10 +93,11 @@ print('Testing Started!')
 ensemble_accuracy = 0.
 model_accuracy = [0., 0.]
 cnt = 0
+TOTAL_BATCH = math.trunc(len(TEST_DATA)/BATCH_SIZE)
 print(len(TEST_DATA))
 for _ in range(TEST_EPHOCS):
-    for i in math.trunc(len(TEST_DATA)/BATCH_SIZE):
-        print("Batch Data Reading {}".format(i))
+    for i in range(TOTAL_BATCH):
+        print("Batch Data Reading {}/{}".format(i, TOTAL_BATCH))
         test_x_batch, test_y_batch = readBatchData(TEST_DATA, START_BATCH_INDEX)
         test_size = len(test_y_batch)
         predictions = np.zeros(test_size * 2).reshape(test_size, 2)
