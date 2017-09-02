@@ -40,7 +40,7 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 
-def readMiniBatch(lines):
+def loadMiniBatch(lines):
     """
     랜덤 미니배치함수
     txt파일에서 불러온 lines를 읽어서 input data인 numpy array로 바꾸기 위한 함수
@@ -62,7 +62,7 @@ def readMiniBatch(lines):
     label = np.array(label)
     return data, label
 
-def readBatch(lines, START_BATCH_INDEX):
+def loadBatch(lines, START_BATCH_INDEX):
     # 각 line은 string으로 되어 있으므로 split한다. split된 리스트 마지막에 '\n'이 추가되므로 [:-1]로 제거한다.
     lines = lines[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
     START_BATCH_INDEX += BATCH_SIZE
@@ -124,7 +124,7 @@ with tf.Session() as sess:
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
             #train_x_batch, train_y_batch = readMiniBatch(TRAIN_DATA)
-            train_x_batch, train_y_batch = readBatch(TRAIN_DATA)
+            train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
 
             # train each model
             for m_idx, m in enumerate(models):
@@ -167,7 +167,7 @@ with tf.Session() as sess:
             print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
 
             #test_x_batch, test_y_batch = readMiniBatch(TEST_DATA)
-            test_x_batch, test_y_batch = readBatch(TEST_DATA)
+            test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
 
             test_size = len(test_y_batch)
             predictions = np.zeros(test_size * 2).reshape(test_size, 2)
