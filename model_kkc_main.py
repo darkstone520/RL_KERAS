@@ -30,7 +30,6 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 def readBatchData(lines, START_BATCH_INDEX):
-    # data = np.loadtxt(data, dtype=np.uint8)
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
     data, label = data[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE,:-1], data[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE:,-1]
@@ -41,16 +40,15 @@ def readBatchData(lines, START_BATCH_INDEX):
     return data, label
 
 
-
 __DATA_PATH = "preprocessed_data/"
 
 IMG_SIZE = (144,144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 20
+TRAIN_EPOCHS = 10
 TRAIN_RATE = 0.8
-NUM_MODELS = 5
-LEARNING_RATE = 0.0001
+NUM_MODELS = 3
+LEARNING_RATE = 0.005
 
 TRAIN_DATA, TEST_DATA = loadInputData()
 
@@ -60,8 +58,7 @@ print("Session open")
 sess = tf.Session()
 
 models = []
-num_models = 2
-for m in range(num_models):
+for m in range(NUM_MODELS):
     models.append(Model(sess, "model" + str(m)))
 
 sess.run(tf.global_variables_initializer())
@@ -71,54 +68,56 @@ print('Learning Started!')
 # train my model
 for epoch in range(1):#range(TRAIN_EPOCHS):
     avg_cost_list = np.zeros(len(models))
-    TOTAL_BATCH = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
+    total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
 
-    for i in range(TOTAL_BATCH):
-        BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
-        print("Batch Data Reading {}/{}".format(i, TOTAL_BATCH))
-        TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
+    for i in range(total_batch_num):
+        batch_data = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX + BATCH_SIZE]
+        print("Batch Data Reading {}/{}".format(i+1, total_batch_num))
+        train_x_batch, train_y_batch = readBatchData(batch_data, START_BATCH_INDEX)
 
         # train each model
         for m_idx, m in enumerate(models):
-            c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
-            avg_cost_list[m_idx] += c / TOTAL_BATCH
+            c, _ = m.train(train_x_batch, train_y_batch)
+            avg_cost_list[m_idx] += c / total_batch_num
 
     print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
+    START_BATCH_INDEX = 0
 
 print('Learning Finished!')
-START_BATCH_INDEX = 0
-TEST_EPHOCS=1
-print('Testing Started!')
 
-ensemble_accuracy = 0.
-model_accuracy = [0., 0.]
-cnt = 0
+
+print('Testing Started!')
+TEST_EPHOCS=1
+ENSEMBLE_ACCURACY = 0.
+MODEL_ACCURACY = [0., 0., 0., 0., 0.]
+CNT = 0
+
 for _ in range(TEST_EPHOCS):
 
-    TOTAL_BATCH = math.trunc(len(TEST_DATA) / BATCH_SIZE)
-    for i in range(TOTAL_BATCH):
+    total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
+    for i in range(total_batch_num):
 
-        print("Batch Data Reading {}/{}".format(i, TOTAL_BATCH))
+        print("Batch Data Reading {}/{}".format(i+1, total_batch_num))
         test_x_batch, test_y_batch = readBatchData(TEST_DATA, START_BATCH_INDEX)
         test_size = len(test_y_batch)
         predictions = np.zeros(test_size * 2).reshape(test_size, 2)
-
         model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
         model_result[:, 0] = range(0, test_size)
 
         for idx, m in enumerate(models):
-            model_accuracy[idx] += m.get_accuracy(test_x_batch, test_y_batch)
+            MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
             p = m.predict(test_x_batch)
             model_result[:, 1] = np.argmax(p, 1)
             for result in model_result:
                 predictions[result[0], result[1]] += 1
 
         ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-        ensemble_accuracy += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-        cnt += 1
+        ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+        CNT += 1
+    START_BATCH_INDEX = 0
 
-for i in range(len(model_accuracy)):
-    print('Model ' + str(i) + ' : ', model_accuracy[i] / cnt)
-print('Ensemble Accuracy : ', sess.run(ensemble_accuracy) / cnt)
+for i in range(len(MODEL_ACCURACY)):
+    print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
 print('Testing Finished!')
 
