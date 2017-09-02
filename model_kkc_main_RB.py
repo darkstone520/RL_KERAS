@@ -55,8 +55,8 @@ def readBatchData(lines):
     data = data / 255.
 
     # 라벨을 one_hot으로 바꾼다.
-    label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    label = np.array(label)
+    #label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
+    label = np.array(label).reshape([-1,1])
     return data, label
 
 def shuffleBatchLines(lines):
@@ -73,10 +73,10 @@ def shuffleBatchLines(lines):
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
-TRAIN_EPOCHS = 20
-TEST_EPHOCHS = 3
+TRAIN_EPOCHS = 1
+TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 1
 LEARNING_RATE = 0.005
 ENSEMBLE_ACCURACY = 0.
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
@@ -122,7 +122,7 @@ with tf.Session() as sess:
         LAST_EPOCH = epoch+1
 
     print('Learning Finished!')
-    saver.save(sess, 'log/epoch_' + str(LAST_EPOCH + 1) + '.ckpt')
+    saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
 
     # 종료 시간 체크
     etime = time.time()

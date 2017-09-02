@@ -69,6 +69,7 @@ import time
 class Model:
     def __init__(self, sess, name):
         self.sess = sess
+        self.class_num = 2
         self.name = name
         self._build_net()
 
@@ -86,7 +87,10 @@ class Model:
 
                 self.X = tf.placeholder(tf.float32, [None, 144*144], name='x_data')
                 X_img = tf.reshape(self.X, shape=[-1, 144, 144, 1])
-                self.Y = tf.placeholder(tf.float32, [None, 2], name='y_data')
+
+                self.label = tf.placeholder(tf.int32, [None, 1])
+                one_hot = tf.one_hot(self.label, self.class_num, name='y_data')
+                self.Y = tf.reshape(one_hot, [-1, 2])
 
             ############################################################################################################
             ## ▣ Convolution 계층 - 1
@@ -289,10 +293,10 @@ class Model:
         return self.sess.run(self.logits, feed_dict={self.X: x_test, self.training: False})
 
     def get_accuracy(self, x_test, y_test):
-        return self.sess.run(self.accuracy, feed_dict={self.X: x_test, self.Y: y_test, self.training: False})
+        return self.sess.run(self.accuracy, feed_dict={self.X: x_test, self.label: y_test, self.training: False})
 
     def train(self, x_data, y_data):
-        return self.sess.run([self.cost, self.optimizer], feed_dict={self.X: x_data, self.Y: y_data, self.training: True})
+        return self.sess.run([self.cost, self.optimizer], feed_dict={self.X: x_data, self.label: y_data, self.training: True})
 
     ####################################################################################################################
     ## ▣ Parametric Relu or Leaky Relu
