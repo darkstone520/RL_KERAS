@@ -80,7 +80,6 @@ LEARNING_RATE = 0.005
 ENSEMBLE_ACCURACY = 0.
 MODEL_ACCURACY = [0., 0., 0.]
 MODELS = []
-
 CNT = 0
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
