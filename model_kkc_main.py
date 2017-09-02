@@ -28,22 +28,21 @@ def loadInputData():
         file.close()
         return lines[:train_last_index], lines[train_last_index:]
 
-def readData(lines, START_BATCH_INDEX):
-    print("line seperating")
-    # data = [line.split(',')[:-1] for line in lines]
-    data = [line.split(',')[:-1] for line in lines]
-
+def readBatchData(lines, START_BATCH_INDEX):
     print("array 변환중")
     # data = np.loadtxt(data, dtype=np.uint8)
-    data = np.array(data, dtype=np.uint8)
-    data, label = data[START_BATCH_INDEX+BATCH_SIZE,:-1], data[START_BATCH_INDEX+BATCH_SIZE:,-1]
+    data = [line.split(',')[:-1] for line in lines]
+    data = np.array(data, dtype=np.float32)
+    data, label = data[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE,:-1], data[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE:,-1]
+    data = data/255.
+    label = [ [1,0] if label == 0 else [0,1] for label in label.tolist()]
+    label = np.array(label)
     START_BATCH_INDEX += BATCH_SIZE
     return data, label
 
 __DATA_PATH = "preprocessed_data/"
 
 IMG_SIZE = (144,144)
-
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 TRAIN_EPOCHS = 20
@@ -58,7 +57,7 @@ TRAIN_DATA, TEST_DATA = loadInputData()
 # print("Test Reading Data")
 # TEST_DATA_X, TEST_DATA_Y = readData(TEST_DATA_X)
 
-print("session open")
+print("Session open")
 # initialize
 sess = tf.Session()
 
@@ -76,8 +75,10 @@ for epoch in range(TRAIN_EPOCHS):
     avg_cost_list = np.zeros(len(models))
     total_batch = round(int(len(TRAIN_DATA) / BATCH_SIZE))
     for i in range(total_batch):
-        TRAIN_DATA_X, TRAIN_DATA_Y = readData(TRAIN_DATA)
+        BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
+        TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
         # train each model
+        print(TRAIN_DATA_X.shape, TRAIN_DATA_Y.shape)
         for m_idx, m in enumerate(models):
             c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
             avg_cost_list[m_idx] += c / total_batch
