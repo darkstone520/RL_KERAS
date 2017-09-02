@@ -94,7 +94,6 @@ ensemble_accuracy = 0.
 model_accuracy = [0., 0.]
 cnt = 0
 TOTAL_BATCH = math.trunc(len(TEST_DATA)/BATCH_SIZE)
-print(len(TEST_DATA))
 for _ in range(TEST_EPHOCS):
     for i in range(TOTAL_BATCH):
         print("Batch Data Reading {}/{}".format(i, TOTAL_BATCH))
