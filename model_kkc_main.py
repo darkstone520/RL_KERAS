@@ -30,7 +30,6 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 def readBatchData(lines, START_BATCH_INDEX):
-    print("Batch Data Reading")
     # data = np.loadtxt(data, dtype=np.uint8)
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
@@ -41,17 +40,6 @@ def readBatchData(lines, START_BATCH_INDEX):
     START_BATCH_INDEX += BATCH_SIZE
     return data, label
 
-
-def readTestData(lines):
-    print("Test Data Reading")
-    # data = np.loadtxt(data, dtype=np.uint8)
-    data = [line.split(',')[:-1] for line in lines]
-    data = np.array(data, dtype=np.float32)
-    data, label = data[:,:-1], data[:,-1]
-    data = data/255.
-    label = [ [1,0] if label == 0 else [0,1] for label in label.tolist()]
-    label = np.array(label)
-    return data, label
 
 
 __DATA_PATH = "preprocessed_data/"
@@ -87,7 +75,9 @@ for epoch in range(1):#range(TRAIN_EPOCHS):
 
     for i in range(total_batch):
         BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
+        print("Batch Data Reading {}".format(i))
         TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
+
         # train each model
         for m_idx, m in enumerate(models):
             c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
@@ -105,7 +95,8 @@ model_accuracy = [0., 0.]
 cnt = 0
 
 for _ in range(TEST_EPHOCS):
-    for _ in math.trunc(len(TEST_DATA)/START_BATCH_INDEX):
+    for i in math.trunc(len(TEST_DATA)/START_BATCH_INDEX):
+        print("Batch Data Reading {}".format(i))
         test_x_batch, test_y_batch = readBatchData(TEST_DATA, START_BATCH_INDEX)
         test_size = len(test_y_batch)
         predictions = np.zeros(test_size * 2).reshape(test_size, 2)
