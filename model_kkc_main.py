@@ -106,6 +106,8 @@ print('Learning Finished!')
 # Test model and check accuracy
 test_size = math.trunc(len(TEST_DATA))
 TEST_DATA_X, TEST_DATA_Y = readTestData(TEST_DATA)
+print(TEST_DATA_X.shape, TEST_DATA_Y.shape)
+
 predictions = np.zeros(test_size * 2).reshape(test_size, 2)
 for m_idx, m in enumerate(models):
     print(m_idx, 'Accuracy:', m.get_accuracy(TEST_DATA_X, TEST_DATA_Y))
