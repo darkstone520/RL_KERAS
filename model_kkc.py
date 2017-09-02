@@ -90,7 +90,7 @@ class Model:
 
                 self.label = tf.placeholder(tf.int32, [None, 1])
                 one_hot = tf.one_hot(self.label, self.class_num, name='y_data')
-                self.Y = tf.reshape(one_hot, [-1, 2])
+                self.Y = tf.reshape(one_hot, [-1, self.class_num])
 
             ############################################################################################################
             ## ▣ Convolution 계층 - 1
