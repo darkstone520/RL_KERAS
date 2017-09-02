@@ -5,6 +5,17 @@ import matplotlib.pyplot as plt
 import random
 import math
 import time
+from drawnow import drawnow
+
+def monitor_train_cost():
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+    plt.title('Epoch per Cost Graph')
+    plt.legend(loc=1)
+    plt.xlabel('Epoch')
+    plt.ylabel('Cost')
+    plt.grid(True)
+
 
 def plot_image(image):
     """image array를 plot으로 보여주는 함수
@@ -48,7 +59,6 @@ def loadMiniBatch(lines):
     :return: numpy arrary의 input data로 X, Y(라벨)을 각각 나누어 리턴한다.
     """
     lines = random.sample(lines, BATCH_SIZE)
-
     # 각 line은 string으로 되어 있으므로 split한다. split된 리스트 마지막에 '\n'이 추가되므로 [:-1]로 제거한다.
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
@@ -91,15 +101,21 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 10
+TRAIN_EPOCHS = 1
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 1
 LEARNING_RATE = 0.005
 ENSEMBLE_ACCURACY = 0.
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
 CNT = 0
+
+# monitoring 관련 parameter
+mon_epoch_list = []
+mon_cost_list = [[] for m in range(NUM_MODELS)]
+mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
+mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 TRAIN_DATA, TEST_DATA = loadInputData()
@@ -129,7 +145,7 @@ with tf.Session() as sess:
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            if epoch > 1:
+            if epoch%2 ==0:
                 train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
             else:
                 train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
@@ -142,6 +158,11 @@ with tf.Session() as sess:
         print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
         START_BATCH_INDEX = 0
         LAST_EPOCH = epoch+1
+
+        mon_epoch_list.append(epoch + 1)
+        for idx, cost in enumerate(avg_cost_list):
+            mon_cost_list[idx].append(cost)
+        drawnow(monitor_train_cost)
 
     print('Learning Finished!')
     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
