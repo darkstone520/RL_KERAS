@@ -55,7 +55,7 @@ def readBatchData(lines):
     data = data / 255.
 
     # 라벨을 one_hot으로 바꾼다.
-    #label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
+    label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
     label = np.array(label).reshape([-1,1])
     return data, label
 
