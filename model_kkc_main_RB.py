@@ -63,6 +63,12 @@ def loadMiniBatch(lines):
     return data, label
 
 def loadBatch(lines, START_BATCH_INDEX):
+    """
+    일반 배치함수
+    :param lines: loadInputData함수를 통해 불러온 .txt파일의 lines
+    :param START_BATCH_INDEX: 데이터를 차례로 가져오기 위한 index 값
+    :return: numpy arrary의 input data로 X, Y(라벨)을 각각 나누어 리턴한다.
+    """
     # 각 line은 string으로 되어 있으므로 split한다. split된 리스트 마지막에 '\n'이 추가되므로 [:-1]로 제거한다.
     lines = lines[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
     START_BATCH_INDEX += BATCH_SIZE
@@ -85,7 +91,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 3
+TRAIN_EPOCHS = 10
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
@@ -123,8 +129,10 @@ with tf.Session() as sess:
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            #train_x_batch, train_y_batch = readMiniBatch(TRAIN_DATA)
-            train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
+            if epoch > 1:
+                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
+            else:
+                train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
 
             # train each model
             for m_idx, m in enumerate(models):
@@ -166,7 +174,7 @@ with tf.Session() as sess:
 
             print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
 
-            #test_x_batch, test_y_batch = readMiniBatch(TEST_DATA)
+            #test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
             test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
 
             test_size = len(test_y_batch)
