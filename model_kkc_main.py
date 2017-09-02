@@ -66,7 +66,7 @@ sess.run(tf.global_variables_initializer())
 print('Learning Started!')
 
 # train my model
-for epoch in range(1):#range(TRAIN_EPOCHS):
+for epoch in range(TRAIN_EPOCHS):
     avg_cost_list = np.zeros(len(models))
     total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
 
