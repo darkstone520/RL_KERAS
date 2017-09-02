@@ -29,14 +29,13 @@ def loadInputData():
         file.close()
         return lines[:train_last_index], lines[train_last_index:]
 
-def readBatchData(lines, START_BATCH_INDEX):
+def readBatchData(lines):
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
-    data, label = data[:-1], data[:,-1]
+    data, label = data[:,:-1], data[:,-1]
     data = data/255.
     label = [ [1,0] if label == 0 else [0,1] for label in label.tolist()]
     label = np.array(label)
-    START_BATCH_INDEX += BATCH_SIZE
     return data, label
 
 
@@ -45,7 +44,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144,144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 3
+TRAIN_EPOCHS = 10
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
 LEARNING_RATE = 0.005
@@ -67,13 +66,16 @@ print('Learning Started!')
 
 # train my model
 for epoch in range(TRAIN_EPOCHS):
+
     avg_cost_list = np.zeros(len(models))
     total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
-    batch_data = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX + BATCH_SIZE]
 
     for i in range(total_batch_num):
+
         print("Batch Data Reading {}/{}".format(i+1, total_batch_num))
-        train_x_batch, train_y_batch = readBatchData(batch_data, START_BATCH_INDEX)
+        batch_data = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX + BATCH_SIZE]
+        train_x_batch, train_y_batch = readBatchData(batch_data)
+        START_BATCH_INDEX += BATCH_SIZE
 
         # train each model
         for m_idx, m in enumerate(models):
@@ -95,11 +97,13 @@ CNT = 0
 for _ in range(TEST_EPHOCS):
 
     total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
-    batch_data = TEST_DATA[START_BATCH_INDEX:START_BATCH_INDEX + BATCH_SIZE]
 
     for i in range(total_batch_num):
+
         print("Batch Data Reading {}/{}".format(i+1, total_batch_num))
-        test_x_batch, test_y_batch = readBatchData(batch_data, START_BATCH_INDEX)
+        batch_data = TEST_DATA[START_BATCH_INDEX:START_BATCH_INDEX + BATCH_SIZE]
+        test_x_batch, test_y_batch = readBatchData(batch_data)
+        START_BATCH_INDEX += BATCH_SIZE
         test_size = len(test_y_batch)
         predictions = np.zeros(test_size * 2).reshape(test_size, 2)
         model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
