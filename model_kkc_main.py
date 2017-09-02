@@ -3,6 +3,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import random
+import math
 
 def plot_image(image):
     """image array를 plot으로 보여주는 함수
@@ -40,6 +41,19 @@ def readBatchData(lines, START_BATCH_INDEX):
     START_BATCH_INDEX += BATCH_SIZE
     return data, label
 
+
+def readTestData(lines):
+    print("array 변환중")
+    # data = np.loadtxt(data, dtype=np.uint8)
+    data = [line.split(',')[:-1] for line in lines]
+    data = np.array(data, dtype=np.float32)
+    data, label = data[:,:-1], data[:,-1]
+    data = data/255.
+    label = [ [1,0] if label == 0 else [0,1] for label in label.tolist()]
+    label = np.array(label)
+    return data, label
+
+
 __DATA_PATH = "preprocessed_data/"
 
 IMG_SIZE = (144,144)
@@ -71,9 +85,10 @@ sess.run(tf.global_variables_initializer())
 print('Learning Started!')
 
 # train my model
-for epoch in range(TRAIN_EPOCHS):
+for epoch in 1:#range(TRAIN_EPOCHS):
     avg_cost_list = np.zeros(len(models))
-    total_batch = round(int(len(TRAIN_DATA) / BATCH_SIZE))
+    total_batch = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
+
     for i in range(total_batch):
         BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
         TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
@@ -89,18 +104,19 @@ print('Learning Finished!')
 
 
 # Test model and check accuracy
-# test_size = len(TEST_DATA)
-# predictions = np.zeros(test_size * 2).reshape(test_size, 2)
-# for m_idx, m in enumerate(models):
-#     print(m_idx, 'Accuracy:', m.get_accuracy(TEST_DATA_X, TEST_DATA_Y))
-#     p = m.predict(TEST_DATA_X)
-#     predictions += p
-#
-# ensemble_correct_prediction = tf.equal(
-#     tf.argmax(predictions, 1), tf.argmax(TEST_DATA_Y, 1))
-# ensemble_accuracy = tf.reduce_mean(
-#     tf.cast(ensemble_correct_prediction, tf.float32))
-# print('Ensemble accuracy:', sess.run(ensemble_accuracy))
+test_size = math.trunc(len(TEST_DATA))
+TEST_DATA_X, TEST_DATA_Y = readTestData(TEST_DATA)
+predictions = np.zeros(test_size * 2).reshape(test_size, 2)
+for m_idx, m in enumerate(models):
+    print(m_idx, 'Accuracy:', m.get_accuracy(TEST_DATA_X, TEST_DATA_Y))
+    p = m.predict(TEST_DATA_X)
+    predictions += p
+
+ensemble_correct_prediction = tf.equal(
+    tf.argmax(predictions, 1), tf.argmax(TEST_DATA_Y, 1))
+ensemble_accuracy = tf.reduce_mean(
+    tf.cast(ensemble_correct_prediction, tf.float32))
+print('Ensemble accuracy:', sess.run(ensemble_accuracy))
 
 
 
