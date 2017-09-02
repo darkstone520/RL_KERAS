@@ -66,10 +66,6 @@ LEARNING_RATE = 0.0001
 
 TRAIN_DATA, TEST_DATA = loadInputData()
 
-# print("Train Reading Data")
-# TRAIN_DATA_X, TRAIN_DATA_Y = readData(TRAIN_DATA_X)
-# print("Test Reading Data")
-# TEST_DATA_X, TEST_DATA_Y = readData(TEST_DATA_X)
 
 print("Session open")
 # initialize
@@ -108,7 +104,7 @@ ensemble_accuracy = 0.
 model_accuracy = [0., 0.]
 cnt = 0
 
-for _ in TEST_EPHOCS:
+for _ in range(TEST_EPHOCS):
     for _ in math.trunc(len(TEST_DATA)/START_BATCH_INDEX):
         test_x_batch, test_y_batch = readBatchData(TEST_DATA, START_BATCH_INDEX)
         test_size = len(test_y_batch)
