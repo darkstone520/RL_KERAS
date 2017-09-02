@@ -104,7 +104,7 @@ with tf.Session() as sess:
 
         for i in range(total_batch_num):
 
-            print("Batch Data Reading {}/{}".format(i + 1, total_batch_num))
+            print("{} Epoch: Batch Data Reading {}/{}".format(epoch, i + 1, total_batch_num))
             batch_data = shuffleBatchLines(TRAIN_DATA)
             train_x_batch, train_y_batch = readBatchData(batch_data)
 
