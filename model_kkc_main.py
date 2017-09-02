@@ -100,24 +100,36 @@ for epoch in range(1):#range(TRAIN_EPOCHS):
     print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
 
 print('Learning Finished!')
+START_BATCH_INDEX = 0
+TEST_EPHOCS=1
+print('Testing Started!')
 
+ensemble_accuracy = 0.
+model_accuracy = [0., 0.]
+cnt = 0
 
-# Test model and check accuracy
-test_size = math.trunc(len(TEST_DATA))
-TEST_DATA_X, TEST_DATA_Y = readTestData(TEST_DATA)
-print(TEST_DATA_X.shape, TEST_DATA_Y.shape)
+for _ in TEST_EPHOCS:
+    for _ in math.trunc(len(TEST_DATA)/START_BATCH_INDEX):
+        test_x_batch, test_y_batch = readBatchData(TEST_DATA, START_BATCH_INDEX)
+        test_size = len(test_y_batch)
+        predictions = np.zeros(test_size * 2).reshape(test_size, 2)
 
-predictions = np.zeros(test_size * 2).reshape(test_size, 2)
-for m_idx, m in enumerate(models):
-    print(m_idx, 'Accuracy:', m.get_accuracy(TEST_DATA_X, TEST_DATA_Y))
-    p = m.predict(TEST_DATA_X)
-    predictions += p
+        model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
+        model_result[:, 0] = range(0, test_size)
 
-ensemble_correct_prediction = tf.equal(
-    tf.argmax(predictions, 1), tf.argmax(TEST_DATA_Y, 1))
-ensemble_accuracy = tf.reduce_mean(
-    tf.cast(ensemble_correct_prediction, tf.float32))
-print('Ensemble accuracy:', sess.run(ensemble_accuracy))
+        for idx, m in enumerate(models):
+            model_accuracy[idx] += m.get_accuracy(test_x_batch, test_y_batch)
+            p = m.predict(test_x_batch)
+            model_result[:, 1] = np.argmax(p, 1)
+            for result in model_result:
+                predictions[result[0], result[1]] += 1
 
+        ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
+        ensemble_accuracy += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+        cnt += 1
 
+for i in range(len(model_accuracy)):
+    print('Model ' + str(i) + ' : ', model_accuracy[i] / cnt)
+print('Ensemble Accuracy : ', sess.run(ensemble_accuracy) / cnt)
+print('Testing Finished!')
 
