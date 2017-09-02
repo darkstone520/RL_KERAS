@@ -71,17 +71,17 @@ print('Learning Started!')
 # train my model
 for epoch in range(1):#range(TRAIN_EPOCHS):
     avg_cost_list = np.zeros(len(models))
-    total_batch = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
+    TOTAL_BATCH = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
 
-    for i in range(total_batch):
+    for i in range(TOTAL_BATCH):
         BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
-        print("Batch Data Reading {}".format(i))
+        print("Batch Data Reading {}/{}".format(i, TOTAL_BATCH))
         TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
 
         # train each model
         for m_idx, m in enumerate(models):
             c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
-            avg_cost_list[m_idx] += c / total_batch
+            avg_cost_list[m_idx] += c / TOTAL_BATCH
 
     print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
 
@@ -93,9 +93,11 @@ print('Testing Started!')
 ensemble_accuracy = 0.
 model_accuracy = [0., 0.]
 cnt = 0
-TOTAL_BATCH = math.trunc(len(TEST_DATA)/BATCH_SIZE)
 for _ in range(TEST_EPHOCS):
+
+    TOTAL_BATCH = math.trunc(len(TEST_DATA) / BATCH_SIZE)
     for i in range(TOTAL_BATCH):
+
         print("Batch Data Reading {}/{}".format(i, TOTAL_BATCH))
         test_x_batch, test_y_batch = readBatchData(TEST_DATA, START_BATCH_INDEX)
         test_size = len(test_y_batch)
