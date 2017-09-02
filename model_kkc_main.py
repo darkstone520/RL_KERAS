@@ -30,7 +30,7 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 def readBatchData(lines, START_BATCH_INDEX):
-    print("array 변환중")
+    print("Batch Data Reading")
     # data = np.loadtxt(data, dtype=np.uint8)
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
@@ -43,7 +43,7 @@ def readBatchData(lines, START_BATCH_INDEX):
 
 
 def readTestData(lines):
-    print("array 변환중")
+    print("Test Data Reading")
     # data = np.loadtxt(data, dtype=np.uint8)
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
@@ -93,7 +93,6 @@ for epoch in range(1):#range(TRAIN_EPOCHS):
         BATCH_DATA = TRAIN_DATA[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
         TRAIN_DATA_X, TRAIN_DATA_Y = readBatchData(BATCH_DATA,START_BATCH_INDEX)
         # train each model
-        print(TRAIN_DATA_X.shape, TRAIN_DATA_Y.shape)
         for m_idx, m in enumerate(models):
             c, _ = m.train(TRAIN_DATA_X, TRAIN_DATA_Y)
             avg_cost_list[m_idx] += c / total_batch
