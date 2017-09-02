@@ -40,12 +40,15 @@ def loadInputData():
         return lines[:train_last_index], lines[train_last_index:]
 
 
-def readBatchData(lines):
+def readMiniBatch(lines):
     """
+    랜덤 미니배치함수
     txt파일에서 불러온 lines를 읽어서 input data인 numpy array로 바꾸기 위한 함수
     :param lines: loadInputData함수를 통해 불러온 .txt파일의 lines
     :return: numpy arrary의 input data로 X, Y(라벨)을 각각 나누어 리턴한다.
     """
+    lines = random.sample(lines, BATCH_SIZE)
+
     # 각 line은 string으로 되어 있으므로 split한다. split된 리스트 마지막에 '\n'이 추가되므로 [:-1]로 제거한다.
     data = [line.split(',')[:-1] for line in lines]
     data = np.array(data, dtype=np.float32)
@@ -59,20 +62,29 @@ def readBatchData(lines):
     label = np.array(label)
     return data, label
 
-def shuffleBatchLines(lines):
-    """
-    BATCH로 데이터를 학습시킬 때 데이터의 순서대로 학습시키는 것이 아닌 BATCH_SIZE만큼 무작위 랜덤으로 추출하는 함수
-    :param lines: TRAIN_DATA 또는 TEST_DATA의 lines(각 라인의 주소)
-    :return: 무작위로 추출한 BATCH_SIZE개의 데이터
-    """
-    lines = random.sample(lines, BATCH_SIZE)
-    return lines
+def readBatch(lines, START_BATCH_INDEX):
+    # 각 line은 string으로 되어 있으므로 split한다. split된 리스트 마지막에 '\n'이 추가되므로 [:-1]로 제거한다.
+    lines = lines[START_BATCH_INDEX:START_BATCH_INDEX+BATCH_SIZE]
+    START_BATCH_INDEX += BATCH_SIZE
+    data = [line.split(',')[:-1] for line in lines]
+    data = np.array(data, dtype=np.float32)
+
+    # X,Y를 나누는 작업
+    data, label = data[:, :-1], data[:, -1]
+    data = data / 255.
+
+    # 라벨을 one_hot으로 바꾼다.
+    label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
+    label = np.array(label)
+    return data, label
+
 
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
+START_BATCH_INDEX = 0
 TRAIN_EPOCHS = 3
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
@@ -104,13 +116,15 @@ with tf.Session() as sess:
     for epoch in range(TRAIN_EPOCHS):
 
         avg_cost_list = np.zeros(len(models))
+
+        # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
 
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            batch_data = shuffleBatchLines(TRAIN_DATA)
-            train_x_batch, train_y_batch = readBatchData(batch_data)
+            #train_x_batch, train_y_batch = readMiniBatch(TRAIN_DATA)
+            train_x_batch, train_y_batch = readBatch(TRAIN_DATA)
 
             # train each model
             for m_idx, m in enumerate(models):
@@ -145,13 +159,15 @@ with tf.Session() as sess:
 
     for _ in range(TEST_EPHOCHS):
 
+        # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
 
         for i in range(total_batch_num):
 
             print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
-            batch_data = shuffleBatchLines(TEST_DATA)
-            test_x_batch, test_y_batch = readBatchData(batch_data)
+
+            #test_x_batch, test_y_batch = readMiniBatch(TEST_DATA)
+            test_x_batch, test_y_batch = readBatch(TEST_DATA)
 
             test_size = len(test_y_batch)
             predictions = np.zeros(test_size * 2).reshape(test_size, 2)
@@ -169,6 +185,7 @@ with tf.Session() as sess:
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
             CNT += 1
 
+        START_BATCH_INDEX = 0
     for i in range(len(MODEL_ACCURACY)):
         print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
     print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
