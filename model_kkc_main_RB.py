@@ -73,12 +73,14 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 TRAIN_EPOCHS = 1
+TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 1
 LEARNING_RATE = 0.005
-TEST_EPHOCS = 1
 ENSEMBLE_ACCURACY = 0.
 MODEL_ACCURACY = [0., 0., 0.]
+MODELS = []
+
 CNT = 0
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
@@ -88,9 +90,8 @@ TRAIN_DATA, TEST_DATA = loadInputData()
 with tf.Session() as sess:
 
     # initialize
-    models = []
     for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m)))
+        MODELS.append(Model(sess, "model" + str(m)))
 
     sess.run(tf.global_variables_initializer())
 
@@ -99,7 +100,7 @@ with tf.Session() as sess:
     # train my model
     for epoch in range(TRAIN_EPOCHS):
 
-        avg_cost_list = np.zeros(len(models))
+        avg_cost_list = np.zeros(len(MODELS))
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
 
         for i in range(total_batch_num):
@@ -109,7 +110,7 @@ with tf.Session() as sess:
             train_x_batch, train_y_batch = readBatchData(batch_data)
 
             # train each model
-            for m_idx, m in enumerate(models):
+            for m_idx, m in enumerate(MODELS):
                 c, _ = m.train(train_x_batch, train_y_batch)
                 avg_cost_list[m_idx] += c / total_batch_num
 
@@ -125,7 +126,7 @@ with tf.Session() as sess:
     print('Test Start!')
     sess.run(tf.global_variables_initializer())
 
-    for _ in range(TEST_EPHOCS):
+    for _ in range(TEST_EPHOCHS):
 
         total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
 
@@ -140,7 +141,7 @@ with tf.Session() as sess:
             model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
             model_result[:, 0] = range(0, test_size)
 
-            for idx, m in enumerate(models):
+            for idx, m in enumerate(MODELS):
                 MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
                 p = m.predict(test_x_batch)
                 model_result[:, 1] = np.argmax(p, 1)
