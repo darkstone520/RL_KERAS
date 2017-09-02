@@ -108,7 +108,7 @@ with tf.Session() as sess:
 
         for i in range(total_batch_num):
 
-            print("{} Epoch: Batch Data Reading {}/{}".format(epoch, i + 1, total_batch_num))
+            print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
             batch_data = shuffleBatchLines(TRAIN_DATA)
             train_x_batch, train_y_batch = readBatchData(batch_data)
 
@@ -119,7 +119,7 @@ with tf.Session() as sess:
 
         print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
         START_BATCH_INDEX = 0
-        LAST_EPOCH = epoch
+        LAST_EPOCH = epoch+1
 
     print('Learning Finished!')
     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH + 1) + '.ckpt')
@@ -149,7 +149,7 @@ with tf.Session() as sess:
 
         for i in range(total_batch_num):
 
-            print("Batch Data Reading {}/{}".format(i + 1, total_batch_num))
+            print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
             batch_data = shuffleBatchLines(TEST_DATA)
             test_x_batch, test_y_batch = readBatchData(batch_data)
 
