@@ -307,7 +307,7 @@ class Model:
         return pos + neg
 
     ####################################################################################################################
-    ## ▣ Maxout - Created by 지혜승
+    ## ▣ Maxout
     ##  ⊙ Convolution 계층이나 FC 계층에서 활성화 함수 대신 dropout 의 효율을 극대화하기 위해 사용하는 함수
     ##  ⊙ conv 또는 affine 계층을 거친 값들에 대해 k 개씩 그룹핑을 수행하고 해당 그룹내에서 가장 큰 값을 다음 계층으로
     ##     보내는 기법
@@ -328,7 +328,7 @@ class Model:
         return outputs
 
     ####################################################################################################################
-    ## ▣ Batch Normalization - Created by 조원태,박상범
+    ## ▣ Batch Normalization
     ##  ⊙ training 하는 과정 자체를 전체적으로 안정화하여 학습 속도를 가속시킬 수 있는 방법
     ##  ⊙ Network의 각 층이나 Activation 마다 input_data 의 distribution 을 평균 0, 표준편차 1인 input_data로 정규화시키는 방법
     ##  ⊙ 초기 파라미터 --> beta : 0 , gamma : 1 , decay : 0.99 , epsilon : 0.001
@@ -337,7 +337,7 @@ class Model:
         return tf.contrib.layers.batch_norm(input, decay=decay, scale=scale, is_training=training, updates_collections=None, scope=name)
 
     ####################################################################################################################
-    ## ▣ dynamic_learning - Created by 조원태
+    ## ▣ dynamic_learning
     ##  ⊙ epoch 가 클수록 아니면 early_stopping 이 시작되면 점차적으로 learning_rate의 값을 줄여 안정적인 훈련이 가능한 방법
     ####################################################################################################################
     def dynamic_learning(self,learning_rate,earlystop,epoch):

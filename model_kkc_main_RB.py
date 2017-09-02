@@ -46,12 +46,11 @@ def shuffleBatchLines(lines):
     return lines
 
 
-
 __DATA_PATH = "preprocessed_data/"
 
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
-TRAIN_EPOCHS = 10
+TRAIN_EPOCHS = 20
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
 LEARNING_RATE = 0.005
