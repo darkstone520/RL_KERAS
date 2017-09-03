@@ -16,7 +16,6 @@ def monitor_train_cost():
     plt.ylabel('Cost')
     plt.grid(True)
 
-
 def plot_image(image):
     """image array를 plot으로 보여주는 함수
     Args:
@@ -44,12 +43,14 @@ def loadInputData():
 
         # 불러온 전체 lines를 셔플한다.
         lines = random.sample(lines, len(lines))
+        lines = random.sample(lines, len(lines))
+        lines = random.sample(lines, len(lines))
 
         # train data를 일정 rate 만큼 뽑아오기 위한 단계
         train_last_index = round(TRAIN_RATE * len(lines))
         file.close()
         # return 시 데이터를 섞어서 return 한다.
-        return shuffleAllLines(lines[:train_last_index]), shuffleAllLines(lines[train_last_index:])
+        return lines[:train_last_index], lines[train_last_index:]
 
 
 def loadMiniBatch(lines):
@@ -95,8 +96,7 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label)
     return data, label
 
-def shuffleAllLines(lines):
-    return random.sample(lines, len(lines))
+
 
 
 # 학습을 위한 기본적인 셋팅
