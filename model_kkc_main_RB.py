@@ -48,6 +48,7 @@ def loadInputData():
         # train data를 일정 rate 만큼 뽑아오기 위한 단계
         train_last_index = round(TRAIN_RATE * len(lines))
         file.close()
+        # return 시 데이터를 섞어서 return 한다.
         return shuffleData(lines[:train_last_index]), shuffleData(lines[train_last_index:])
 
 
