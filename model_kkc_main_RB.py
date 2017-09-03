@@ -48,7 +48,7 @@ def loadInputData():
         # train data를 일정 rate 만큼 뽑아오기 위한 단계
         train_last_index = round(TRAIN_RATE * len(lines))
         file.close()
-        return lines[:train_last_index], lines[train_last_index:]
+        return shuffleData(lines[:train_last_index]), shuffleData(lines[train_last_index:])
 
 
 def loadMiniBatch(lines):
@@ -94,6 +94,8 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label)
     return data, label
 
+def shuffleData(lines):
+    return random.sample(lines, len(lines))
 
 
 # 학습을 위한 기본적인 셋팅
