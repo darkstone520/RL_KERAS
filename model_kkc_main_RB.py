@@ -96,7 +96,52 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label)
     return data, label
 
+def validateModel(ENSEMBLE_ACCURACY, CNT):
+    with tf.Session() as sess:
 
+        print('Test Start!')
+        models = []
+        for m in range(NUM_MODELS):
+            models.append(Model(sess, "model" + str(m)))
+
+        sess.run(tf.global_variables_initializer())
+        saver = tf.train.Saver()
+        saver.restore(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
+
+        for _ in range(TEST_EPHOCHS):
+
+            # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
+            total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
+
+            for i in range(total_batch_num):
+
+                print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
+
+                # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
+                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
+
+                test_size = len(test_y_batch)
+                predictions = np.zeros(test_size * 2).reshape(test_size, 2)
+                model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
+                model_result[:, 0] = range(0, test_size)
+
+                for idx, m in enumerate(models):
+                    MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
+                    p = m.predict(test_x_batch)
+                    model_result[:, 1] = np.argmax(p, 1)
+                    for result in model_result:
+                        predictions[result[0], result[1]] += 1
+
+                ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
+                ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                CNT += 1
+
+            START_BATCH_INDEX = 0
+        for i in range(len(MODEL_ACCURACY)):
+            print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+        print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
+        print('Testing Finished!')
+        return ENSEMBLE_ACCURACY
 
 
 # 학습을 위한 기본적인 셋팅
@@ -104,10 +149,10 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 12
+TRAIN_EPOCHS = 1
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 2
+NUM_MODELS = 1
 ENSEMBLE_ACCURACY = 0.
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
@@ -175,50 +220,52 @@ with tf.Session() as sess:
 
 
 tf.reset_default_graph()
+ENSEMBLE_ACCURACY = validateModel()
+print(ENSEMBLE_ACCURACY)
 
 # TEST
-with tf.Session() as sess:
-
-    print('Test Start!')
-    models = []
-    for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m)))
-
-    sess.run(tf.global_variables_initializer())
-    saver = tf.train.Saver()
-    saver.restore(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
-
-    for _ in range(TEST_EPHOCHS):
-
-        # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
-        total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
-
-        for i in range(total_batch_num):
-
-            print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
-
-            #test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-            test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
-
-            test_size = len(test_y_batch)
-            predictions = np.zeros(test_size * 2).reshape(test_size, 2)
-            model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
-            model_result[:, 0] = range(0, test_size)
-
-            for idx, m in enumerate(models):
-                MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
-                p = m.predict(test_x_batch)
-                model_result[:, 1] = np.argmax(p, 1)
-                for result in model_result:
-                    predictions[result[0], result[1]] += 1
-
-            ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-            ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-            CNT += 1
-
-        START_BATCH_INDEX = 0
-    for i in range(len(MODEL_ACCURACY)):
-        print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-    print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
-    print('Testing Finished!')
+# with tf.Session() as sess:
+#
+#     print('Test Start!')
+#     models = []
+#     for m in range(NUM_MODELS):
+#         models.append(Model(sess, "model" + str(m)))
+#
+#     sess.run(tf.global_variables_initializer())
+#     saver = tf.train.Saver()
+#     saver.restore(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
+#
+#     for _ in range(TEST_EPHOCHS):
+#
+#         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
+#         total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
+#
+#         for i in range(total_batch_num):
+#
+#             print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
+#
+#             #test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
+#             test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
+#
+#             test_size = len(test_y_batch)
+#             predictions = np.zeros(test_size * 2).reshape(test_size, 2)
+#             model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
+#             model_result[:, 0] = range(0, test_size)
+#
+#             for idx, m in enumerate(models):
+#                 MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
+#                 p = m.predict(test_x_batch)
+#                 model_result[:, 1] = np.argmax(p, 1)
+#                 for result in model_result:
+#                     predictions[result[0], result[1]] += 1
+#
+#             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
+#             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+#             CNT += 1
+#
+#         START_BATCH_INDEX = 0
+#     for i in range(len(MODEL_ACCURACY)):
+#         print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+#     print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
+#     print('Testing Finished!')
 
