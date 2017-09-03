@@ -96,7 +96,12 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label)
     return data, label
 
-def validateModel(ENSEMBLE_ACCURACY, CNT):
+def validateModel(MODEL_ACCURACY):
+
+    START_BATCH_INDEX = 0
+    ENSEMBLE_ACCURACY = 0
+    CNT = 0
+
     with tf.Session() as sess:
 
         print('Test Start!')
@@ -220,8 +225,7 @@ with tf.Session() as sess:
 
 
 tf.reset_default_graph()
-ENSEMBLE_ACCURACY = validateModel(ENSEMBLE_ACCURACY, CNT)
-print(ENSEMBLE_ACCURACY)
+validateModel(MODEL_ACCURACY)
 
 # TEST
 # with tf.Session() as sess:
