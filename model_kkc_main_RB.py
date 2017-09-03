@@ -220,7 +220,7 @@ with tf.Session() as sess:
 
 
 tf.reset_default_graph()
-ENSEMBLE_ACCURACY = validateModel()
+ENSEMBLE_ACCURACY = validateModel(ENSEMBLE_ACCURACY, CNT)
 print(ENSEMBLE_ACCURACY)
 
 # TEST
