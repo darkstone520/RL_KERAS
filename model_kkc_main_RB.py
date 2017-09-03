@@ -49,7 +49,7 @@ def loadInputData():
         train_last_index = round(TRAIN_RATE * len(lines))
         file.close()
         # return 시 데이터를 섞어서 return 한다.
-        return shuffleData(lines[:train_last_index]), shuffleData(lines[train_last_index:])
+        return shuffleAllLines(lines[:train_last_index]), shuffleAllLines(lines[train_last_index:])
 
 
 def loadMiniBatch(lines):
@@ -95,7 +95,7 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label)
     return data, label
 
-def shuffleData(lines):
+def shuffleAllLines(lines):
     return random.sample(lines, len(lines))
 
 
