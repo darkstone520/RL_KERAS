@@ -30,7 +30,6 @@ def plot_image(image):
         plt.imshow(image)
     plt.show()
 
-
 def loadInputData():
     """
     텍스트화된 이미지 txt파일을 로드하는 함수
@@ -51,7 +50,6 @@ def loadInputData():
         file.close()
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
-
 
 def loadMiniBatch(lines):
     """
@@ -96,6 +94,7 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label)
     return data, label
 
+# early stopping하기 위해 테스트 하는 것을 별도 함수로 구현
 def validateModel(MODEL_ACCURACY):
 
     START_BATCH_INDEX = 0
@@ -195,7 +194,7 @@ with tf.Session() as sess:
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            if epoch == 0:
+            if epoch < 2:
                 train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
             else:
                 train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
@@ -225,49 +224,5 @@ with tf.Session() as sess:
 tf.reset_default_graph()
 validateModel(MODEL_ACCURACY)
 
-# TEST
-# with tf.Session() as sess:
-#
-#     print('Test Start!')
-#     models = []
-#     for m in range(NUM_MODELS):
-#         models.append(Model(sess, "model" + str(m)))
-#
-#     sess.run(tf.global_variables_initializer())
-#     saver = tf.train.Saver()
-#     saver.restore(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
-#
-#     for _ in range(TEST_EPHOCHS):
-#
-#         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
-#         total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
-#
-#         for i in range(total_batch_num):
-#
-#             print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
-#
-#             #test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-#             test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
-#
-#             test_size = len(test_y_batch)
-#             predictions = np.zeros(test_size * 2).reshape(test_size, 2)
-#             model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
-#             model_result[:, 0] = range(0, test_size)
-#
-#             for idx, m in enumerate(models):
-#                 MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
-#                 p = m.predict(test_x_batch)
-#                 model_result[:, 1] = np.argmax(p, 1)
-#                 for result in model_result:
-#                     predictions[result[0], result[1]] += 1
-#
-#             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-#             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-#             CNT += 1
-#
-#         START_BATCH_INDEX = 0
-#     for i in range(len(MODEL_ACCURACY)):
-#         print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-#     print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
-#     print('Testing Finished!')
+
 
