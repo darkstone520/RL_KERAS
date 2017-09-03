@@ -101,10 +101,10 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 6
+TRAIN_EPOCHS = 12
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 2
 ENSEMBLE_ACCURACY = 0.
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
@@ -144,7 +144,7 @@ with tf.Session() as sess:
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            if epoch%2 == 0:
+            if epoch > 0:
                 train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
             else:
                 train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
