@@ -144,7 +144,7 @@ with tf.Session() as sess:
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            if epoch>5:
+            if epoch%2 == 0:
                 train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
             else:
                 train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
