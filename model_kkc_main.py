@@ -216,7 +216,10 @@ with tf.Session() as sess:
 
         # 랜덤 미니배치 중복없이 할 경우 매 에폭마다 Train Data를 섞어준다.
         if RANDOM_MINI_BATCH_ORDER:
+            print("랜덤 미니배치(중복불가)를 수행합니다.")
             TRAIN_DATA = shuffleLines(TRAIN_DATA)
+        else:
+            print("랜덤 미니배치(중복허용)를 수행합니다.")
 
         for i in range(total_batch_num):
 
@@ -237,8 +240,7 @@ with tf.Session() as sess:
                 else:
                     train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
 
-
-            # train each model
+            # Train each model
             for m_idx, m in enumerate(models):
                 c, _ = m.train(train_x_batch, train_y_batch)
                 avg_cost_list[m_idx] += c / total_batch_num
