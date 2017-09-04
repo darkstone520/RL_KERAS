@@ -10,7 +10,7 @@ from drawnow import drawnow
 def monitor_train_cost():
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.title('Epoch per Cost Graph')
+    plt.title('Cost Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
     plt.ylabel('Cost')
@@ -89,6 +89,18 @@ def loadBatch(lines, START_BATCH_INDEX):
     data, label = data[:, :-1], data[:, -1]
     data = data / 255.
 
+    # 고양이, 개 사진이 잘 섞였는지 확인하는 부분
+    # for idx, l in enumerate(label):
+    #     if l == 0:
+    #         print(l)
+    #         print("고양이입니다.")
+    #     else:
+    #         print(l)
+    #         print("개입니다.")
+    #     plot_image(data[idx].reshape(144,144))
+
+
+
     # 라벨을 one_hot으로 바꾼다.
     label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
     label = np.array(label)
@@ -153,7 +165,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 20
+TRAIN_EPOCHS = 12
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 2
