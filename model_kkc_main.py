@@ -107,6 +107,7 @@ def loadBatch(lines, START_BATCH_INDEX):
     return data, label
 
 def shuffleLines(lines):
+    lines = random.sample(lines, len(lines))
     return random.sample(lines, len(lines))
 
 # early stopping하기 위해 테스트 하는 것을 별도 함수로 구현
