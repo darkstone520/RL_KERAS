@@ -99,8 +99,6 @@ def loadBatch(lines, START_BATCH_INDEX):
     #         print("개입니다.")
     #     plot_image(data[idx].reshape(144,144))
 
-
-
     # 라벨을 one_hot으로 바꾼다.
     label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
     label = np.array(label)
@@ -136,15 +134,15 @@ def validateModel(MODEL_ACCURACY):
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
                 test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
 
-                test_size = len(test_y_batch)
-                predictions = np.zeros(test_size * 2).reshape(test_size, 2)
-                model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)
-                model_result[:, 0] = range(0, test_size)
+                test_size = len(test_y_batch) # 테스트 데이터
+                predictions = np.zeros(test_size * 2).reshape(test_size, 2) # [[0.0, 0.0], [0.0, 0.0] ...]
+                model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)  #[ [0,0], [0,0]...]
+                model_result[:, 0] = range(0, test_size) # [[0,0],[1,0], [2,0], [3,0] ......]
 
                 for idx, m in enumerate(models):
-                    MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch)
-                    p = m.predict(test_x_batch)
-                    model_result[:, 1] = np.argmax(p, 1)
+                    MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch) # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
+                    p = m.predict(test_x_batch) # 모델이 분류한 라벨 값
+                    model_result[:, 1] = np.argmax(p, 1) #  두번째 인덱스에 p중 가장 큰값을 넣는다 [[0,0],[1,1], [2,1], [3,0] ......]
                     for result in model_result:
                         predictions[result[0], result[1]] += 1
 
@@ -153,6 +151,7 @@ def validateModel(MODEL_ACCURACY):
                 CNT += 1
 
             START_BATCH_INDEX = 0
+
         for i in range(len(MODEL_ACCURACY)):
             print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
         print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
