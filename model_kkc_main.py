@@ -53,7 +53,7 @@ def loadInputData():
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
 
-def loadMiniBatch(lines):
+def loadRandomMiniBatch(lines):
     """
     랜덤 미니배치함수
     txt파일에서 불러온 lines를 읽어서 input data인 numpy array로 바꾸기 위한 함수
@@ -99,12 +99,15 @@ def loadBatch(lines, START_BATCH_INDEX):
     #     else:
     #         print(l)
     #         print("개입니다.")
-    #     plot_image(data[idx].reshape(144,144))
+    #     plotImage(data[idx].reshape(144,144))
 
     # 라벨을 one_hot으로 바꾼다.
     label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
     label = np.array(label)
     return data, label
+
+def shuffleLines(lines):
+    return random.sample(lines, len(lines))
 
 # early stopping하기 위해 테스트 하는 것을 별도 함수로 구현
 def validateModel(MODEL_ACCURACY):
@@ -134,7 +137,7 @@ def validateModel(MODEL_ACCURACY):
                 print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
 
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
+                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATH_INDEX)
 
                 test_size = len(test_y_batch) # 테스트 데이터
                 predictions = np.zeros(test_size * 2).reshape(test_size, 2) # [[0.0, 0.0], [0.0, 0.0] ...]
@@ -170,7 +173,8 @@ TRAIN_EPOCHS = 14
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
-MINI_BATCH = True
+RANDOM_MINI_BATCH_ORDER = True
+RANDOM_MINI_BATCH = ~RANDOM_MINI_BATCH_ORDER
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
 
@@ -204,19 +208,26 @@ with tf.Session() as sess:
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
+        if RANDOM_MINI_BATCH_ORDER:
+            TRAIN_DATA = shuffleLines(TRAIN_DATA)
 
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
 
             # MINI_BATCH 여부에 따라 나뉜다.
-            if MINI_BATCH:
+            # 중복 없는 Random Mini Batch
+            if RANDOM_MINI_BATCH_ORDER:
+                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
+
+            # 중복 허용 Random Mini Batch
+            else:
+                # 에폭 2회까지는 전체 데이터를 일반배치로 학습한다.
                 if epoch < 2:
                     train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
                 else:
-                    train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
-            else:
-                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
+                    train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
+
 
             # train each model
             for m_idx, m in enumerate(models):
