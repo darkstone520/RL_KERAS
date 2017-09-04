@@ -16,7 +16,7 @@ def monitorTrainCost(pltSave=False):
     plt.ylabel('Cost')
     plt.grid(True)
     if pltSave:
-        plt.savefig()
+        plt.savefig('Cost Graph per Epoch')
 
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
