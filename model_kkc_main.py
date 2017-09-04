@@ -173,8 +173,8 @@ TRAIN_EPOCHS = 14
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
+# Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 RANDOM_MINI_BATCH_ORDER = True
-RANDOM_MINI_BATCH = ~RANDOM_MINI_BATCH_ORDER
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
 
@@ -209,22 +209,29 @@ with tf.Session() as sess:
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
 
+        ################################################################################
+        ###  - 랜덤 미니배치(데이터 중복 또는 중복 불가)를 수행하는 부분
+        ###  - RANDOM_MINI_BATCH_ORDER의 Boolen 값에 따라 수행하는 것이 달라진다.
+        ################################################################################
+
         # 랜덤 미니배치 중복없이 할 경우 매 에폭마다 Train Data를 섞어준다.
         if RANDOM_MINI_BATCH_ORDER:
             TRAIN_DATA = shuffleLines(TRAIN_DATA)
 
         for i in range(total_batch_num):
 
-            print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-
             # MINI_BATCH 여부에 따라 나뉜다.
             # 중복 없는 Random Mini Batch
             if RANDOM_MINI_BATCH_ORDER:
+                print("[데이터 중복 불가] {} Epoch: Random Mini Batch Data Reading {}/{}".
+                      format(epoch + 1, i + 1, total_batch_num))
                 train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # 중복 허용 Random Mini Batch
             else:
                 # 에폭 2회까지는 전체 데이터를 일반배치로 학습한다.
+                print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
+                      format(epoch + 1, i + 1, total_batch_num))
                 if epoch < 2:
                     train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
                 else:
