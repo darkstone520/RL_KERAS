@@ -7,7 +7,7 @@ import math
 import time
 from drawnow import drawnow
 
-def monitor_train_cost():
+def monitorTrainCost(pltSave):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.title('Cost Graph per Epoch')
@@ -15,8 +15,10 @@ def monitor_train_cost():
     plt.xlabel('Epoch')
     plt.ylabel('Cost')
     plt.grid(True)
+    if pltSave:
+        plt.savefig()
 
-def plot_image(image):
+def plotImage(image):
     """image array를 plot으로 보여주는 함수
     Args:
         image (2-D or 3-D array): (H, W) or (H, W, C)
@@ -167,7 +169,7 @@ START_BATCH_INDEX = 0
 TRAIN_EPOCHS = 12
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 1
 MINI_BATCH = False
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
@@ -228,8 +230,9 @@ with tf.Session() as sess:
         mon_epoch_list.append(epoch + 1)
         for idx, cost in enumerate(avg_cost_list):
             mon_cost_list[idx].append(cost)
-        drawnow(monitor_train_cost)
+        drawnow(monitorTrainCost)
 
+    drawnow(monitorTrainCost, pltSave=True)
     print('Learning Finished!')
     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
 
