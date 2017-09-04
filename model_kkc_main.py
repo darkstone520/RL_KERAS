@@ -137,7 +137,7 @@ def validateModel(MODEL_ACCURACY):
                 print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
 
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATH_INDEX)
+                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
 
                 test_size = len(test_y_batch) # 테스트 데이터
                 predictions = np.zeros(test_size * 2).reshape(test_size, 2) # [[0.0, 0.0], [0.0, 0.0] ...]
@@ -208,6 +208,8 @@ with tf.Session() as sess:
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
+
+        # 랜덤 미니배치 중복없이 할 경우 매 에폭마다 Train Data를 섞어준다.
         if RANDOM_MINI_BATCH_ORDER:
             TRAIN_DATA = shuffleLines(TRAIN_DATA)
 
