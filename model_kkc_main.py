@@ -165,10 +165,11 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 10
+TRAIN_EPOCHS = 12
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
+MINI_BATCH = False
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
 
@@ -206,10 +207,15 @@ with tf.Session() as sess:
         for i in range(total_batch_num):
 
             print("{} Epoch: Batch Data Reading {}/{}".format(epoch+1, i + 1, total_batch_num))
-            if epoch < 2:
-                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
+
+            # MINI_BATCH 여부에 따라 나뉜다.
+            if MINI_BATCH:
+                if epoch < 2:
+                    train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
+                else:
+                    train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
             else:
-                train_x_batch, train_y_batch = loadMiniBatch(TRAIN_DATA)
+                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # train each model
             for m_idx, m in enumerate(models):
