@@ -52,7 +52,7 @@ def loadInputData():
         file.close()
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
-
+ 
 def loadRandomMiniBatch(lines):
     """
     랜덤 미니배치함수
@@ -111,8 +111,17 @@ def loadBatch(lines, START_BATCH_INDEX):
     #     plotImage(data[idx].reshape(144,144))
 
     # 라벨을 one_hot으로 바꾼다.
-    label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    label = np.array(label)
+    # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
+    label_list = []
+    for label in label.tolist():
+        if label == 0:
+            label_list.append([1, 0, 0])
+        elif label == 1:
+            label_list.append([0, 1, 0])
+        else:
+            label_list.append([0, 0, 1])
+    label = np.array(label_list)
+
     return data, label
 
 def shuffleLines(lines):
