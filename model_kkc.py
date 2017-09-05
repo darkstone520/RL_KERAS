@@ -70,8 +70,8 @@ class Model:
     def __init__(self, sess, name):
         self.sess = sess
         self.name = name
-        self._build_net()
         self.class_num = 3
+        self._build_net()
 
     def _build_net(self):
         with tf.variable_scope(self.name):
