@@ -71,6 +71,7 @@ class Model:
         self.sess = sess
         self.name = name
         self._build_net()
+        self.class_num = 3
 
     def _build_net(self):
         with tf.variable_scope(self.name):
@@ -86,7 +87,7 @@ class Model:
 
                 self.X = tf.placeholder(tf.float32, [None, 144*144], name='x_data')
                 X_img = tf.reshape(self.X, shape=[-1, 144, 144, 1])
-                self.Y = tf.placeholder(tf.float32, [None, 2], name='y_data')
+                self.Y = tf.placeholder(tf.float32, [None, self.class_num], name='y_data')
 
             ############################################################################################################
             ## ▣ Convolution 계층 - 1
@@ -224,8 +225,8 @@ class Model:
             ##  ⊙ 편향        → shape: 2, 초기값: 0.001
             ##  ⊙ 활성화 함수 → Softmax
             ############################################################################################################
-            self.W_out = tf.get_variable(name='W_out', shape=[1000, 2], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-            self.b_out = tf.Variable(tf.constant(value=0.001, shape=[2], name='b_out'))
+            self.W_out = tf.get_variable(name='W_out', shape=[1000, self.class_num], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+            self.b_out = tf.Variable(tf.constant(value=0.001, shape=[self.class_num], name='b_out'))
             self.logits = tf.matmul(self.L_fc2, self.W_out) + self.b_out
 
         ################################################################################################################

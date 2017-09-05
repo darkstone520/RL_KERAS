@@ -70,8 +70,17 @@ def loadRandomMiniBatch(lines):
     data = data / 255.
 
     # 라벨을 one_hot으로 바꾼다.
-    label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    label = np.array(label)
+    # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
+    label_list = []
+    for label in label.tolist():
+        if label == 0:
+            label_list.append([1,0,0])
+        elif label == 1:
+            label_list.append([0,1,0])
+        else:
+            label_list.append([0,0,1])
+
+    label = np.array(label_list)
     return data, label
 
 def loadBatch(lines, START_BATCH_INDEX):
@@ -141,8 +150,8 @@ def validateModel(MODEL_ACCURACY):
                 test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
 
                 test_size = len(test_y_batch) # 테스트 데이터
-                predictions = np.zeros(test_size * 2).reshape(test_size, 2) # [[0.0, 0.0], [0.0, 0.0] ...]
-                model_result = np.zeros(test_size * 2, dtype=np.int).reshape(test_size, 2)  #[ [0,0], [0,0]...]
+                predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size, CLASS_NUM) # [[0.0, 0.0], [0.0, 0.0] ...]
+                model_result = np.zeros(test_size * CLASS_NUM, dtype=np.int).reshape(test_size, CLASS_NUM)  #[ [0,0], [0,0]...]
                 model_result[:, 0] = range(0, test_size) # [[0,0],[1,0], [2,0], [3,0] ......]
 
                 for idx, m in enumerate(models):
@@ -174,6 +183,7 @@ TRAIN_EPOCHS = 14
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
+CLASS_NUM = 3
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 RANDOM_MINI_BATCH_ORDER = False
