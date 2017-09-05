@@ -38,7 +38,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "cat_dog_flower_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -52,7 +52,7 @@ def loadInputData():
         file.close()
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
- 
+
 def loadRandomMiniBatch(lines):
     """
     랜덤 미니배치함수
