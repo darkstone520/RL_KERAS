@@ -195,7 +195,7 @@ NUM_MODELS = 3
 CLASS_NUM = 3
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
-RANDOM_MINI_BATCH_ORDER = False
+RANDOM_MINI_BATCH_ORDER = True
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
 
