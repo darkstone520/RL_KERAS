@@ -197,8 +197,9 @@ CLASS_NUM = 3
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
+RANDOM_MINI_BATCH_NO_ORDER = True
 RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
-NORMAL_BATCH = True # 일반배치
+NORMAL_BATCH = False # 일반배치
 
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
@@ -264,15 +265,12 @@ with tf.Session() as sess:
                 train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # 중복 허용 Random Mini Batch
-            else:
+            elif RANDOM_MINI_BATCH_NO_ORDER:
                 print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
                       format(epoch + 1, i + 1, total_batch_num))
-                if RANDOM_MINI_BATCH_ORDER:
-                    # 특정 Epoch만큼 데이터 중복없이 일반배치 또는 랜덤미니배치를 수행을 설정하는 부분
-                    if epoch >= 0:
-                        train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
-                    else:
-                        train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
+                # 특정 Epoch만큼 데이터 중복없이 일반배치 또는 랜덤미니배치를 수행을 설정하는 부분
+                if epoch < 2:
+                    train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
                 else:
                     train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
 
