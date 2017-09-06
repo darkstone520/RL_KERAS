@@ -268,12 +268,15 @@ with tf.Session() as sess:
 
             # 중복 허용 Random Mini Batch
             elif RANDOM_MINI_BATCH_NO_ORDER:
-                print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
-                      format(epoch + 1, i + 1, total_batch_num))
+
                 # 특정 Epoch만큼 데이터 중복없이 일반배치 또는 랜덤미니배치를 수행을 설정하는 부분
                 if epoch < ORDER_BATCH_EPCHO_NUM:
+                    print("[데이터 중복 불가] {}/{} Epoch : Normal Batch Data Reading {}/{}".
+                          format(epoch + 1, ORDER_BATCH_EPCHO_NUM, i + 1, total_batch_num))
                     train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
                 else:
+                    print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
+                          format(epoch + 1, i + 1, total_batch_num))
                     train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
 
             # Train each model
