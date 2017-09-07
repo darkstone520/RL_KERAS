@@ -161,7 +161,7 @@ def validateModel(MODEL_ACCURACY):
         saver = tf.train.Saver()
         saver.restore(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
 
-        for _ in range(TEST_EPHOCHS):
+        for epoch in range(TEST_EPHOCHS):
 
             # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
             total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
@@ -186,14 +186,14 @@ def validateModel(MODEL_ACCURACY):
                         predictions[result[0], result[1]] += 1
 
                 ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-                ENSEMBLE_ACCURACY[i] += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                ENSEMBLE_ACCURACY[epoch] += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
                 CNT += 1
 
             START_BATCH_INDEX = 0
 
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-            print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY[i]) / CNT)
+            print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY[epoch]) / CNT)
             print('Testing Finished!')
         return np.max(ENSEMBLE_ACCURACY)
 
@@ -203,7 +203,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 18
+TRAIN_EPOCHS = 1
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
