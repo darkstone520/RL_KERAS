@@ -38,7 +38,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_flower_mushroom_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "cat_dog_flower_mushroom_elephant_rhino_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -74,13 +74,20 @@ def loadRandomMiniBatch(lines):
     label_list = []
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0])
+            label_list.append([1,0,0,0,0,0])
         elif label == 1:
-            label_list.append([0,1,0,0])
+            label_list.append([0,1,0,0,0,0])
         elif label == 2:
-            label_list.append([0,0,1,0])
+            label_list.append([0,0,1,0,0,0])
+        elif label ==3:
+            label_list.append([0,0,0,1,0,0])
+        elif label ==4:
+            label_list.append([0,0,0,0,1,0])
         else:
-            label_list.append([0,0,0,1])
+            label_list.append([0,0,0,0,0,1])
+
+
+
     label = np.array(label_list)
     return data, label
 
@@ -116,15 +123,20 @@ def loadBatch(lines, START_BATCH_INDEX):
     label_list = []
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0])
+            label_list.append([1,0,0,0,0,0])
         elif label == 1:
-            label_list.append([0,1,0,0])
+            label_list.append([0,1,0,0,0,0])
         elif label == 2:
-            label_list.append([0,0,1,0])
+            label_list.append([0,0,1,0,0,0])
+        elif label ==3:
+            label_list.append([0,0,0,1,0,0])
+        elif label ==4:
+            label_list.append([0,0,0,0,1,0])
         else:
-            label_list.append([0,0,0,1])
-    label = np.array(label_list)
+            label_list.append([0,0,0,0,0,1])
 
+
+    label = np.array(label_list)
     return data, label
 
 def shuffleLines(lines):
@@ -135,7 +147,7 @@ def shuffleLines(lines):
 def validateModel(MODEL_ACCURACY):
 
     START_BATCH_INDEX = 0
-    ENSEMBLE_ACCURACY = 0
+    ENSEMBLE_ACCURACY = np.zeros(TEST_EPHOCHS)
     CNT = 0
 
     with tf.Session() as sess:
@@ -174,16 +186,16 @@ def validateModel(MODEL_ACCURACY):
                         predictions[result[0], result[1]] += 1
 
                 ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-                ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                ENSEMBLE_ACCURACY[i] += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
                 CNT += 1
 
             START_BATCH_INDEX = 0
 
-        for i in range(len(MODEL_ACCURACY)):
-            print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-        print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
-        print('Testing Finished!')
-        return ENSEMBLE_ACCURACY
+            for i in range(len(MODEL_ACCURACY)):
+                print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+            print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY[i]) / CNT)
+            print('Testing Finished!')
+        return np.max(ENSEMBLE_ACCURACY)
 
 
 # 학습을 위한 기본적인 셋팅
@@ -191,17 +203,17 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 20
-TEST_EPHOCHS = 2
+TRAIN_EPOCHS = 16
+TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
-CLASS_NUM = 4
+CLASS_NUM = 6
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
 RANDOM_MINI_BATCH_NO_ORDER = True
-MIN_ORDER_BATCH_EPCHO = 2 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
+MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
 RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
 NORMAL_BATCH = False # 일반배치
