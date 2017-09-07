@@ -201,7 +201,7 @@ CLASS_NUM = 4
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
 RANDOM_MINI_BATCH_NO_ORDER = True
-MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
+MIN_ORDER_BATCH_EPCHO = 2 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
 RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
 NORMAL_BATCH = False # 일반배치
@@ -216,7 +216,11 @@ mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
+stime = time.time()
 TRAIN_DATA, TEST_DATA = loadInputData()
+# 종료 시간 체크
+etime = time.time()
+print('Data Loading Consumption Time : ', round(etime - stime, 6))
 
 # TRAIN
 with tf.Session() as sess:
@@ -302,7 +306,7 @@ with tf.Session() as sess:
 
     # 종료 시간 체크
     etime = time.time()
-    print('consumption time : ', round(etime - stime, 6))
+    print('Consumption Time : ', round(etime - stime, 6))
 
 
 tf.reset_default_graph()
