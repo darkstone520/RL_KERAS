@@ -258,7 +258,7 @@ NORMAL_BATCH = True # 일반배치
 
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
-
+ 
 # monitoring 관련 parameter
 mon_epoch_list = []
 mon_cost_list = [[] for m in range(NUM_MODELS)]
