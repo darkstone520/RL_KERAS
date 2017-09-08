@@ -212,7 +212,6 @@ def validateModel(MODEL_ACCURACY):
 
                 ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
                 ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-                TEST_ACCURACY_LIST.append(ENSEMBLE_ACCURACY)
                 CNT += 1
 
             START_BATCH_INDEX = 0
@@ -220,6 +219,7 @@ def validateModel(MODEL_ACCURACY):
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
+            TEST_ACCURACY_LIST.append(ENSEMBLE_ACCURACY/CNT )
             print('Testing Finished!')
         print("TEST_EPHOCH 수: {}, 최대 정확도: {}".format(TEST_EPHOCHS,np.max(sess.run(TEST_ACCURACY_LIST), axis=-1)))
 
@@ -241,7 +241,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 20
+TRAIN_EPOCHS = 15
 TEST_EPHOCHS = 2
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
@@ -253,8 +253,8 @@ CLASS_NUM = 6
 RANDOM_MINI_BATCH_NO_ORDER = False
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
-RANDOM_MINI_BATCH_ORDER = True # 중복없는 랜덤 미니배치
-NORMAL_BATCH = False # 일반배치
+RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
+NORMAL_BATCH = True # 일반배치
 
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
