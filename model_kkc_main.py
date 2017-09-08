@@ -171,7 +171,8 @@ def shuffleLines(lines):
 def validateModel(MODEL_ACCURACY):
 
     START_BATCH_INDEX = 0
-    ENSEMBLE_ACCURACY = list(np.zeros(TEST_EPHOCHS))
+    ENSEMBLE_ACCURACY = 0
+    TEST_ACCURACY_LIST = []
     CNT = 0
 
     with tf.Session() as sess:
@@ -210,18 +211,28 @@ def validateModel(MODEL_ACCURACY):
                         predictions[result[0], result[1]] += 1
 
                 ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-                ENSEMBLE_ACCURACY[epoch] += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                TEST_ACCURACY_LIST.append(ENSEMBLE_ACCURACY)
                 CNT += 1
 
             START_BATCH_INDEX = 0
 
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-            print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY[epoch]) / CNT)
+            print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
             print('Testing Finished!')
-        return tf.maximum(ENSEMBLE_ACCURACY)
+        print("TEST_EPHOCH 수: {}, 최대 정확도: {}".format(TEST_EPHOCHS,np.max(TEST_ACCURACY_LIST, axis=-1)))
 
 def predictConsumtionTime():
+    """
+    총소요시간 = 배치 사이즈 * a * 앙상블 모델의 수 * 배치 횟수(per Epoch) * 전체 Ephoc 수
+    0.0053 : 이미지 1개당 연산 시간(현재모델 0.0053)
+    alpha = 총소요시간 / (배치사이즈 * 앙상블 모델의 수 * 배치 횟수 * 전체 Ephoc 수)
+    alpha 를 구하기 위해서는 전체 소요시간을 1회 측정해서 구해야한다.
+    """
+    alpha = 0.0053
+    c_time = BATCH_SIZE * 0.0053 * NUM_MODELS * math.trunc(int(len(TRAIN_DATA)/BATCH_SIZE)) * TRAIN_EPOCHS
+    print("모델 학습 예상 소요시간: {} 분".format(float(c_time/60)))
     pass
 
 
@@ -230,7 +241,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 18
+TRAIN_EPOCHS = 8
 TEST_EPHOCHS = 2
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
@@ -239,11 +250,11 @@ CLASS_NUM = 6
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
-RANDOM_MINI_BATCH_NO_ORDER = True
+RANDOM_MINI_BATCH_NO_ORDER = False
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
 RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
-NORMAL_BATCH = False # 일반배치
+NORMAL_BATCH = True # 일반배치
 
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
