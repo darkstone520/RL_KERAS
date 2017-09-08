@@ -38,7 +38,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_flower_mushroom_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "cat_dog_flower_mushroom_elephant_rhino_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -71,31 +71,32 @@ def loadRandomMiniBatch(lines):
 
     # 라벨을 one_hot으로 바꾼다.
     # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    # label_list = []
-    # for label in label.tolist():
-    #     if label == 0:
-    #         label_list.append([1,0,0,0,0,0])
-    #     elif label == 1:
-    #         label_list.append([0,1,0,0,0,0])
-    #     elif label == 2:
-    #         label_list.append([0,0,1,0,0,0])
-    #     elif label ==3:
-    #         label_list.append([0,0,0,1,0,0])
-    #     elif label ==4:
-    #         label_list.append([0,0,0,0,1,0])
-    #     else:
-    #         label_list.append([0,0,0,0,0,1])
 
     label_list = []
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0])
+            label_list.append([1,0,0,0,0,0])
         elif label == 1:
-            label_list.append([0,1,0,0])
+            label_list.append([0,1,0,0,0,0])
         elif label == 2:
-            label_list.append([0,0,1,0])
+            label_list.append([0,0,1,0,0,0])
         elif label ==3:
-            label_list.append([0,0,0,1])
+            label_list.append([0,0,0,1,0,0])
+        elif label ==4:
+            label_list.append([0,0,0,0,1,0])
+        else:
+            label_list.append([0,0,0,0,0,1])
+
+    # label_list = []
+    # for label in label.tolist():
+    #     if label == 0:
+    #         label_list.append([1,0,0,0])
+    #     elif label == 1:
+    #         label_list.append([0,1,0,0])
+    #     elif label == 2:
+    #         label_list.append([0,0,1,0])
+    #     elif label ==3:
+    #         label_list.append([0,0,0,1])
 
 
 
@@ -131,30 +132,32 @@ def loadBatch(lines, START_BATCH_INDEX):
 
     # 라벨을 one_hot으로 바꾼다.
     # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    # label_list = []
-    # for label in label.tolist():
-    #     if label == 0:
-    #         label_list.append([1,0,0,0,0,0])
-    #     elif label == 1:
-    #         label_list.append([0,1,0,0,0,0])
-    #     elif label == 2:
-    #         label_list.append([0,0,1,0,0,0])
-    #     elif label ==3:
-    #         label_list.append([0,0,0,1,0,0])
-    #     elif label ==4:
-    #         label_list.append([0,0,0,0,1,0])
-    #     else:
-    #         label_list.append([0,0,0,0,0,1])
+
     label_list = []
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0])
+            label_list.append([1,0,0,0,0,0])
         elif label == 1:
-            label_list.append([0,1,0,0])
+            label_list.append([0,1,0,0,0,0])
         elif label == 2:
-            label_list.append([0,0,1,0])
+            label_list.append([0,0,1,0,0,0])
         elif label ==3:
-            label_list.append([0,0,0,1])
+            label_list.append([0,0,0,1,0,0])
+        elif label ==4:
+            label_list.append([0,0,0,0,1,0])
+        else:
+            label_list.append([0,0,0,0,0,1])
+
+    # label_list = []
+    # for label in label.tolist():
+    #     if label == 0:
+    #         label_list.append([1,0,0,0])
+    #     elif label == 1:
+    #         label_list.append([0,1,0,0])
+    #     elif label == 2:
+    #         label_list.append([0,0,1,0])
+    #     elif label ==3:
+    #         label_list.append([0,0,0,1])
 
 
     label = np.array(label_list)
@@ -228,7 +231,7 @@ TRAIN_EPOCHS = 20
 TEST_EPHOCHS = 2
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
-CLASS_NUM = 4
+CLASS_NUM = 6
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
