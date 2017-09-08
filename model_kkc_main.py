@@ -221,13 +221,16 @@ def validateModel(MODEL_ACCURACY):
             print('Testing Finished!')
         return tf.maximum(ENSEMBLE_ACCURACY)
 
+def predictConsumtionTime():
+    pass
+
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 20
+TRAIN_EPOCHS = 18
 TEST_EPHOCHS = 2
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
