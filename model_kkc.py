@@ -95,20 +95,21 @@ class Model:
             ##  ⊙ 활성화 함수 → Parametric Relu
             ##  ⊙ 풀링 계층   → Max Pooling
             ##  ⊙ 드롭 아웃 구현
-            ##tf.contrib.layers.variance_scaling_initializer()
+            ## tf.contrib.layers.variance_scaling_initializer()
+            ## tf.contrib.layers.xavier_initializer_conv2d()
             ############################################################################################################
             with tf.name_scope('conv_layer1') as scope:
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[4, 4, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[4, 4, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 1, 1, 1], padding='VALID')  # 144x144 -> 141x141
                 self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
 
-                self.W2_sub = tf.get_variable(name='W2_sub', shape=[4, 4, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W2_sub = tf.get_variable(name='W2_sub', shape=[4, 4, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='VALID')  # 141x141 -> 138x138
                 self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R2_sub')
 
-                self.W3_sub = tf.get_variable(name='W3_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W3_sub = tf.get_variable(name='W3_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='VALID')  # 138x138 -> 136x136
                 self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R3_sub')
@@ -129,7 +130,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer2') as scope:
-                self.W2 = tf.get_variable(name='W2', shape=[3, 3, 20, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W2 = tf.get_variable(name='W2', shape=[3, 3, 20, 40], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L2 = tf.nn.conv2d(input=self.L1, filter=self.W2, strides=[1, 1, 1, 1], padding='SAME')
                 self.L2 = self.BN(input=self.L2, scale=True, training=self.training, name='Conv2_BN')
                 self.L2 = self.parametric_relu(self.L2, 'R2')
@@ -150,7 +151,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer3') as scope:
-                self.W3 = tf.get_variable(name='W3', shape=[3, 3, 40, 80], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W3 = tf.get_variable(name='W3', shape=[3, 3, 40, 80], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L3 = tf.nn.conv2d(input=self.L2, filter=self.W3, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3 = self.BN(input=self.L3, scale=True, training=self.training, name='Conv3_BN')
                 self.L3 = self.parametric_relu(self.L3, 'R3')
@@ -165,7 +166,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer4') as scope:
-                self.W4 = tf.get_variable(name='W4', shape=[2, 2, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W4 = tf.get_variable(name='W4', shape=[2, 2, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L4 = tf.nn.conv2d(input=self.L3, filter=self.W4, strides=[1, 1, 1, 1], padding='VALID')
                 self.L4 = self.BN(input=self.L4, scale=True, training=self.training, name='Conv4_sub_BN')
                 self.L4 = self.parametric_relu(self.L4, 'R4')
@@ -181,7 +182,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer5') as scope:
-                self.W5 = tf.get_variable(name='W5', shape=[7, 7, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W5 = tf.get_variable(name='W5', shape=[7, 7, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L5 = tf.nn.conv2d(input=self.L4, filter=self.W5, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5 = self.BN(input=self.L5, scale=True, training=self.training, name='Conv5_sub_BN')
                 self.L5 = self.parametric_relu(self.L5, 'R5')
@@ -235,11 +236,11 @@ class Model:
         ################################################################################################################
         self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.Y)) + (0.01/(2*tf.to_float(tf.shape(self.Y)[0])))*tf.reduce_sum(tf.square(self.W_out))
 
-        # self.optimizer = tf.train.RMSPropOptimizer(learning_rate=0.0025,
-        #                                            momentum=0.9, decay=0.99,
-        #                                            epsilon=0.01).minimize(self.cost)
+        self.optimizer = tf.train.RMSPropOptimizer(learning_rate=0.0025,
+                                                   momentum=0.9, decay=0.99,
+                                                   epsilon=0.01).minimize(self.cost)
 
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.005).minimize(self.cost)
+        # self.optimizer = tf.train.AdamOptimizer(learning_rate=0.005).minimize(self.cost)
 
         self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(self.logits, 1), tf.arg_max(self.Y, 1)), dtype=tf.float32))
 
