@@ -216,7 +216,7 @@ def validateModel(MODEL_ACCURACY):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY[epoch]) / CNT)
             print('Testing Finished!')
-        return np.max(ENSEMBLE_ACCURACY)
+        return tf.maximum(ENSEMBLE_ACCURACY)
 
 
 # 학습을 위한 기본적인 셋팅
