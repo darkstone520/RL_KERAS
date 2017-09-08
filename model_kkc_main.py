@@ -258,7 +258,7 @@ NORMAL_BATCH = True # 일반배치
 
 MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
 LAST_EPOCH = None
- 
+
 # monitoring 관련 parameter
 mon_epoch_list = []
 mon_cost_list = [[] for m in range(NUM_MODELS)]
@@ -271,6 +271,7 @@ TRAIN_DATA, TEST_DATA = loadInputData()
 # 종료 시간 체크
 etime = time.time()
 print('Data Loading Consumption Time : ', round(etime - stime, 6))
+predictConsumtionTime()
 
 # TRAIN
 with tf.Session() as sess:
