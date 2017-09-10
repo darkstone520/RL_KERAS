@@ -194,8 +194,8 @@ def predictConsumtionTime():
     alpha 를 구하기 위해서는 전체 소요시간을 1회 측정해서 구해야한다.
     """
     alpha = 0.0053
-    c_time = BATCH_SIZE * 0.0053 * NUM_MODELS * math.trunc(int(len(TRAIN_DATA)/BATCH_SIZE)) * TRAIN_EPOCHS
-    print("{} 에폭 기준, 모델 학습 예상 소요시간: {} 분".format(TRAIN_EPOCHS,float(c_time/60)))
+    c_time = BATCH_SIZE * 0.0053 * NUM_MODELS * math.trunc(int(len(TRAIN_DATA)/BATCH_SIZE)) * START_EARLY_STOP_EPOCH
+    print("{} 에폭 기준, 모델 학습 예상 소요시간: {} 분".format(START_EARLY_STOP_EPOCH,float(c_time/60)))
     pass
 
 
@@ -205,7 +205,7 @@ IMG_SIZE = (144, 144)
 BATCH_SIZE = 200
 START_BATCH_INDEX = 0
 # 예상 에폭 수
-TRAIN_EPOCHS = 25
+START_EARLY_STOP_EPOCH = 21
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 1
@@ -325,9 +325,8 @@ with tf.Session() as sess:
 
         ###################################################################################
         ## Early Stop, Test 검증
-        ##
         ################################################################################
-        if epoch > 0:
+        if epoch >= START_EARLY_STOP_EPOCH:
             CNT = 0
             TEST_ACCURACY = None
 
@@ -373,7 +372,6 @@ with tf.Session() as sess:
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
 
-
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:
                 if float(TEST_ACCURACY_LIST[0]) > float(TEST_ACCURACY_LIST[1]):
@@ -385,7 +383,6 @@ with tf.Session() as sess:
                     TEST_ACCURACY_LIST.pop()
                     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
                     print("학습을 계속 진행합니다.")
-
 
     drawnow(monitorTrainCost, pltSave=True)
     print('Learning Finished!')
