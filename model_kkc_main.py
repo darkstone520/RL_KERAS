@@ -185,59 +185,6 @@ def shuffleLines(lines):
     lines = random.sample(lines, len(lines))
     return random.sample(lines, len(lines))
 
-# early stopping하기 위해 테스트 하는 것을 별도 함수로 구현
-def validateModel(MODEL_ACCURACY):
-
-    START_BATCH_INDEX = 0
-    ENSEMBLE_ACCURACY = 0
-    CNT = 0
-
-    with tf.Session() as sess:
-
-        print('Test Start!')
-        models = []
-        for m in range(NUM_MODELS):
-            models.append(Model(sess, "model" + str(m)))
-
-        sess.run(tf.global_variables_initializer())
-        saver = tf.train.Saver()
-        saver.restore(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
-
-        for epoch in range(TEST_EPHOCHS):
-
-            # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
-            total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
-
-            for i in range(total_batch_num):
-
-                print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
-
-                # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
-
-                test_size = len(test_y_batch) # 테스트 데이터
-                predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size, CLASS_NUM) # [[0.0, 0.0], [0.0, 0.0] ...]
-                model_result = np.zeros(test_size * CLASS_NUM, dtype=np.int).reshape(test_size, CLASS_NUM)  #[ [0,0], [0,0]...]
-                model_result[:, 0] = range(0, test_size) # [[0,0],[1,0], [2,0], [3,0] ......]
-
-                for idx, m in enumerate(models):
-                    MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch, test_y_batch) # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
-                    p = m.predict(test_x_batch) # 모델이 분류한 라벨 값
-                    model_result[:, 1] = np.argmax(p, 1) #  두번째 인덱스에 p중 가장 큰값을 넣는다 [[0,0],[1,1], [2,1], [3,0] ......]
-                    for result in model_result:
-                        predictions[result[0], result[1]] += 1
-
-                ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-                ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-                CNT += 1
-
-            START_BATCH_INDEX = 0
-
-            for i in range(len(MODEL_ACCURACY)):
-                print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-            print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
-            print('Testing Finished!')
-            return sess.run(ENSEMBLE_ACCURACY) / CNT
 
 def predictConsumtionTime():
     """
@@ -263,6 +210,11 @@ TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 1
 CLASS_NUM = 10
+TEST_ACCURACY = []
+START_BATCH_INDEX = 0
+ENSEMBLE_ACCURACY = 0
+CNT = 0
+
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
@@ -376,11 +328,50 @@ with tf.Session() as sess:
         if epoch > 0:
             print("{} 검증을 시작합니다.".format(epoch))
             # 21 에폭부터 저장
-            saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
 
             # 모델 검증
-            result = validateModel(MODEL_ACCURACY)
-            valid_result.append(result)
+            for epoch in range(TEST_EPHOCHS):
+
+                # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
+                total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
+
+                for i in range(total_batch_num):
+
+                    print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
+
+                    # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
+                    test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
+
+                    test_size = len(test_y_batch)  # 테스트 데이터
+                    predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size,
+                                                                          CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
+                    model_result = np.zeros(test_size * CLASS_NUM, dtype=np.int).reshape(test_size,
+                                                                                         CLASS_NUM)  # [ [0,0], [0,0]...]
+                    model_result[:, 0] = range(0, test_size)  # [[0,0],[1,0], [2,0], [3,0] ......]
+
+                    for idx, m in enumerate(models):
+                        MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch,
+                                                              test_y_batch)  # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
+                        p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
+                        model_result[:, 1] = np.argmax(p,
+                                                       1)  # 두번째 인덱스에 p중 가장 큰값을 넣는다 [[0,0],[1,1], [2,1], [3,0] ......]
+                        for TEST_ACCURACY in model_result:
+                            predictions[TEST_ACCURACY[0], TEST_ACCURACY[1]] += 1
+
+                    ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
+                    ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                    CNT += 1
+
+                START_BATCH_INDEX = 0
+
+                for i in range(len(MODEL_ACCURACY)):
+                    print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+                TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY) / CNT
+                print('Ensemble Accuracy : ', TEST_ACCURACY)
+                print('Testing Finished!')
+
+
+            valid_result.append(TEST_ACCURACY)
             if len(valid_result) != 1:
                 if float(valid_result[0]) > float(valid_result[1]):
                     print("Ealry Stop 으로 학습을 중단합니다.")
@@ -389,9 +380,8 @@ with tf.Session() as sess:
                 else:
                     valid_result[0] = valid_result[1]
                     valid_result.pop()
+                    saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
                     print("학습을 계속 진행합니다.")
-
-
 
 
     drawnow(monitorTrainCost, pltSave=True)
