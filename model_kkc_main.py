@@ -224,7 +224,7 @@ MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행
 RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
 NORMAL_BATCH = False # 일반배치
 
-MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
+
 LAST_EPOCH = None
 
 # monitoring 관련 parameter
@@ -327,6 +327,9 @@ with tf.Session() as sess:
         ## Early Stop, Test 검증
         ################################################################################
         if epoch >= START_EARLY_STOP_EPOCH:
+
+            # Test 수행 시 마다 초기화가 필요한 변수들
+            MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
             CNT = 0
             TEST_ACCURACY = None
             ENSEMBLE_ACCURACY = 0
