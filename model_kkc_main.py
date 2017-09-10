@@ -330,8 +330,7 @@ with tf.Session() as sess:
             TEST_ACCURACY = None
             ENSEMBLE_ACCURACY = 0
 
-            print("{} 검증을 시작합니다.".format(epoch))
-            # 21 에폭부터 저장
+            print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
 
             # 모델 검증
             # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
