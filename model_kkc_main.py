@@ -204,15 +204,14 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 200
 START_BATCH_INDEX = 0
-# 예상 에폭 수
+
+# EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 21
-TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 1
+NUM_MODELS = 3
 CLASS_NUM = 10
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
-ENSEMBLE_ACCURACY = 0
 
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
@@ -329,6 +328,7 @@ with tf.Session() as sess:
         if epoch >= START_EARLY_STOP_EPOCH:
             CNT = 0
             TEST_ACCURACY = None
+            ENSEMBLE_ACCURACY = 0
 
             print("{} 검증을 시작합니다.".format(epoch))
             # 21 에폭부터 저장
