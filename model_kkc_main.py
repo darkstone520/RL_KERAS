@@ -325,51 +325,52 @@ with tf.Session() as sess:
 
         epoch += 1
 
-        # early stop
+        ###################################################################################
+        ## Early Stop, Test 검증
+        ##
+        ################################################################################
         if epoch > 0:
             print("{} 검증을 시작합니다.".format(epoch))
             # 21 에폭부터 저장
 
             # 모델 검증
-            for epoch in range(TEST_EPHOCHS):
+            # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
+            test_total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
 
-                # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
-                total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
+            for i in range(test_total_batch_num):
 
-                for i in range(total_batch_num):
+                print("Test Batch Data Reading {}/{}".format(i + 1, test_total_batch_num))
 
-                    print("Test Batch Data Reading {}/{}".format(i + 1, total_batch_num))
+                # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
+                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
 
-                    # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-                    test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
+                test_size = len(test_y_batch)  # 테스트 데이터
+                predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size,
+                                                                      CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
+                model_result = np.zeros(test_size * CLASS_NUM, dtype=np.int).reshape(test_size,
+                                                                                     CLASS_NUM)  # [ [0,0], [0,0]...]
+                model_result[:, 0] = range(0, test_size)  # [[0,0],[1,0], [2,0], [3,0] ......]
 
-                    test_size = len(test_y_batch)  # 테스트 데이터
-                    predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size,
-                                                                          CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
-                    model_result = np.zeros(test_size * CLASS_NUM, dtype=np.int).reshape(test_size,
-                                                                                         CLASS_NUM)  # [ [0,0], [0,0]...]
-                    model_result[:, 0] = range(0, test_size)  # [[0,0],[1,0], [2,0], [3,0] ......]
+                for idx, m in enumerate(models):
+                    MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch,
+                                                          test_y_batch)  # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
+                    p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
+                    model_result[:, 1] = np.argmax(p,
+                                                   1)  # 두번째 인덱스에 p중 가장 큰값을 넣는다 [[0,0],[1,1], [2,1], [3,0] ......]
+                    for TEST_ACCURACY in model_result:
+                        predictions[TEST_ACCURACY[0], TEST_ACCURACY[1]] += 1
 
-                    for idx, m in enumerate(models):
-                        MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch,
-                                                              test_y_batch)  # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
-                        p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
-                        model_result[:, 1] = np.argmax(p,
-                                                       1)  # 두번째 인덱스에 p중 가장 큰값을 넣는다 [[0,0],[1,1], [2,1], [3,0] ......]
-                        for TEST_ACCURACY in model_result:
-                            predictions[TEST_ACCURACY[0], TEST_ACCURACY[1]] += 1
+                ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
+                ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+                CNT += 1
 
-                    ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-                    ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-                    CNT += 1
+            START_BATCH_INDEX = 0
 
-                START_BATCH_INDEX = 0
-
-                for i in range(len(MODEL_ACCURACY)):
-                    print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-                TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY) / CNT
-                print('Ensemble Accuracy : ', TEST_ACCURACY)
-                print('Testing Finished!')
+            for i in range(len(MODEL_ACCURACY)):
+                print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+            TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY) / CNT
+            print('Ensemble Accuracy : ', TEST_ACCURACY)
+            print('Testing Finished!')
 
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
