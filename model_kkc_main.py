@@ -210,7 +210,6 @@ TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 1
 CLASS_NUM = 10
-TEST_ACCURACY = None
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
 ENSEMBLE_ACCURACY = 0
@@ -330,6 +329,7 @@ with tf.Session() as sess:
         ################################################################################
         if epoch > 0:
             CNT = 0
+            TEST_ACCURACY = None
 
             print("{} 검증을 시작합니다.".format(epoch))
             # 21 에폭부터 저장
