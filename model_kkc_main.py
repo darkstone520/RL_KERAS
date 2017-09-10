@@ -207,7 +207,7 @@ BATCH_SIZE = 200
 START_BATCH_INDEX = 0
 
 # EARLY_STOP 시작하는 에폭 시점
-START_EARLY_STOP_EPOCH = 18
+START_EARLY_STOP_EPOCH = 10
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
 CLASS_NUM = 10
@@ -326,7 +326,7 @@ with tf.Session() as sess:
         ###################################################################################
         ## Early Stop, Test 검증
         ################################################################################
-        if epoch >= START_EARLY_STOP_EPOCH:
+        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list) < 0.005):
 
             # Test 수행 시 마다 초기화가 필요한 변수들
             MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
