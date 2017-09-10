@@ -214,7 +214,6 @@ TEST_ACCURACY = None
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
 ENSEMBLE_ACCURACY = 0
-CNT = 0
 
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
@@ -330,6 +329,8 @@ with tf.Session() as sess:
         ##
         ################################################################################
         if epoch > 0:
+            CNT = 0
+
             print("{} 검증을 시작합니다.".format(epoch))
             # 21 에폭부터 저장
 
