@@ -248,7 +248,7 @@ def predictConsumtionTime():
     """
     alpha = 0.0053
     c_time = BATCH_SIZE * 0.0053 * NUM_MODELS * math.trunc(int(len(TRAIN_DATA)/BATCH_SIZE)) * TRAIN_EPOCHS
-    print("모델 학습 예상 소요시간: {} 분".format(float(c_time/60)))
+    print("{} 에폭 기준, 모델 학습 예상 소요시간: {} 분".format(TRAIN_EPOCHS,float(c_time/60)))
     pass
 
 
@@ -257,7 +257,8 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 200
 START_BATCH_INDEX = 0
-# TRAIN_EPOCHS = 25
+# 예상 에폭 수
+TRAIN_EPOCHS = 25
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 1
@@ -373,6 +374,7 @@ with tf.Session() as sess:
 
         # early stop
         if epoch > 0:
+            print("{} 검증을 시작합니다.".format(epoch))
             # 21 에폭부터 저장
             saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
 
