@@ -186,7 +186,7 @@ def shuffleLines(lines):
     return random.sample(lines, len(lines))
 
 
-def predictConsumtionTime():
+def predictConsumtionTime(epoch_num):
     """
     총소요시간 = 배치 사이즈 * a * 앙상블 모델의 수 * 배치 횟수(per Epoch) * 전체 Ephoc 수
     0.0053 : 이미지 1개당 연산 시간(현재모델 0.0053)
@@ -194,9 +194,10 @@ def predictConsumtionTime():
     alpha 를 구하기 위해서는 전체 소요시간을 1회 측정해서 구해야한다.
     """
     alpha = 0.0053
-    c_time = BATCH_SIZE * 0.0053 * NUM_MODELS * math.trunc(int(len(TRAIN_DATA)/BATCH_SIZE)) * START_EARLY_STOP_EPOCH
-    print("{} 에폭 기준, 모델 학습 예상 소요시간: {} 분".format(START_EARLY_STOP_EPOCH,float(c_time/60)))
-    pass
+    c_time = BATCH_SIZE * 0.0053 * NUM_MODELS * math.trunc(int(len(TRAIN_DATA)/BATCH_SIZE)) * epoch_num
+    c_time = float(c_time/60)
+    print("총 {} 에폭 학습, 학습 예상 소요시간: {} 분".format(epoch_num,c_time))
+    return c_time
 
 
 # 학습을 위한 기본적인 셋팅
@@ -238,7 +239,7 @@ TRAIN_DATA, TEST_DATA = loadInputData()
 # 종료 시간 체크
 etime = time.time()
 print('Data Loading Consumption Time : ', round(etime - stime, 6))
-predictConsumtionTime()
+predictConsumtionTime(START_EARLY_STOP_EPOCH)
 
 # TRAIN
 with tf.Session() as sess:
@@ -388,10 +389,15 @@ with tf.Session() as sess:
 
     # 종료 시간 체크
     etime = time.time()
-    print('Consumption Time : {} 분'.format( round(etime - stime, 6)/60) )
-    predictConsumtionTime()
+    c_time = round(etime - stime, 6)/60
+    p_time = predictConsumtionTime(LAST_EPOCH)
 
-tf.reset_default_graph()
+    print('Total Consumption Time : {} 분'.format(c_time))
+    print('학습에 소요된 Consumption Time : 약 {} 분'.format(p_time))
+    print('Early Stoping에 소요된 Consumption Time : 약 {} 분'.format(c_time-p_time))
+
+
+
 
 
 
