@@ -75,17 +75,25 @@ def loadRandomMiniBatch(lines):
     label_list = []
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0,0,0])
+            label_list.append([1,0,0,0,0,0,0,0,0,0])
         elif label == 1:
-            label_list.append([0,1,0,0,0,0])
+            label_list.append([0,1,0,0,0,0,0,0,0,0])
         elif label == 2:
-            label_list.append([0,0,1,0,0,0])
-        elif label ==3:
-            label_list.append([0,0,0,1,0,0])
-        elif label ==4:
-            label_list.append([0,0,0,0,1,0])
-        else:
-            label_list.append([0,0,0,0,0,1])
+            label_list.append([0,0,1,0,0,0,0,0,0,0])
+        elif label == 3:
+            label_list.append([0,0,0,1,0,0,0,0,0,0])
+        elif label == 4:
+            label_list.append([0,0,0,0,1,0,0,0,0,0])
+        elif label == 5:
+            label_list.append([0,0,0,0,0,1,0,0,0,0])
+        elif label == 6:
+            label_list.append([0,0,0,0,0,0,1,0,0,0])
+        elif label == 7:
+            label_list.append([0,0,0,0,0,0,0,1,0,0])
+        elif label == 8:
+            label_list.append([0,0,0,0,0,0,0,0,1,0])
+        elif label == 9:
+            label_list.append([0,0,0,0,0,0,0,0,0,1])
 
     # label_list = []
     # for label in label.tolist():
@@ -136,17 +144,27 @@ def loadBatch(lines, START_BATCH_INDEX):
     label_list = []
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0,0,0])
+            label_list.append([1,0,0,0,0,0,0,0,0,0])
         elif label == 1:
-            label_list.append([0,1,0,0,0,0])
+            label_list.append([0,1,0,0,0,0,0,0,0,0])
         elif label == 2:
-            label_list.append([0,0,1,0,0,0])
-        elif label ==3:
-            label_list.append([0,0,0,1,0,0])
-        elif label ==4:
-            label_list.append([0,0,0,0,1,0])
-        else:
-            label_list.append([0,0,0,0,0,1])
+            label_list.append([0,0,1,0,0,0,0,0,0,0])
+        elif label == 3:
+            label_list.append([0,0,0,1,0,0,0,0,0,0])
+        elif label == 4:
+            label_list.append([0,0,0,0,1,0,0,0,0,0])
+        elif label == 5:
+            label_list.append([0,0,0,0,0,1,0,0,0,0])
+        elif label == 6:
+            label_list.append([0,0,0,0,0,0,1,0,0,0])
+        elif label == 7:
+            label_list.append([0,0,0,0,0,0,0,1,0,0])
+        elif label == 8:
+            label_list.append([0,0,0,0,0,0,0,0,1,0])
+        elif label == 9:
+            label_list.append([0,0,0,0,0,0,0,0,0,1])
+
+
 
     # label_list = []
     # for label in label.tolist():
@@ -241,10 +259,10 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 200
 START_BATCH_INDEX = 0
-TRAIN_EPOCHS = 20
+# TRAIN_EPOCHS = 25
 TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 1
 CLASS_NUM = 10
 
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
@@ -278,6 +296,8 @@ with tf.Session() as sess:
     # 시작 시간 체크
     stime = time.time()
     models = []
+    valid_result = []
+    epoch = 0
     # initialize
     for m in range(NUM_MODELS):
         models.append(Model(sess, "model" + str(m)))
@@ -288,8 +308,8 @@ with tf.Session() as sess:
     print('Learning Started!')
 
     # train my model
-    for epoch in range(TRAIN_EPOCHS):
-
+    # for epoch in range(TRAIN_EPOCHS):
+    while True:
         avg_cost_list = np.zeros(len(models))
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
@@ -351,9 +371,31 @@ with tf.Session() as sess:
             mon_cost_list[idx].append(cost)
         drawnow(monitorTrainCost)
 
+        epoch += 1
+
+        # early stop
+        if epoch > 0:
+            # 21 에폭부터 저장
+            saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
+
+            # 모델 검증
+            result = validateModel(MODEL_ACCURACY)
+            valid_result.append(result)
+            if len(valid_result) != 1:
+                if float(valid_result[0]) > float(valid_result[1]):
+                    print("Ealry Stop 으로 학습을 중단합니다.")
+                    print("최고정확도 {}".format(valid_result[0]))
+                    break
+                else:
+                    valid_result[0] = valid_result[1]
+                    valid_result.pop()
+                    print("학습을 계속 진행합니다.")
+
+
+
+
     drawnow(monitorTrainCost, pltSave=True)
     print('Learning Finished!')
-    saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
 
     # 종료 시간 체크
     etime = time.time()
@@ -361,7 +403,6 @@ with tf.Session() as sess:
     predictConsumtionTime()
 
 tf.reset_default_graph()
-validateModel(MODEL_ACCURACY)
 
 
 
