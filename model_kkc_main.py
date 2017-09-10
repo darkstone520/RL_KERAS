@@ -210,7 +210,8 @@ TEST_EPHOCHS = 1
 TRAIN_RATE = 0.8
 NUM_MODELS = 1
 CLASS_NUM = 10
-TEST_ACCURACY = []
+TEST_ACCURACY = None
+TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
 ENSEMBLE_ACCURACY = 0
 CNT = 0
@@ -371,15 +372,15 @@ with tf.Session() as sess:
                 print('Testing Finished!')
 
 
-            valid_result.append(TEST_ACCURACY)
-            if len(valid_result) != 1:
-                if float(valid_result[0]) > float(valid_result[1]):
+            TEST_ACCURACY_LIST.append(TEST_ACCURACY)
+            if len(TEST_ACCURACY_LIST) != 1:
+                if float(TEST_ACCURACY_LIST[0]) > float(TEST_ACCURACY_LIST[1]):
                     print("Ealry Stop 으로 학습을 중단합니다.")
-                    print("최고정확도 {}".format(valid_result[0]))
+                    print("최고정확도 {}".format(TEST_ACCURACY_LIST[0]))
                     break
                 else:
-                    valid_result[0] = valid_result[1]
-                    valid_result.pop()
+                    TEST_ACCURACY_LIST[0] = TEST_ACCURACY_LIST[1]
+                    TEST_ACCURACY_LIST.pop()
                     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
                     print("학습을 계속 진행합니다.")
 
