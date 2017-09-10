@@ -190,7 +190,6 @@ def validateModel(MODEL_ACCURACY):
 
     START_BATCH_INDEX = 0
     ENSEMBLE_ACCURACY = 0
-    TEST_ACCURACY_LIST = []
     CNT = 0
 
     with tf.Session() as sess:
@@ -237,9 +236,8 @@ def validateModel(MODEL_ACCURACY):
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             print('Ensemble Accuracy : ', sess.run(ENSEMBLE_ACCURACY) / CNT)
-            TEST_ACCURACY_LIST.append(ENSEMBLE_ACCURACY/CNT )
             print('Testing Finished!')
-        print("TEST_EPHOCH 수: {}, 최대 정확도: {}".format(TEST_EPHOCHS,np.max(sess.run(TEST_ACCURACY_LIST), axis=-1)))
+            return sess.run(ENSEMBLE_ACCURACY) / CNT
 
 def predictConsumtionTime():
     """
