@@ -326,7 +326,7 @@ with tf.Session() as sess:
         ###################################################################################
         ## Early Stop, Test 검증
         ################################################################################
-        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list) < 0.005):
+        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list)) < 0.005:
 
             # Test 수행 시 마다 초기화가 필요한 변수들
             MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
