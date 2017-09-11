@@ -72,7 +72,7 @@ def loadRandomMiniBatch(lines):
 
     # 라벨을 one_hot으로 바꾼다.
     # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    if random.random() > 0.50:
+    if DISTORT_RATE > random.random():
         data = distortImage(data)
 
     label_list = []
@@ -209,6 +209,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 200
 START_BATCH_INDEX = 0
+DISTORT_RATE = 0.8
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 10
