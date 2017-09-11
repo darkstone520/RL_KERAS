@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import random
 import math
 import time
+from scipy import ndimage
 from drawnow import drawnow
 
 def monitorTrainCost(pltSave=False):
@@ -71,6 +72,8 @@ def loadRandomMiniBatch(lines):
 
     # 라벨을 one_hot으로 바꾼다.
     # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
+    if random.random() > 0.50:
+        data = distortImage(data)
 
     label_list = []
     for label in label.tolist():
@@ -185,7 +188,6 @@ def shuffleLines(lines):
     lines = random.sample(lines, len(lines))
     return random.sample(lines, len(lines))
 
-
 def predictConsumtionTime(epoch_num):
     """
     총소요시간 = 배치 사이즈 * a * 앙상블 모델의 수 * 배치 횟수(per Epoch) * 전체 Ephoc 수
@@ -199,6 +201,8 @@ def predictConsumtionTime(epoch_num):
     print("총 {} 에폭 학습, 학습 예상 소요시간: {} 분".format(epoch_num,c_time))
     return c_time
 
+def distortImage(images):
+    return ndimage.uniform_filter(images, size=11)
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
@@ -236,6 +240,17 @@ mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
 TRAIN_DATA, TEST_DATA = loadInputData()
+
+print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))
+
+# for line in TRAIN_DATA:
+#     line = line.split(',')
+#     line.pop()
+#     line.pop()
+#     line = np.array(line, dtype=np.float32).reshape(144,144)
+#     line = line/255.
+#     plotImage(line)
+
 # 종료 시간 체크
 etime = time.time()
 print('Data Loading Consumption Time : ', round(etime - stime, 6))
@@ -333,7 +348,7 @@ with tf.Session() as sess:
             CNT = 0
             TEST_ACCURACY = None
             ENSEMBLE_ACCURACY = 0
-
+            TEST_DATA = shuffleLines(TEST_DATA)
             print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
 
             # 모델 검증
