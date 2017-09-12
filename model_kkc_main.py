@@ -72,7 +72,7 @@ def loadRandomMiniBatch(lines):
 
     # 라벨을 one_hot으로 바꾼다.
     # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-    if DISTORT_RATE > random.random():
+    if IMAGE_DISTORT_RATE > random.random():
         data = distortImage(data)
 
     label_list = []
@@ -207,14 +207,16 @@ def distortImage(images):
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
-BATCH_SIZE = 200
+BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-DISTORT_RATE = 0.2
+
+# 학습 도중 이미지를 Distort하는 데이터의 비중
+IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 10
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 5
 CLASS_NUM = 10
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
