@@ -272,6 +272,7 @@ mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
 TRAIN_DATA, TEST_DATA = loadInputData()
+ALL_TEST_LABELS = loadAllTestLabel(TEST_DATA)
 
 print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))
 
@@ -381,7 +382,6 @@ with tf.Session() as sess:
             TEST_ACCURACY = None
             ENSEMBLE_ACCURACY = 0
             TEST_DATA = shuffleLines(TEST_DATA)
-            ALL_LABELS = loadAllTestLabel(TEST_DATA)
 
             print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
             # 모델 검증
@@ -410,7 +410,7 @@ with tf.Session() as sess:
 
                 CNT += 1
 
-            ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_LABELS, 1))
+            ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
             START_BATCH_INDEX = 0
