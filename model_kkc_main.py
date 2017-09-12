@@ -187,7 +187,7 @@ def loadBatch(lines, START_BATCH_INDEX):
 def loadAllTestLabel(lines):
     labels = [line.split(',')[-2] for line in lines]
     label_list = []
-    for label in labels.tolist():
+    for label in labels:
         if label == 0:
             label_list.append([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
         elif label == 1:
