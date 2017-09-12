@@ -184,6 +184,35 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label_list)
     return data, label
 
+def loadAllTestLabel(lines):
+    labels = [line.split(',')[-2] for line in lines]
+    label_list = []
+    for label in labels.tolist():
+        if label == 0:
+            label_list.append([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
+        elif label == 1:
+            label_list.append([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
+        elif label == 2:
+            label_list.append([0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
+        elif label == 3:
+            label_list.append([0, 0, 0, 1, 0, 0, 0, 0, 0, 0])
+        elif label == 4:
+            label_list.append([0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
+        elif label == 5:
+            label_list.append([0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
+        elif label == 6:
+            label_list.append([0, 0, 0, 0, 0, 0, 1, 0, 0, 0])
+        elif label == 7:
+            label_list.append([0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
+        elif label == 8:
+            label_list.append([0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
+        elif label == 9:
+            label_list.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
+
+    label = np.array(label_list)
+    return label
+
+
 def shuffleLines(lines):
     lines = random.sample(lines, len(lines))
     return random.sample(lines, len(lines))
@@ -215,9 +244,8 @@ IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 1
-EARLY_STOP_START_COST = 0.5
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 2
 CLASS_NUM = 10
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
@@ -345,7 +373,7 @@ with tf.Session() as sess:
         ###################################################################################
         ## Early Stop, Test 검증
         ################################################################################
-        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list)) < EARLY_STOP_START_COST:
+        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list)) < 1:
 
             # Test 수행 시 마다 초기화가 필요한 변수들
             MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
@@ -353,8 +381,9 @@ with tf.Session() as sess:
             TEST_ACCURACY = None
             ENSEMBLE_ACCURACY = 0
             TEST_DATA = shuffleLines(TEST_DATA)
-            print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
+            ALL_LABELS = loadAllTestLabel(TEST_DATA)
 
+            print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
             # 모델 검증
             # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
             test_total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
@@ -364,34 +393,31 @@ with tf.Session() as sess:
                 print("Test Batch Data Reading {}/{}".format(i + 1, test_total_batch_num))
 
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX)
+                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX) # 리턴 시 START_BATCH_INDEX는 + BATCH_SZIE 되어 있음
 
                 test_size = len(test_y_batch)  # 테스트 데이터
                 predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size,
                                                                       CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
-                # model_result = np.zeros(test_size * CLASS_NUM, dtype=np.int).reshape(test_size,
-                #                                                                      CLASS_NUM)  # [ [0,0], [0,0]...]
-                # model_result[:, 0] = range(0, test_size)  # [[0,0],[1,0], [2,0], [3,0] ......]
 
+                # 모든 앙상블 모델들에 대해 각각 모델의 정확도와 predict를 구하는 과정
                 for idx, m in enumerate(models):
                     MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch,
                                                           test_y_batch)  # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
-                    p = m.predict(test_x_batch)  # 모델이 예측한 값 [[0.1,0.9], [0.3,0.7]...]
-                    predictions += p  # 각 모델별로 예측한값을 predictions에 누적합계 더해준다.
+                    p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
 
-                    # model_result[:, 1] = np.argmax(p, 1)  # 인덱스 1에 p중 가장 큰값의 인덱스(라벨)를 넣는다 [[0,0],[1,1], [2,1], [3,0] ......]
-                    # for result in model_result:
-                    #     predictions[result[0], result[1]] += 1
+                    # 위에서 load배치 함수를 호출하면 START_BATCH_INDEX가 BATCH_SIZE만큼 증가하기 때문에 다시 빼준다.
+                    predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
 
-                ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(test_y_batch, 1))
-                ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
-                CNT += 1 # 총 배치돈 횟수(에폭*배치돈횟수)
+                CNT += 1
+
+            ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_LABELS, 1))
+            ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
             START_BATCH_INDEX = 0
 
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
-            TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY) / CNT
+            TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
 
