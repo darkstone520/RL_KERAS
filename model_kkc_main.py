@@ -186,6 +186,7 @@ def loadBatch(lines, START_BATCH_INDEX):
 
 def loadAllTestLabel(lines):
     labels = [line.split(',')[-2] for line in lines]
+    labels = np.array(labels, dtype=np.uint8)
     label_list = []
     for label in labels:
         if label == 0:
@@ -273,6 +274,7 @@ mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 stime = time.time()
 TRAIN_DATA, TEST_DATA = loadInputData()
 ALL_TEST_LABELS = loadAllTestLabel(TEST_DATA)
+print(ALL_TEST_LABELS.shape)
 
 print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))
 
