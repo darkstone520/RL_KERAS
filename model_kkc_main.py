@@ -17,7 +17,7 @@ def monitorTrainCost(pltSave=False):
     plt.ylabel('Cost')
     plt.grid(True)
     if pltSave:
-        plt.savefig('Cost Graph per Epoch')
+        plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
@@ -39,7 +39,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_flower_mushroom_elephant_rhino_nature_building_simson_snake_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "cat_dog_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -76,40 +76,12 @@ def loadRandomMiniBatch(lines):
         data = distortImage(data)
 
     label_list = []
+
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0,0,0,0,0,0,0])
-        elif label == 1:
-            label_list.append([0,1,0,0,0,0,0,0,0,0])
-        elif label == 2:
-            label_list.append([0,0,1,0,0,0,0,0,0,0])
-        elif label == 3:
-            label_list.append([0,0,0,1,0,0,0,0,0,0])
-        elif label == 4:
-            label_list.append([0,0,0,0,1,0,0,0,0,0])
-        elif label == 5:
-            label_list.append([0,0,0,0,0,1,0,0,0,0])
-        elif label == 6:
-            label_list.append([0,0,0,0,0,0,1,0,0,0])
-        elif label == 7:
-            label_list.append([0,0,0,0,0,0,0,1,0,0])
-        elif label == 8:
-            label_list.append([0,0,0,0,0,0,0,0,1,0])
-        elif label == 9:
-            label_list.append([0,0,0,0,0,0,0,0,0,1])
-
-    # label_list = []
-    # for label in label.tolist():
-    #     if label == 0:
-    #         label_list.append([1,0,0,0])
-    #     elif label == 1:
-    #         label_list.append([0,1,0,0])
-    #     elif label == 2:
-    #         label_list.append([0,0,1,0])
-    #     elif label ==3:
-    #         label_list.append([0,0,0,1])
-
-
+            label_list.append([1,0])
+        else:
+            label_list.append([0,1])
 
     label = np.array(label_list)
     return data, label
@@ -131,63 +103,24 @@ def loadBatch(lines, START_BATCH_INDEX):
     data, label = data[:, :-1], data[:, -1]
     data = data / 255.
 
-    # 고양이, 개 사진이 잘 섞였는지 확인하는 부분
-    # for idx, l in enumerate(label):
-    #     if l == 0:
-    #         print(l)
-    #         print("고양이입니다.")
-    #     else:
-    #         print(l)
-    #         print("개입니다.")
-    #     plotImage(data[idx].reshape(144,144))
-
-    # 라벨을 one_hot으로 바꾼다.
-    # label = [[1, 0] if label == 0 else [0, 1] for label in label.tolist()]
-
     label_list = []
+
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0,0,0,0,0,0,0,0,0])
-        elif label == 1:
-            label_list.append([0,1,0,0,0,0,0,0,0,0])
-        elif label == 2:
-            label_list.append([0,0,1,0,0,0,0,0,0,0])
-        elif label == 3:
-            label_list.append([0,0,0,1,0,0,0,0,0,0])
-        elif label == 4:
-            label_list.append([0,0,0,0,1,0,0,0,0,0])
-        elif label == 5:
-            label_list.append([0,0,0,0,0,1,0,0,0,0])
-        elif label == 6:
-            label_list.append([0,0,0,0,0,0,1,0,0,0])
-        elif label == 7:
-            label_list.append([0,0,0,0,0,0,0,1,0,0])
-        elif label == 8:
-            label_list.append([0,0,0,0,0,0,0,0,1,0])
-        elif label == 9:
-            label_list.append([0,0,0,0,0,0,0,0,0,1])
+            label_list.append([1,0])
+        else:
+            label_list.append([0,1])
 
-
-
-    # label_list = []
-    # for label in label.tolist():
-    #     if label == 0:
-    #         label_list.append([1,0,0,0])
-    #     elif label == 1:
-    #         label_list.append([0,1,0,0])
-    #     elif label == 2:
-    #         label_list.append([0,0,1,0])
-    #     elif label ==3:
-    #         label_list.append([0,0,0,1])
 
 
     label = np.array(label_list)
-    return data, label
+    return data, label, START_BATCH_INDEX
 
 def loadAllTestLabel(lines):
     labels = [line.split(',')[-2] for line in lines]
     labels = np.array(labels, dtype=np.uint8)
     label_list = []
+
     for label in labels:
         if label == 0:
             label_list.append([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
@@ -244,10 +177,11 @@ START_BATCH_INDEX = 0
 IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
-START_EARLY_STOP_EPOCH = 1
+START_EARLY_STOP_EPOCH = 6
+START_EARLY_STOP_COST = 0.01
 TRAIN_RATE = 0.8
-NUM_MODELS = 2
-CLASS_NUM = 10
+NUM_MODELS = 3
+CLASS_NUM = 2
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
 
@@ -255,10 +189,10 @@ START_BATCH_INDEX = 0
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
-RANDOM_MINI_BATCH_NO_ORDER = True
+RANDOM_MINI_BATCH_NO_ORDER = False
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
-RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
+RANDOM_MINI_BATCH_ORDER = True # 중복없는 랜덤 미니배치
 NORMAL_BATCH = False # 일반배치
 
 
@@ -273,8 +207,7 @@ mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
 TRAIN_DATA, TEST_DATA = loadInputData()
-ALL_TEST_LABELS = loadAllTestLabel(TEST_DATA)
-print(ALL_TEST_LABELS.shape)
+#loadAllTestLabel(TEST_DATA)
 
 print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))
 
@@ -334,24 +267,24 @@ with tf.Session() as sess:
             # MINI_BATCH 여부에 따라 나뉜다.
             # 중복 없는 Random Mini Batch
             if RANDOM_MINI_BATCH_ORDER:
-                print("[데이터 중복 불가] {} Epoch: Random Mini Batch Data Reading {}/{}".
-                      format(epoch + 1, i + 1, total_batch_num))
-                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
+                print("[데이터 중복 불가] {} Epoch: Random Mini Batch Data Reading {}/{}, DATA INDEX : {}".
+                      format(epoch + 1, i + 1, total_batch_num,START_BATCH_INDEX))
+                train_x_batch, train_y_batch, START_BATCH_INDEX = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # Normal Batch
             elif NORMAL_BATCH:
-                print("[데이터 중복 불가] {} Epoch: Normal Batch Data Reading {}/{}".
-                      format(epoch + 1, i + 1, total_batch_num))
-                train_x_batch, train_y_batch = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
+                print("[데이터 중복 불가] {} Epoch: Normal Batch Data Reading {}/{}, DATA INDEX : {}".
+                      format(epoch + 1, i + 1, total_batch_num, START_BATCH_INDEX))
+                train_x_batch, train_y_batch, START_BATCH_INDEX = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # 중복 허용 Random Mini Batch
             elif RANDOM_MINI_BATCH_NO_ORDER:
 
                 # 특정 Epoch만큼 데이터 중복없이 일반배치 또는 랜덤미니배치를 수행을 설정하는 부분
                 if epoch < MIN_ORDER_BATCH_EPCHO:
-                    print("[데이터 중복 불가] {}/{} Epoch : Normal Batch Data Reading {}/{}".
-                          format(epoch + 1, MIN_ORDER_BATCH_EPCHO, i + 1, total_batch_num))
-                    train_x_batch, train_y_batch = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
+                    print("[데이터 중복 불가] {}/{} Epoch : Normal Batch Data Reading {}/{}, DATA INDEX : {}".
+                          format(epoch + 1, MIN_ORDER_BATCH_EPCHO, i + 1, total_batch_num, START_BATCH_INDEX))
+                    train_x_batch, train_y_batch, START_BATCH_INDEX = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
                 else:
                     print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
                           format(epoch + 1, i + 1, total_batch_num))
@@ -376,7 +309,7 @@ with tf.Session() as sess:
         ###################################################################################
         ## Early Stop, Test 검증
         ################################################################################
-        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list)) < 1:
+        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list)) < START_EARLY_STOP_COST:
 
             # Test 수행 시 마다 초기화가 필요한 변수들
             MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
@@ -384,34 +317,35 @@ with tf.Session() as sess:
             TEST_ACCURACY = None
             ENSEMBLE_ACCURACY = 0
             TEST_DATA = shuffleLines(TEST_DATA)
+            test_total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
+            ALL_TEST_LABELS = []
+            predictions = np.zeros(test_total_batch_num * BATCH_SIZE * CLASS_NUM)\
+                .reshape(-1,CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
 
             print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
             # 모델 검증
             # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
-            test_total_batch_num = math.trunc(len(TEST_DATA) / BATCH_SIZE)
 
             for i in range(test_total_batch_num):
 
-                print("Test Batch Data Reading {}/{}".format(i + 1, test_total_batch_num))
+                print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
 
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
-                test_x_batch, test_y_batch = loadBatch(TEST_DATA, START_BATCH_INDEX) # 리턴 시 START_BATCH_INDEX는 + BATCH_SZIE 되어 있음
-
-                test_size = len(test_y_batch)  # 테스트 데이터
-                predictions = np.zeros(test_size * CLASS_NUM).reshape(test_size,
-                                                                      CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
+                test_x_batch, test_y_batch, START_BATCH_INDEX = loadBatch(TEST_DATA, START_BATCH_INDEX) # 리턴 시 START_BATCH_INDEX는 + BATCH_SZIE 되어 있음
+                ALL_TEST_LABELS.append(test_y_batch)
 
                 # 모든 앙상블 모델들에 대해 각각 모델의 정확도와 predict를 구하는 과정
                 for idx, m in enumerate(models):
                     MODEL_ACCURACY[idx] += m.get_accuracy(test_x_batch,
                                                           test_y_batch)  # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
                     p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
-
                     # 위에서 load배치 함수를 호출하면 START_BATCH_INDEX가 BATCH_SIZE만큼 증가하기 때문에 다시 빼준다.
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
 
                 CNT += 1
-
+            ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
+            print(ALL_TEST_LABELS.shape)
+            print(predictions.shape)
             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
