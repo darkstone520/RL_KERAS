@@ -6,7 +6,7 @@ class Model:
     def __init__(self, sess, name):
         self.sess = sess
         self.name = name
-        self.class_num = 2
+        self.class_num = 10
         self._build_net()
 
     def _conv(self, name, x, filter_size, in_filters, out_filters, strides):
