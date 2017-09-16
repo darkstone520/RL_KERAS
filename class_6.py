@@ -326,7 +326,7 @@ with tf.Session() as sess:
         ###################################################################################
         ## Early Stop, Test 검증
         ################################################################################
-        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.min(avg_cost_list)) < START_EARLY_STOP_COST:
+        if (epoch >= START_EARLY_STOP_EPOCH) and float(np.mean(avg_cost_list)) < START_EARLY_STOP_COST:
 
             # Test 수행 시 마다 초기화가 필요한 변수들
             MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
@@ -374,7 +374,7 @@ with tf.Session() as sess:
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:
-                if float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]):
+                if abs(float(TEST_ACCURACY_LIST[0] - TEST_ACCURACY_LIST[1])) > 0.01 and  float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]):
                     print("Ealry Stop 으로 학습을 중단합니다.")
                     print("최고정확도 {}".format(TEST_ACCURACY_LIST[0]))
                     break

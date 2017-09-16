@@ -310,7 +310,10 @@ class Model:
     ##  ⊙ Leaky Relu      : 0 에 근접한 작은 값을 alpha 값으로 설정하는 Relu 함수
     ####################################################################################################################
     def parametric_relu(self, _x, name):
-        alphas = tf.get_variable(name, _x.get_shape()[-1], initializer=tf.constant_initializer(0.01), dtype=tf.float32)
+        alphas = tf.get_variable(name,
+                                 _x.get_shape()[-1],
+                                 initializer=tf.constant_initializer(0.01),
+                                 dtype=tf.float32)
         pos = tf.nn.relu(_x)
         neg = alphas * (_x - abs(_x)) * 0.5
         return pos + neg
