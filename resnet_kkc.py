@@ -101,7 +101,6 @@ class Model:
                 # 64개 필터를 128개로 확대
                 self.bottle_neck_3 = tf.get_variable(name='W4_bottle_nack_3', shape=[3,3,64,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
-
                 # output 18x18
                 # 128개 필터를 64개로 축소
                 self.L4_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.bottle_neck, strides=[1,2,2,1], padding='SAME')
@@ -143,25 +142,56 @@ class Model:
                 self.W5_sub = tf.get_variable(name='W5_sub', shape=[3,3,256,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.W5_sub_1 = tf.get_variable(name='W5_sub_1', shape=[3,3,512,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
+                # 256개의 필터를 128개로 축소
+                self.bottle_neck = tf.get_variable(name='W5_bottle_nack', shape=[1, 1, 256, 128], dtype=tf.float32,
+                                                   initializer=tf.contrib.layers.variance_scaling_initializer())
+                # 128개로 축소된 필터를 다음 레이어로 512개 확대
+                self.bottle_neck_1 = tf.get_variable(name='W5_bottle_nack_1', shape=[1, 1, 128, 512], dtype=tf.float32,
+                                                     initializer=tf.contrib.layers.variance_scaling_initializer())
+                # 128개로 축소된 필터를 3x3 연산
+                self.bottle_neck_2 = tf.get_variable(name='W5_bottle_nack_2', shape=[3, 3, 128, 128], dtype=tf.float32,
+                                                     initializer=tf.contrib.layers.variance_scaling_initializer())
+                # 128개 필터를 256개로 확대
+                self.bottle_neck_3 = tf.get_variable(name='W5_bottle_nack_3', shape=[3, 3, 128, 256], dtype=tf.float32,
+                                                     initializer=tf.contrib.layers.variance_scaling_initializer())
+
                 # output 9x9
-                self.L5_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W5_sub, strides=[1,2,2,1], padding='SAME')
+                # 256개 필터를 128개로 축소
+                self.L5_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.bottle_neck, strides=[1,2,2,1], padding='SAME')
                 self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_1')
                 self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_1')
 
                 # output : 9x9
-                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
+                # 128개로 축소된 필터에 대해 3x3 연산
+                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.bottle_neck_2, strides=[1, 1, 1, 1], padding='SAME')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_1_1')
+                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_1_1')
+
+                # output : 9x9
+                # 128개로 축소된 필터를 다시 256개로 확대
+                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.bottle_neck_3, strides=[1, 1, 1, 1], padding='SAME')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_1_2')
+                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_1_2')
+
+
+                # output : 9x9
+                # 256개 필터를 128개로 축소
+                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.bottle_neck, strides=[1,1,1,1], padding='SAME')
                 self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_2')
-                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_2')
+                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_2') + tf.layers.conv2d(self.L4_sub, kernel_size=(1,1), strides=(2,2), padding='SAME', filters=512, activation=tf.nn.relu)
 
                 # output : 9x9
-                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
-                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_3')
-                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_3')
+                # 128개로 축소된 필터에 대해 3x3 연산
+                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.bottle_neck_2, strides=[1, 1, 1, 1], padding='SAME')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_2_1')
+                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_2_1')
 
                 # output : 9x9
-                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W5_sub_1, strides=[1,1,1,1], padding='SAME')
-                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_4')
-                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_4') + tf.layers.conv2d(self.L4_sub, kernel_size=(1,1), strides=(2,2), padding='SAME', filters=512, activation=tf.nn.relu)
+                # 128개로 축소된 필터를 최종적으로 512개로 확대
+                self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.bottle_neck_1, strides=[1, 1, 1, 1], padding='SAME')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_2_2')
+                self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_2_2')
+
 
             with tf.name_scope('avg_pool') as scope:
                 self.avg_pool = tf.nn.avg_pool(value=self.L5_sub, ksize=[1,3,3,1], strides=[1,1,1,1], padding='SAME')
