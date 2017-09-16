@@ -111,20 +111,25 @@ class Model:
                 self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='VALID')
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
+
                 # output : (35-3)/1 +1 = 33x33
                 self.L2_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='VALID')
+                self.L2_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN_1')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R_conv2_1')
 
                 # output : 31x31
                 self.L2_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='VALID')
+                self.L2_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN_2')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R_conv2_2')
 
                 # output : 29x29
                 self.L2_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='VALID')
+                self.L2_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN_3')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R_conv2_3')
 
                 # output : 27x27
                 self.L2_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='VALID')
+                self.L2_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN_4')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R_conv2_4')
 
 
@@ -135,18 +140,22 @@ class Model:
 
                 # output (27-3)/1 + 1 = 25x25
                 self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1,1,1,1], padding='VALID')
+                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN_1')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R_conv3_1')
 
                 # output : 23x23
                 self.L3_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='VALID')
+                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN_2')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R_conv3_2')
 
                 # output : 21x21
                 self.L3_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='VALID')
+                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN_3')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R_conv3_3')
 
                 # output : 19x19
                 self.L3_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W3_sub_1, strides=[1,1,1,1], padding='VALID')
+                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN_4')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R_conv3_4')
 
 
@@ -157,18 +166,22 @@ class Model:
 
                 # output (19-3)/1 + 1 = 17x17
                 self.L4_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W4_sub, strides=[1,1,1,1], padding='VALID')
+                self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv4_sub_BN_1')
                 self.L4_sub = self.parametric_relu(self.L4_sub, 'R_conv4_1')
 
                 # output : 15x15
                 self.L4_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W4_sub_1, strides=[1, 1, 1, 1], padding='VALID')
+                self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv4_sub_BN_2')
                 self.L4_sub = self.parametric_relu(self.L4_sub, 'R_conv4_2')
 
                 # output : 13x13
                 self.L4_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W4_sub_1, strides=[1, 1, 1, 1], padding='VALID')
+                self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv4_sub_BN_3')
                 self.L4_sub = self.parametric_relu(self.L4_sub, 'R_conv4_3')
 
                 # output : 11x11
                 self.L4_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W4_sub_1, strides=[1,1,1,1], padding='VALID')
+                self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv4_sub_BN_4')
                 self.L4_sub = self.parametric_relu(self.L4_sub, 'R_conv4_4')
 
 
@@ -179,18 +192,22 @@ class Model:
 
                 # output (11-3)/1 + 1 = 9x9
                 self.L5_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W5_sub, strides=[1,1,1,1], padding='VALID')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_1')
                 self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_1')
 
                 # output : 7x7
                 self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W5_sub_1, strides=[1,1,1,1], padding='VALID')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_2')
                 self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_2')
 
                 # output : 5x5
                 self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W5_sub_1, strides=[1,1,1,1], padding='VALID')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_3')
                 self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_3')
 
                 # output : 3x3
                 self.L5_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W5_sub_1, strides=[1,1,1,1], padding='VALID')
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv5_sub_BN_4')
                 self.L5_sub = self.parametric_relu(self.L5_sub, 'R_conv5_4')
 
             with tf.name_scope('avg_pool') as scope:
