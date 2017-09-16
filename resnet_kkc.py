@@ -103,7 +103,6 @@ class Model:
                 #(144-4)/2 + 1 = 71x71
                 self.W1_sub = tf.get_variable(name='W1_sub', shape=[4,4,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,2,2,1], padding='VALID')
-                self.L1_sub = self.BN(input=self.L1_sub, scale=True, training=self.training, name='Conv1_sub_BN')
 
             with tf.name_scope('conv2_x'):
 
