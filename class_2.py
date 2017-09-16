@@ -1,4 +1,4 @@
-from model_kkc import Model
+from resnet_kkc import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -177,7 +177,7 @@ START_BATCH_INDEX = 0
 IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
-START_EARLY_STOP_EPOCH = 6
+START_EARLY_STOP_EPOCH = 5
 START_EARLY_STOP_COST = 0.01
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
@@ -189,11 +189,11 @@ START_BATCH_INDEX = 0
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
-RANDOM_MINI_BATCH_NO_ORDER = True
-MIN_ORDER_BATCH_EPCHO = 2 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
+RANDOM_MINI_BATCH_NO_ORDER = False
+MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
 RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
-NORMAL_BATCH = False # 일반배치
+NORMAL_BATCH = True # 일반배치
 
 
 LAST_EPOCH = None
