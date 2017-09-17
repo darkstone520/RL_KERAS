@@ -30,6 +30,7 @@ class Model:
 
                 # 36 x36
                 self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
+                self.avg_pool = self.BN(intput=self.L2_sub, scale=True, training=self.training, name='avg_pool_BN')
 
                 # output : 36x36
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
