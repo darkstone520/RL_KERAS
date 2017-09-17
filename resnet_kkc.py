@@ -8,7 +8,7 @@ class Model:
     def __init__(self, sess, name):
         self.sess = sess
         self.name = name
-        self.class_num = 2
+        self.class_num = 10
         self._build_net()
 
     def _build_net(self):
@@ -25,22 +25,24 @@ class Model:
                 # 72x72
                 self.W1_sub = tf.get_variable(name='W1_sub', shape=[7,7,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,2,2,1], padding='SAME')
-                self.L1_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
 
             with tf.name_scope('conv2_x'):
+
+                # 36 x36
+                self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
 
                 # output : 36x36
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 # output : 36x36
-                self.L2_sub_1 = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
+                self.L2_sub_1 = tf.nn.conv2d(input=self.L2_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_1 = self.BN(input=self.L2_sub_1, scale=True, training=self.training, name='Conv2_sub_BN_1')
                 self.L2_sub_1_r = self.parametric_relu(self.L2_sub_1, 'R_conv2_1')
 
                 # output : 36x36 with shortcut
                 self.L2_sub_2 = tf.nn.conv2d(input=self.L2_sub_1_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_2 = self.BN(input=self.L2_sub_2, scale=True, training=self.training, name='Conv2_sub_BN_2')
-                self.L2_sub_2_r = self.parametric_relu(self.L2_sub_2, 'R_conv2_2') + self.L2_sub_1_r
+                self.L2_sub_2_r = self.parametric_relu(self.L2_sub_2 + self.L2_sub_1_r, 'R_conv2_2')
 
                 # output : 36x36
                 self.L2_sub_3 = tf.nn.conv2d(input=self.L2_sub_2_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
@@ -50,7 +52,7 @@ class Model:
                 # output : 36x36 with shortcut
                 self.L2_sub_4 = tf.nn.conv2d(input=self.L2_sub_3_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_4 = self.BN(input=self.L2_sub_4, scale=True, training=self.training, name='Conv2_sub_BN_4')
-                self.L2_sub_4_r = self.parametric_relu(self.L2_sub_4, 'R_conv2_4') + self.L2_sub_3_r
+                self.L2_sub_4_r = self.parametric_relu(self.L2_sub_4 + self.L2_sub_3_r, 'R_conv2_4')
 
 
             with tf.name_scope('conv3_x'):
@@ -66,7 +68,7 @@ class Model:
                 # output : 18x18 with shortcut
                 self.L3_sub_2 = tf.nn.conv2d(input=self.L3_sub_1_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_2 = self.BN(input=self.L3_sub_2, scale=True, training=self.training, name='Conv3_sub_BN_2')
-                self.L3_sub_2_r = self.parametric_relu(self.L3_sub_2, 'R_conv3_2') + self.L3_sub_1_r
+                self.L3_sub_2_r = self.parametric_relu(self.L3_sub_2 + self.L3_sub_1_r, 'R_conv3_2')
 
                 # output : 18x18
                 self.L3_sub_3 = tf.nn.conv2d(input=self.L3_sub_2_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
@@ -76,7 +78,7 @@ class Model:
                 # output : 18x18 with shortcut
                 self.L3_sub_4 = tf.nn.conv2d(input=self.L3_sub_3_r, filter=self.W3_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L3_sub_4 = self.BN(input=self.L3_sub_4, scale=True, training=self.training, name='Conv3_sub_BN_4')
-                self.L3_sub_4_r = self.parametric_relu(self.L3_sub_4, 'R_conv3_4') + self.L3_sub_3_r
+                self.L3_sub_4_r = self.parametric_relu(self.L3_sub_4 + self.L3_sub_3_r, 'R_conv3_4')
 
             # INPUT으로 128개의 필터가 들어온다.
             with tf.name_scope('conv4_x'):
@@ -107,7 +109,8 @@ class Model:
                 # 3x3 연산 후 다시 필터를 128개로 바꾼다. with shortcut
                 self.L4_sub_3 = tf.nn.conv2d(input=self.L4_sub_2_r, filter=self.bottle_neck_3, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_3 = self.BN(input=self.L4_sub_3, scale=True, training=self.training, name='Conv4_sub_BN_1_2')
-                self.L4_sub_3_r = self.parametric_relu(self.L4_sub_3, 'R_conv4_1_2') + tf.layers.conv2d(self.L3_sub_4_r, kernel_size=(1,1), strides=(2,2), padding='VALID', filters=128)
+                input_x = tf.layers.conv2d(self.L3_sub_4_r, kernel_size=(1,1), strides=(2,2), padding='VALID', filters=128)
+                self.L4_sub_3_r = self.parametric_relu(self.L4_sub_3 + input_x, 'R_conv4_1_2')
 
                 # output : 9x9
                 # 128개 필터를 64개로 축소
@@ -125,7 +128,8 @@ class Model:
                 # 3x3 연산후 256개 필터로 바꾼다
                 self.L4_sub_6 = tf.nn.conv2d(input=self.L4_sub_5_r, filter=self.bottle_neck_1, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_6 = self.BN(input=self.L4_sub_6, scale=True, training=self.training, name='Conv4_sub_BN_2_2')
-                self.L4_sub_6_r = self.parametric_relu(self.L4_sub_6, 'R_conv4_2_2') + tf.layers.conv2d(self.L4_sub_3_r, kernel_size=(1,1), strides=(1,1), padding='SAME', filters=256)
+                input_x = tf.layers.conv2d(self.L4_sub_3_r, kernel_size=(1,1), strides=(1,1), padding='SAME', filters=256)
+                self.L4_sub_6_r = self.parametric_relu(self.L4_sub_6 + input_x, 'R_conv4_2_2')
 
 
             with tf.name_scope('conv5_x'):
@@ -162,7 +166,8 @@ class Model:
                 # 128개로 축소된 필터를 다시 256개로 확대
                 self.L5_sub_3 = tf.nn.conv2d(input=self.L5_sub_2_r, filter=self.bottle_neck_3, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5_sub_3 = self.BN(input=self.L5_sub_3, scale=True, training=self.training, name='Conv5_sub_BN_1_2')
-                self.L5_sub_3_r = self.parametric_relu(self.L5_sub_3, 'R_conv5_1_2') + tf.layers.conv2d(self.L4_sub_6_r, kernel_size=(1,1), strides=(2,2), padding='VALID', filters=256)
+                input_x = tf.layers.conv2d(self.L4_sub_6_r, kernel_size=(1,1), strides=(2,2), padding='VALID', filters=256)
+                self.L5_sub_3_r = self.parametric_relu(self.L5_sub_3 + input_x, 'R_conv5_1_2')
 
 
                 # output : 5x5
@@ -181,7 +186,8 @@ class Model:
                 # 128개로 축소된 필터를 최종적으로 512개로 확대
                 self.L5_sub_6= tf.nn.conv2d(input=self.L5_sub_5_r, filter=self.bottle_neck_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5_sub_6 = self.BN(input=self.L5_sub_6, scale=True, training=self.training, name='Conv5_sub_BN_2_2')
-                self.L5_sub_6_r = self.parametric_relu(self.L5_sub_6, 'R_conv5_2_2') + tf.layers.conv2d(self.L5_sub_3_r, kernel_size=(1,1), strides=(1,1), padding='SAME', filters=512)
+                input_x = tf.layers.conv2d(self.L5_sub_3_r, kernel_size=(1,1), strides=(1,1), padding='SAME', filters=512)
+                self.L5_sub_6_r = self.parametric_relu(self.L5_sub_6 + input_x, 'R_conv5_2_2')
 
 
             with tf.name_scope('avg_pool'):
