@@ -42,7 +42,7 @@ class Model:
                 # output : 36x36 with shortcut
                 self.L2_sub_2 = tf.nn.conv2d(input=self.L2_sub_1_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_2 = self.BN(input=self.L2_sub_2, scale=True, training=self.training, name='Conv2_sub_BN_2')
-                self.L2_sub_2_r = self.parametric_relu(self.L2_sub_2 + self.L2_sub_1_r, 'R_conv2_2')
+                self.L2_sub_2_r = self.parametric_relu(self.L2_sub_2 + self.L2_sub, 'R_conv2_2')
 
                 # output : 36x36
                 self.L2_sub_3 = tf.nn.conv2d(input=self.L2_sub_2_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
@@ -52,7 +52,7 @@ class Model:
                 # output : 36x36 with shortcut
                 self.L2_sub_4 = tf.nn.conv2d(input=self.L2_sub_3_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_4 = self.BN(input=self.L2_sub_4, scale=True, training=self.training, name='Conv2_sub_BN_4')
-                self.L2_sub_4_r = self.parametric_relu(self.L2_sub_4 + self.L2_sub_3_r, 'R_conv2_4')
+                self.L2_sub_4_r = self.parametric_relu(self.L2_sub_4 + self.L2_sub_2_r, 'R_conv2_4')
 
 
             with tf.name_scope('conv3_x'):
@@ -68,7 +68,7 @@ class Model:
                 # output : 18x18 with shortcut
                 self.L3_sub_2 = tf.nn.conv2d(input=self.L3_sub_1_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_2 = self.BN(input=self.L3_sub_2, scale=True, training=self.training, name='Conv3_sub_BN_2')
-                self.L3_sub_2_r = self.parametric_relu(self.L3_sub_2 + self.L3_sub_1_r, 'R_conv3_2')
+                self.L3_sub_2_r = self.parametric_relu(self.L3_sub_2 + self.L2_sub_4_r, 'R_conv3_2')
 
                 # output : 18x18
                 self.L3_sub_3 = tf.nn.conv2d(input=self.L3_sub_2_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
@@ -78,7 +78,7 @@ class Model:
                 # output : 18x18 with shortcut
                 self.L3_sub_4 = tf.nn.conv2d(input=self.L3_sub_3_r, filter=self.W3_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L3_sub_4 = self.BN(input=self.L3_sub_4, scale=True, training=self.training, name='Conv3_sub_BN_4')
-                self.L3_sub_4_r = self.parametric_relu(self.L3_sub_4 + self.L3_sub_3_r, 'R_conv3_4')
+                self.L3_sub_4_r = self.parametric_relu(self.L3_sub_4 + self.L3_sub_2_r, 'R_conv3_4')
 
             # INPUT으로 128개의 필터가 들어온다.
             with tf.name_scope('conv4_x'):
