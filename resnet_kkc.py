@@ -170,7 +170,7 @@ class Model:
                 self.L5_sub_3_r = self.parametric_relu(self.L5_sub_3 + input_x, 'R_conv5_1_2')
 
 
-                # output : 5x5
+                # output : 5x5#
                 # 256개 필터를 128개로 축소
                 self.L5_sub_4 = tf.nn.conv2d(input=self.L5_sub_3_r, filter=self.bottle_neck, strides=[1,1,1,1], padding='SAME')
                 self.L5_sub_4 = self.BN(input=self.L5_sub_4, scale=True, training=self.training, name='Conv5_sub_BN_2')
