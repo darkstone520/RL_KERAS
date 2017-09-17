@@ -8,7 +8,7 @@ class Model:
     def __init__(self, sess, name):
         self.sess = sess
         self.name = name
-        self.class_num = 10
+        self.class_num = 2
         self._build_net()
 
     def _build_net(self):
