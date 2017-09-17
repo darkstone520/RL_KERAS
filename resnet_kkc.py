@@ -193,6 +193,7 @@ class Model:
 
             with tf.name_scope('avg_pool'):
                 self.avg_pool = tf.nn.avg_pool(value=self.L5_sub_6_r, ksize=[1,3,3,1], strides=[1,1,1,1], padding='SAME')
+                self.avg_pool = self.BN(intput=self.avg_pool, scale=True, training=self.training, name='avg_pool_BN')
                 self.avg_pool = tf.reshape(self.avg_pool, shape=[-1, 5*5*512])
 
             with tf.name_scope('fc_layer1'):
