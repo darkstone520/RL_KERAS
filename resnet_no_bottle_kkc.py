@@ -227,7 +227,7 @@ class Model:
                 self.L5_sub_6 = self.BN(input=self.L5_sub_6, scale=True, training=self.training, name='Conv5_sub_BN_6')
                 self.L5_sub_6_r = self.parametric_relu(self.L5_sub_6, 'R_conv5_6') + self.L5_sub_4_r
 
-
+            #
             with tf.name_scope('avg_pool'):
                 self.avg_pool = tf.nn.avg_pool(value=self.L5_sub_6_r, ksize=[1,3,3,1], strides=[1,1,1,1], padding='SAME')
                 self.avg_pool = tf.reshape(self.avg_pool, shape=[-1, 5*5*512])
