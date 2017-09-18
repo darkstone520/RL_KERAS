@@ -1,4 +1,4 @@
-from model_kkc import Model
+from resnet_no_bottle_kkc import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
