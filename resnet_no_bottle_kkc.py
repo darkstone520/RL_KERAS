@@ -189,7 +189,7 @@ class Model:
                 self.W5_sub_1 = tf.get_variable(name='W5_sub_1', shape=[3,3,512,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 # 5X5
-                input_x = tf.layers.conv2d(self.L4_sub_12_r, kernel_size=(2,2), strides=(2,2), filters=256, padding='VALID')
+                input_x = tf.layers.conv2d(self.L4_sub_12_r, kernel_size=(1,1), strides=(2,2), filters=256, padding='VALID')
 
                 # 2-1
                 self.L5_sub_1 = tf.nn.conv2d(input=input_x, filter=self.W5_sub, strides=[1,1,1,1], padding='SAME')
@@ -199,7 +199,7 @@ class Model:
                 # output : 5x5
                 self.L5_sub_2 = tf.nn.conv2d(input=self.L5_sub_1_r, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5_sub_2 = self.BN(input=self.L5_sub_2, scale=True, training=self.training, name='Conv5_sub_BN_2')
-                input_x = tf.layers.conv2d(self.L4_sub_12_r, kernel_size=(2,2), strides=(2,2), filters=512, padding='VALID')
+                input_x = tf.layers.conv2d(self.L4_sub_12_r, kernel_size=(1,1), strides=(2,2), filters=512, padding='VALID')
                 self.L5_sub_2_r = self.parametric_relu(self.L5_sub_2, 'R_conv5_2') + input_x
 
 
