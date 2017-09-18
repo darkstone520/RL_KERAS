@@ -109,8 +109,7 @@ class Model:
 
                 # 2-4
                 # output : 18x18
-                self.L3_sub_7 = tf.nn.conv2d(input=self.L3_sub_6_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1],
-                                             padding='SAME')
+                self.L3_sub_7 = tf.nn.conv2d(input=self.L3_sub_6_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_7 = self.BN(input=self.L3_sub_7, scale=True, training=self.training, name='Conv3_sub_BN_7')
                 self.L3_sub_7_r = self.parametric_relu(self.L3_sub_7, 'R_conv3_7')
 
@@ -206,7 +205,7 @@ class Model:
 
                 # 2-2
                 # output (9-1)/2 +1 = 5x5
-                self.L5_sub_3 = tf.nn.conv2d(input=self.L5_sub_2_r, filter=self.W5_sub_1, strides=[1,2,2,1], padding='SAME')
+                self.L5_sub_3 = tf.nn.conv2d(input=self.L5_sub_2_r, filter=self.W5_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L5_sub_3 = self.BN(input=self.L5_sub_1, scale=True, training=self.training, name='Conv5_sub_BN_3')
                 self.L5_sub_3_r = self.parametric_relu(self.L5_sub_1, 'R_conv5_3')
 
@@ -218,7 +217,7 @@ class Model:
 
                 # 2-3
                 # output (9-1)/2 +1 = 5x5
-                self.L5_sub_5 = tf.nn.conv2d(input=self.L5_sub_4_r, filter=self.W5_sub_1, strides=[1,2,2,1], padding='VALID')
+                self.L5_sub_5 = tf.nn.conv2d(input=self.L5_sub_4_r, filter=self.W5_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L5_sub_5 = self.BN(input=self.L5_sub_1, scale=True, training=self.training, name='Conv5_sub_BN_5')
                 self.L5_sub_5_r = self.parametric_relu(self.L5_sub_1, 'R_conv5_5')
 
