@@ -16,8 +16,8 @@ class Model:
             with tf.name_scope('input_layer'):
                 self.dropout_rate = tf.Variable(tf.constant(value=0.5), name='dropout_rate')
                 self.training = tf.placeholder(tf.bool, name='training')
-                self.X = tf.placeholder(tf.float32, [None, 144*144], name='x_data')
-                X_img = tf.reshape(self.X, shape=[-1, 144, 144, 1])
+                self.X = tf.placeholder(tf.float32, [None, 128*128], name='x_data')
+                X_img = tf.reshape(self.X, shape=[-1, 128, 128, 1])
                 self.Y = tf.placeholder(tf.float32, [None, self.class_num], name='y_data')
 
             with tf.name_scope('conv1'):

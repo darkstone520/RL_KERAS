@@ -1,4 +1,4 @@
-from resnet_kkc import Model
+from resnet_no_bottle_kkc import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,7 +39,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "128_cat_dog_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -169,7 +169,7 @@ def distortImage(images):
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
-IMG_SIZE = (144, 144)
+IMG_SIZE = (128, 128)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 

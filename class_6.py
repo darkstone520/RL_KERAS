@@ -39,7 +39,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_flower_mushroom_elephant_rhino_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "128_cat_dog_flower_mushroom_elephant_rhino_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -185,7 +185,7 @@ def distortImage(images):
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
-IMG_SIZE = (144, 144)
+IMG_SIZE = (128, 128)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
@@ -374,7 +374,7 @@ with tf.Session() as sess:
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:
-                if abs(float(TEST_ACCURACY_LIST[0] - TEST_ACCURACY_LIST[1])) > 0.01 and  float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]):
+                if float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]):
                     print("Ealry Stop 으로 학습을 중단합니다.")
                     print("최고정확도 {}".format(TEST_ACCURACY_LIST[0]))
                     break
