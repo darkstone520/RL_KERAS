@@ -3,6 +3,7 @@
 import tensorflow as tf
 import numpy as np
 import time
+import tflearn as tflearn
 
 class Model:
     def __init__(self, sess, name):
@@ -119,7 +120,6 @@ class Model:
                 self.L3_sub_8_r = self.parametric_relu(self.L3_sub_8, 'R_conv3_8') + self.L3_sub_6_r
 
 
-            # INPUT으로 128개의 필터가 들어온다.
             with tf.name_scope('conv4_x'):
 
                 self.W4_sub = tf.get_variable(name='W4_sub', shape=[3,3,128,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
@@ -214,7 +214,7 @@ class Model:
 
 
                 # 2-3
-                # output (9-1)/2 +1 = 4x4
+                # output  = 4x4
                 self.L5_sub_5 = tf.nn.conv2d(input=self.L5_sub_4_r, filter=self.W5_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L5_sub_5 = self.BN(input=self.L5_sub_1, scale=True, training=self.training, name='Conv5_sub_BN_5')
                 self.L5_sub_5_r = self.parametric_relu(self.L5_sub_1, 'R_conv5_5')
@@ -226,13 +226,15 @@ class Model:
 
 
             with tf.name_scope('avg_pool'):
-                self.avg_pool = tf.nn.avg_pool(value=self.L5_sub_6_r, ksize=[1,3,3,1], strides=[1,1,1,1], padding='SAME')
-                self.avg_pool = tf.reshape(self.avg_pool, shape=[-1, 4*4*512])
+
+                self.global_avg_pool = tflearn.layers.conv.global_avg_pool(self.L5_sub_6_r, name='global_avg')
+                #self.avg_pool = tf.nn.avg_pool(value=self.L5_sub_6_r, ksize=[1,3,3,1], strides=[1,1,1,1], padding='SAME')
+                #self.avg_pool = tf.reshape(self.avg_pool, shape=[-1, 4*4*512])
 
             with tf.name_scope('fc_layer1'):
-                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[4*4*512, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[512, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.b_fc1 = tf.Variable(tf.constant(value=0.001, shape=[1000], name='b_fc1'))
-                self.L6 = tf.matmul(self.avg_pool, self.W_fc1) + self.b_fc1
+                self.L6 = tf.matmul(self.global_avg_pool, self.W_fc1) + self.b_fc1
                 self.L6 = self.BN(input=self.L6, scale=True, training=self.training, name='Conv6_sub_BN')
                 self.L_fc1 = self.parametric_relu(self.L6, 'R_fc1')
 
@@ -328,46 +330,5 @@ class Model:
         neg = alphas * (_x - abs(_x)) * 0.5
         return pos + neg
 
-    ####################################################################################################################
-    ## ▣ Maxout
-    ##  ⊙ Convolution 계층이나 FC 계층에서 활성화 함수 대신 dropout 의 효율을 극대화하기 위해 사용하는 함수
-    ##  ⊙ conv 또는 affine 계층을 거친 값들에 대해 k 개씩 그룹핑을 수행하고 해당 그룹내에서 가장 큰 값을 다음 계층으로
-    ##     보내는 기법
-    ####################################################################################################################
-    def max_out(self, inputs, num_units, axis=None):
-        shape = inputs.get_shape().as_list()
-        if shape[0] is None:
-            shape[0] = -1
-        if axis is None:  # Assume that channel is the last dimension
-            axis = -1
-        num_channels = shape[axis]
-        if num_channels % num_units:
-            raise ValueError(
-                'number of features({}) is not a multiple of num_units({})'.format(num_channels, num_units))
-        shape[axis] = num_units  # m
-        shape += [num_channels // num_units]  # k
-        outputs = tf.reduce_max(tf.reshape(inputs, shape), -1, keep_dims=False)
-        return outputs
-
-    ####################################################################################################################
-    ## ▣ Batch Normalization
-    ##  ⊙ training 하는 과정 자체를 전체적으로 안정화하여 학습 속도를 가속시킬 수 있는 방법
-    ##  ⊙ Network의 각 층이나 Activation 마다 input_data 의 distribution 을 평균 0, 표준편차 1인 input_data로 정규화시키는 방법
-    ##  ⊙ 초기 파라미터 --> beta : 0 , gamma : 1 , decay : 0.99 , epsilon : 0.001
-    ####################################################################################################################
     def BN(self, input, training, scale, name, decay=0.99):
         return tf.contrib.layers.batch_norm(input, decay=decay, scale=scale, is_training=training, updates_collections=None, scope=name)
-
-    ####################################################################################################################
-    ## ▣ dynamic_learning
-    ##  ⊙ epoch 가 클수록 아니면 early_stopping 이 시작되면 점차적으로 learning_rate의 값을 줄여 안정적인 훈련이 가능한 방법
-    ####################################################################################################################
-    def dynamic_learning(self,learning_rate,earlystop,epoch):
-        max_learning_rate = learning_rate
-        min_learing_rate = 0.001
-        learning_decay = 60 # 낮을수록 빨리 떨어진다.
-        if earlystop >= 1:
-            lr = min_learing_rate + (max_learning_rate - min_learing_rate) * np.exp(-epoch / learning_decay)
-        else:
-            lr = max_learning_rate
-        return round(lr,4)
