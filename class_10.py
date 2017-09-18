@@ -230,7 +230,7 @@ BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
-IMAGE_DISTORT_RATE = 0.05
+IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 5
@@ -413,11 +413,13 @@ with tf.Session() as sess:
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:
-                if float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]):
+                if float(TEST_ACCURACY_LIST[0]) > float(TEST_ACCURACY_LIST[1]) :
+                    print("이전 정확도: {}, 현재 정확도:{} ".format(TEST_ACCURACY_LIST[0], TEST_ACCURACY_LIST[1]))
                     print("Ealry Stop 으로 학습을 중단합니다.")
                     print("최고정확도 {}".format(TEST_ACCURACY_LIST[0]))
                     break
                 else:
+                    print("이전 정확도: {}, 현재 정확도:{} ".format(TEST_ACCURACY_LIST[0], TEST_ACCURACY_LIST[1]))
                     TEST_ACCURACY_LIST[0] = TEST_ACCURACY_LIST[1]
                     TEST_ACCURACY_LIST.pop()
                     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
