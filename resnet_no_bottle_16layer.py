@@ -129,7 +129,7 @@ class Model:
                 # output :
                 self.L5_sub_2 = tf.nn.conv2d(input=self.L5_sub_1_r, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5_sub_2 = self.BN(input=self.L5_sub_2, scale=True, training=self.training, name='Conv5_sub_BN_2')
-                input_x = tf.layers.conv2d(self.L4_sub_12_r, kernel_size=(2,2), strides=(2,2), filters=512, padding='SAME')
+                input_x = tf.layers.conv2d(self.L4_sub_4_r, kernel_size=(2,2), strides=(2,2), filters=512, padding='SAME')
                 self.L5_sub_2_r = self.parametric_relu(self.L5_sub_2, 'R_conv5_2') + input_x
 
                 # 2-2
