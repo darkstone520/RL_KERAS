@@ -24,7 +24,7 @@ class Model:
             with tf.name_scope('conv1'):
 
                 # 128x128
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[7,7,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[5,5,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,1,1,1], padding='SAME')
 
             with tf.name_scope('conv2_x'):
