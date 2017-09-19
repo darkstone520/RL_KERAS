@@ -23,28 +23,28 @@ class Model:
 
             with tf.name_scope('conv1'):
 
-                # 128x128
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[3,3,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,1,1,1], padding='SAME')
+                # 64x64
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[7,7,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,2,2,1], padding='SAME')
 
             with tf.name_scope('conv2_x'):
 
                 # 64x64
-                self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
+                # self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
 
                 # output : 64x64
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 # 2-1
                 # output : 64x64
-                self.L2_sub_1 = tf.nn.conv2d(input=self.L2_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
+                self.L2_sub_1 = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_1 = self.BN(input=self.L2_sub_1, scale=True, training=self.training, name='Conv2_sub_BN_1')
                 self.L2_sub_1_r = self.parametric_relu(self.L2_sub_1, 'R_conv2_1')
 
                 # output : 64x64 with shortcut
                 self.L2_sub_2 = tf.nn.conv2d(input=self.L2_sub_1_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
                 self.L2_sub_2 = self.BN(input=self.L2_sub_2, scale=True, training=self.training, name='Conv2_sub_BN_2')
-                self.L2_sub_2_r = self.parametric_relu(self.L2_sub_2, 'R_conv2_2') + self.L2_sub
+                self.L2_sub_2_r = self.parametric_relu(self.L2_sub_2, 'R_conv2_2') + self.L1_sub
 
                 # 2-2
                 # output : 64x64
