@@ -165,7 +165,7 @@ def predictConsumtionTime(epoch_num):
     return c_time
 
 def distortImage(images):
-    return ndimage.uniform_filter(images, size=11)
+    return ndimage.uniform_filter(images, size=3)
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
