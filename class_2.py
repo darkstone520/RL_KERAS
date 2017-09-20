@@ -169,7 +169,7 @@ def distortImage(images):
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
-IMG_SIZE = (128, 128)
+IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
