@@ -1,4 +1,4 @@
-from model_kkc import Model
+from resnet_no_bottle_16layer import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -39,7 +39,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "cat_dog_flower_mushroom_elephant_rhino_nature_building_simson_snake_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "128_cat_dog_flower_mushroom_elephant_rhino_nature_building_simson_snake_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -225,7 +225,7 @@ def distortImage(images):
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
-IMG_SIZE = (144, 144)
+IMG_SIZE = (128, 128)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
@@ -384,7 +384,7 @@ with tf.Session() as sess:
 
             for i in range(test_total_batch_num):
 
-                print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
+                # print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
 
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
                 test_x_batch, test_y_batch, START_BATCH_INDEX = loadBatch(TEST_DATA, START_BATCH_INDEX) # 리턴 시 START_BATCH_INDEX는 + BATCH_SZIE 되어 있음
