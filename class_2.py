@@ -1,4 +1,4 @@
-from resnet_no_bottle_kkc import Model
+from model_kkc import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -267,14 +267,14 @@ with tf.Session() as sess:
             # MINI_BATCH 여부에 따라 나뉜다.
             # 중복 없는 Random Mini Batch
             if RANDOM_MINI_BATCH_ORDER:
-                print("[데이터 중복 불가] {} Epoch: Random Mini Batch Data Reading {}/{}, DATA INDEX : {}".
-                      format(epoch + 1, i + 1, total_batch_num,START_BATCH_INDEX))
+                # print("[데이터 중복 불가] {} Epoch: Random Mini Batch Data Reading {}/{}, DATA INDEX : {}".
+                #       format(epoch + 1, i + 1, total_batch_num,START_BATCH_INDEX))
                 train_x_batch, train_y_batch, START_BATCH_INDEX = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # Normal Batch
             elif NORMAL_BATCH:
-                print("[데이터 중복 불가] {} Epoch: Normal Batch Data Reading {}/{}, DATA INDEX : {}".
-                      format(epoch + 1, i + 1, total_batch_num, START_BATCH_INDEX))
+                # print("[데이터 중복 불가] {} Epoch: Normal Batch Data Reading {}/{}, DATA INDEX : {}".
+                #       format(epoch + 1, i + 1, total_batch_num, START_BATCH_INDEX))
                 train_x_batch, train_y_batch, START_BATCH_INDEX = loadBatch(TRAIN_DATA, START_BATCH_INDEX)
 
             # 중복 허용 Random Mini Batch
@@ -282,12 +282,12 @@ with tf.Session() as sess:
 
                 # 특정 Epoch만큼 데이터 중복없이 일반배치 또는 랜덤미니배치를 수행을 설정하는 부분
                 if epoch < MIN_ORDER_BATCH_EPCHO:
-                    print("[데이터 중복 불가] {}/{} Epoch : Normal Batch Data Reading {}/{}, DATA INDEX : {}".
-                          format(epoch + 1, MIN_ORDER_BATCH_EPCHO, i + 1, total_batch_num, START_BATCH_INDEX))
+                    # print("[데이터 중복 불가] {}/{} Epoch : Normal Batch Data Reading {}/{}, DATA INDEX : {}".
+                    #       format(epoch + 1, MIN_ORDER_BATCH_EPCHO, i + 1, total_batch_num, START_BATCH_INDEX))
                     train_x_batch, train_y_batch, START_BATCH_INDEX = loadBatch(TRAIN_DATA,START_BATCH_INDEX)
                 else:
-                    print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
-                          format(epoch + 1, i + 1, total_batch_num))
+                    # print("[데이터 중복 허용] {} Epoch: Random Mini Batch Data Reading {}/{}".
+                    #       format(epoch + 1, i + 1, total_batch_num))
                     train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
 
             # Train each model
@@ -329,7 +329,7 @@ with tf.Session() as sess:
 
             for i in range(test_total_batch_num):
 
-                print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
+                # print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
 
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
                 test_x_batch, test_y_batch, START_BATCH_INDEX = loadBatch(TEST_DATA, START_BATCH_INDEX) # 리턴 시 START_BATCH_INDEX는 + BATCH_SZIE 되어 있음
