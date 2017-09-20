@@ -29,14 +29,12 @@ class Model:
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R_conv1_1')
 
 
-
             with tf.name_scope('conv2_x'):
 
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 # 64x64
                 self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
-                self.L2_sub = self.parametric_relu(self.L2_sub, 'R_conv1_1')
 
                 # 2-1
                 # output :
@@ -76,7 +74,7 @@ class Model:
                 # output :  with shortcut
                 self.L3_sub_2 = tf.nn.conv2d(input=self.L3_sub_1_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_2 = self.BN(input=self.L3_sub_2, scale=True, training=self.training, name='Conv3_sub_BN_2')
-                input_x = tf.layers.conv2d(inputs=self.L2_sub_4_r, kernel_size=(2,2), strides=(2,2), padding='SAME', filters=128, activation=tf.nn.relu)
+                input_x = tf.layers.conv2d(inputs=self.L2_sub_4_r, kernel_size=(2,2), strides=(2,2), padding='SAME', filters=128)
                 self.L3_sub_2_r = self.parametric_relu(self.L3_sub_2, 'R_conv3_2') + input_x
 
 
@@ -105,7 +103,7 @@ class Model:
 
                 self.L4_sub_2 = tf.nn.conv2d(input=self.L4_sub_1_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_2 = self.BN(input=self.L4_sub_2, scale=True, training=self.training, name='Conv4_sub_BN_2')
-                input_x = tf.layers.conv2d(self.L3_sub_4_r, kernel_size=(2,2), strides=(2,2), filters=256, padding='SAME', activation=tf.nn.relu)
+                input_x = tf.layers.conv2d(self.L3_sub_4_r, kernel_size=(2,2), strides=(2,2), filters=256, padding='SAME')
                 self.L4_sub_2_r = self.parametric_relu(self.L4_sub_2, 'R_conv4_2') + input_x
 
 
@@ -134,7 +132,7 @@ class Model:
                 # output :
                 self.L5_sub_2 = tf.nn.conv2d(input=self.L5_sub_1_r, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5_sub_2 = self.BN(input=self.L5_sub_2, scale=True, training=self.training, name='Conv5_sub_BN_2')
-                input_x = tf.layers.conv2d(self.L4_sub_4_r, kernel_size=(2,2), strides=(2,2), filters=512, padding='SAME', activation=tf.nn.relu)
+                input_x = tf.layers.conv2d(self.L4_sub_4_r, kernel_size=(2,2), strides=(2,2), filters=512, padding='SAME')
                 self.L5_sub_2_r = self.parametric_relu(self.L5_sub_2, 'R_conv5_2') + input_x
 
                 # 2-2
