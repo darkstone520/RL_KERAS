@@ -312,12 +312,12 @@ with tf.Session() as sess:
 
         # 랜덤 미니배치 중복없이 할 경우 매 에폭마다 Train Data를 섞어준다.
         if RANDOM_MINI_BATCH_ORDER:
-            print("랜덤 미니배치(중복불가)를 수행합니다. Data Shuffle")
+            # print("랜덤 미니배치(중복불가)를 수행합니다. Data Shuffle")
             TRAIN_DATA = shuffleLines(TRAIN_DATA)
-        elif NORMAL_BATCH:
-            print("일반 배치(중복불가)를 수행합니다.")
-        else:
-            print("랜덤 미니배치(중복허용)를 수행합니다.")
+        # elif NORMAL_BATCH:
+        #     print("일반 배치(중복불가)를 수행합니다.")
+        # else:
+        #     print("랜덤 미니배치(중복허용)를 수행합니다.")
 
         for i in range(total_batch_num):
 
