@@ -431,7 +431,7 @@ with tf.Session() as sess:
     # 종료 시간 체크
     etime = time.time()
     c_time = round(etime - stime, 6)/60
-    p_time = predictConsumtionTime(LAST_EPOCH)
+    p_time = predictConsumtionTime(LAST_EPOCH-1)
 
     print('Total Consumption Time : {} 분'.format(c_time))
     print('학습에 소요된 Consumption Time : 약 {} 분'.format(p_time))
