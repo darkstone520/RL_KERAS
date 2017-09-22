@@ -7,6 +7,8 @@ import math
 import time
 from scipy import ndimage
 from drawnow import drawnow
+from pandas_ml import ConfusionMatrix
+
 
 def monitorTrainCost(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
@@ -201,6 +203,33 @@ def loadAllTestLabel(lines):
     label = np.array(label_list)
     return label
 
+def confusionMatrix(label_array):
+
+    label_list = []
+    for one_hot in label_array:
+        if one_hot == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
+            label_list.append(1)
+        elif one_hot == [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]:
+            label_list.append(2)
+        elif one_hot == [0, 0, 1, 0, 0, 0, 0, 0, 0, 0]:
+            label_list.append(3)
+        elif one_hot == [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]:
+            label_list.append(4)
+        elif one_hot == [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]:
+            label_list.append(5)
+        elif one_hot == [0, 0, 0, 0, 0, 1, 0, 0, 0, 0]:
+            label_list.append(6)
+        elif one_hot == [0, 0, 0, 0, 0, 0, 1, 0, 0, 0]:
+            label_list.append(7)
+        elif one_hot == [0, 0, 0, 0, 0, 0, 0, 1, 0, 0]:
+            label_list.append(8)
+        elif one_hot == [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]:
+            label_list.append(9)
+        elif one_hot == [1, 0, 0, 0, 0, 0, 0, 0, 0, 1]:
+            label_list.append(10)
+    return label_list
+
+
 
 def shuffleLines(lines):
     lines = random.sample(lines, len(lines))
@@ -232,8 +261,8 @@ START_BATCH_INDEX = 0
 IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
-START_EARLY_STOP_EPOCH = 5
-START_EARLY_STOP_COST = 0.005
+START_EARLY_STOP_EPOCH = 1
+START_EARLY_STOP_COST = 1
 
 TRAIN_RATE = 0.8
 NUM_MODELS = 5
@@ -400,6 +429,12 @@ with tf.Session() as sess:
 
                 CNT += 1
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
+
+            actual_confusionMatrix = confusionMatrix(ALL_TEST_LABELS)
+            prediction_confusionMatrix = confusionMatrix(predictions)
+            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+            print(confusion_matrix)
+
             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
