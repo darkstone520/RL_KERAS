@@ -10,6 +10,7 @@ from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
 
 
+
 def monitorTrainCost(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
@@ -52,9 +53,15 @@ def loadInputData():
 
         # train data를 일정 rate 만큼 뽑아오기 위한 단계
         train_last_index = round(TRAIN_RATE * len(lines))
+
         file.close()
+
+        # 테스트용 리턴값
+        # return lines[:100], lines[100:200]
+
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
+
 
 def loadRandomMiniBatch(lines):
     """
@@ -203,31 +210,10 @@ def loadAllTestLabel(lines):
     label = np.array(label_list)
     return label
 
-def confusionMatrix(label_array):
+def onehot2label(label_array):
 
-    label_list = []
-    for one_hot in label_array:
-        if one_hot == [1, 0, 0, 0, 0, 0, 0, 0, 0, 0]:
-            label_list.append(1)
-        elif one_hot == [0, 1, 0, 0, 0, 0, 0, 0, 0, 0]:
-            label_list.append(2)
-        elif one_hot == [0, 0, 1, 0, 0, 0, 0, 0, 0, 0]:
-            label_list.append(3)
-        elif one_hot == [0, 0, 0, 1, 0, 0, 0, 0, 0, 0]:
-            label_list.append(4)
-        elif one_hot == [0, 0, 0, 0, 1, 0, 0, 0, 0, 0]:
-            label_list.append(5)
-        elif one_hot == [0, 0, 0, 0, 0, 1, 0, 0, 0, 0]:
-            label_list.append(6)
-        elif one_hot == [0, 0, 0, 0, 0, 0, 1, 0, 0, 0]:
-            label_list.append(7)
-        elif one_hot == [0, 0, 0, 0, 0, 0, 0, 1, 0, 0]:
-            label_list.append(8)
-        elif one_hot == [0, 0, 0, 0, 0, 0, 0, 0, 1, 0]:
-            label_list.append(9)
-        elif one_hot == [1, 0, 0, 0, 0, 0, 0, 0, 0, 1]:
-            label_list.append(10)
-    return label_list
+    label_list = np.argmax(label_array, axis=1)
+    return label_list.tolist()
 
 
 
@@ -261,8 +247,8 @@ START_BATCH_INDEX = 0
 IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
-START_EARLY_STOP_EPOCH = 1
-START_EARLY_STOP_COST = 1
+START_EARLY_STOP_EPOCH = 5
+START_EARLY_STOP_COST = 0.005
 
 TRAIN_RATE = 0.8
 NUM_MODELS = 5
@@ -318,7 +304,7 @@ with tf.Session() as sess:
     epoch = 0
     # initialize
     for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m)))
+        models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
@@ -430,11 +416,6 @@ with tf.Session() as sess:
                 CNT += 1
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
 
-            actual_confusionMatrix = confusionMatrix(ALL_TEST_LABELS)
-            prediction_confusionMatrix = confusionMatrix(predictions)
-            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
-            print(confusion_matrix)
-
             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
@@ -445,6 +426,13 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
+
+            actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
+            prediction_confusionMatrix = onehot2label(predictions)
+            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+            print(confusion_matrix)
+            confusion_matrix.print_stats()
+
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:

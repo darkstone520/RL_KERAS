@@ -67,10 +67,10 @@ import numpy as np
 import time
 
 class Model:
-    def __init__(self, sess, name):
+    def __init__(self, sess, name, class_num):
         self.sess = sess
         self.name = name
-        self.class_num = 10
+        self.class_num = class_num
         self._build_net()
 
     def _build_net(self):

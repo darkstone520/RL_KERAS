@@ -1,4 +1,4 @@
-from resnet_no_bottle_16layer import Model
+from model_kkc import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,6 +7,8 @@ import math
 import time
 from scipy import ndimage
 from drawnow import drawnow
+from pandas_ml import ConfusionMatrix
+
 
 def monitorTrainCost(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
@@ -39,7 +41,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "128_cat_dog_flower_mushroom_elephant_rhino_nature_building_simson_snake_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "cat_dog_flower_mushroom_elephant_rhino_nature_building_simson_snake_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -202,6 +204,10 @@ def loadAllTestLabel(lines):
     label = np.array(label_list)
     return label
 
+def onehot2label(label_array):
+
+    label_list = np.argmax(label_array, axis=1)
+    return label_list.tolist()
 
 def shuffleLines(lines):
     lines = random.sample(lines, len(lines))
@@ -225,7 +231,7 @@ def distortImage(images):
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
-IMG_SIZE = (128, 128)
+IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
@@ -234,7 +240,7 @@ IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 5
-START_EARLY_STOP_COST = 0.01
+START_EARLY_STOP_COST = 0.005
 
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
@@ -290,7 +296,7 @@ with tf.Session() as sess:
     epoch = 0
     # initialize
     for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m)))
+        models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
@@ -410,6 +416,13 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
+
+            actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
+            prediction_confusionMatrix = onehot2label(predictions)
+            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+            print(confusion_matrix)
+            confusion_matrix.print_stats()
+
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:
