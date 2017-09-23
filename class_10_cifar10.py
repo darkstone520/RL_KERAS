@@ -430,7 +430,6 @@ with tf.Session() as sess:
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
             confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
-            print(confusion_matrix)
             confusion_matrix.print_stats()
 
 
