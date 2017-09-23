@@ -7,7 +7,13 @@ import math
 import time
 from scipy import ndimage
 from drawnow import drawnow
-#
+from pandas_ml import ConfusionMatrix
+
+def onehot2label(label_array):
+
+    label_list = np.argmax(label_array, axis=1)
+    return label_list.tolist()
+
 def monitorTrainCost(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
@@ -250,7 +256,7 @@ with tf.Session() as sess:
     epoch = 0
     # initialize
     for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m)))
+        models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
@@ -371,6 +377,12 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
+
+            actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
+            prediction_confusionMatrix = onehot2label(predictions)
+            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+            confusion_matrix.print_stats()
+
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:

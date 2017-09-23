@@ -1,4 +1,4 @@
-from resnet_no_bottle_16layer import Model
+from resnet_no_bottle_18layer import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -420,7 +420,6 @@ with tf.Session() as sess:
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
             confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
-            print(confusion_matrix)
             confusion_matrix.print_stats()
 
 

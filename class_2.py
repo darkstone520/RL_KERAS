@@ -7,6 +7,13 @@ import math
 import time
 from scipy import ndimage
 from drawnow import drawnow
+from pandas_ml import ConfusionMatrix
+
+def onehot2label(label_array):
+
+    label_list = np.argmax(label_array, axis=1)
+    return label_list.tolist()
+
 
 def monitorTrainCost(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
@@ -178,7 +185,7 @@ IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 5
-START_EARLY_STOP_COST = 0.01
+START_EARLY_STOP_COST = 0.05
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
 CLASS_NUM = 2
@@ -192,8 +199,8 @@ START_BATCH_INDEX = 0
 RANDOM_MINI_BATCH_NO_ORDER = False
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
-RANDOM_MINI_BATCH_ORDER = True # 중복없는 랜덤 미니배치
-NORMAL_BATCH = False # 일반배치
+RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
+NORMAL_BATCH = True # 일반배치
 
 
 LAST_EPOCH = None
@@ -233,7 +240,7 @@ with tf.Session() as sess:
     epoch = 0
     # initialize
     for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m)))
+        models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
@@ -357,6 +364,11 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
+
+            actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
+            prediction_confusionMatrix = onehot2label(predictions)
+            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+            confusion_matrix.print_stats()
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
             if len(TEST_ACCURACY_LIST) != 1:
