@@ -242,7 +242,7 @@ with tf.Session() as sess:
 
     # train my model
     # for epoch in range(TRAIN_EPOCHS):
-    while True:
+    while True:#
         avg_cost_list = np.zeros(len(models))
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다

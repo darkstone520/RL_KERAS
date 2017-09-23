@@ -11,7 +11,7 @@ from drawnow import drawnow
 def monitorTrainCost(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.title('Cost Graph per Epoch')
+    plt.title('Cost Graph per Epoch')#
     plt.legend(loc=1)
     plt.xlabel('Epoch')
     plt.ylabel('Cost')
