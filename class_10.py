@@ -234,7 +234,7 @@ __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (144, 144)
 BATCH_SIZE = 100
 START_BATCH_INDEX = 0
-
+#
 # 학습 도중 이미지를 Distort하는 데이터의 비중
 IMAGE_DISTORT_RATE = 0
 

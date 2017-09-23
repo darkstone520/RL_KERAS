@@ -191,7 +191,7 @@ START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
 IMAGE_DISTORT_RATE = 0
-
+#
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 5
 START_EARLY_STOP_COST = 0.01
