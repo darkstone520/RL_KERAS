@@ -190,7 +190,7 @@ class Model:
         ################################################################################################################
         self.cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=self.logits, labels=self.Y)) + (0.01/(2*tf.to_float(tf.shape(self.Y)[0])))*tf.reduce_sum(tf.square(self.W_out))
 
-        self.optimizer = tf.train.RMSPropOptimizer(learning_rate=0.0025,
+        self.optimizer = tf.train.RMSPropOptimizer(learning_rate=0.005,
                                                    momentum=0.9, decay=0.99,
                                                    epsilon=0.01).minimize(self.cost)
 
