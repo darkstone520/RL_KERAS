@@ -1,4 +1,4 @@
-from resnet_20layers_cifar10 import Model
+from resnet_34layers_cifar10 import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -228,7 +228,7 @@ START_EARLY_STOP_EPOCH = 5
 START_EARLY_STOP_COST = 0.005
 
 TRAIN_RATE = 0.8
-NUM_MODELS = 5
+NUM_MODELS = 3
 CLASS_NUM = 10
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
