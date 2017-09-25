@@ -1,4 +1,4 @@
-from resnet_no_bottle_18layer import Model
+from resnet_no_bottle_34layer import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -240,10 +240,10 @@ IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 5
-START_EARLY_STOP_COST = 0.005
+START_EARLY_STOP_COST = 0.01
 
 TRAIN_RATE = 0.8
-NUM_MODELS = 3
+NUM_MODELS = 1
 CLASS_NUM = 10
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0

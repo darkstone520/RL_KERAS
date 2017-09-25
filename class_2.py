@@ -262,12 +262,12 @@ with tf.Session() as sess:
 
         # 랜덤 미니배치 중복없이 할 경우 매 에폭마다 Train Data를 섞어준다.
         if RANDOM_MINI_BATCH_ORDER:
-            print("랜덤 미니배치(중복불가)를 수행합니다. Data Shuffle")
+            # print("랜덤 미니배치(중복불가)를 수행합니다. Data Shuffle")
             TRAIN_DATA = shuffleLines(TRAIN_DATA)
-        elif NORMAL_BATCH:
-            print("일반 배치(중복불가)를 수행합니다.")
-        else:
-            print("랜덤 미니배치(중복허용)를 수행합니다.")
+        # elif NORMAL_BATCH:
+        #     print("일반 배치(중복불가)를 수행합니다.")
+        # else:
+        #     print("랜덤 미니배치(중복허용)를 수행합니다.")
 
         for i in range(total_batch_num):
 
@@ -368,6 +368,7 @@ with tf.Session() as sess:
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
             confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+            print(confusion_matrix)
             confusion_matrix.print_stats()
 
             TEST_ACCURACY_LIST.append(TEST_ACCURACY)
