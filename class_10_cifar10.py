@@ -208,8 +208,6 @@ def randomCrop(image_array):
     rnd_width = random.randint(0,4)
     rnd_height = random.randint(0,4)
     image_array = np.pad(image_array, (2,2), "constant")
-    width = image_array.shape[0]
-    height = image_array.shape[1]
 
     image_array = image_array[rnd_width:origin_size[0]+rnd_width,rnd_height:origin_size[1]+rnd_height]
     return image_array
@@ -340,13 +338,14 @@ with tf.Session() as sess:
                     #       format(epoch + 1, i + 1, total_batch_num))
                     train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
 
-            # Train each model
 
+            # crop data augmentation
             cropped_train_x_batch = []
             for i in train_x_batch:
                 cropped_train_x_batch.append(randomCrop(i))
             train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32,32)
 
+            # Train each model
             for m_idx, m in enumerate(models):
                 c, _ = m.train(train_x_batch, train_y_batch)
                 avg_cost_list[m_idx] += c / total_batch_num
