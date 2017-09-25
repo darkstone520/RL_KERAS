@@ -1,4 +1,3 @@
-# 34 layer with bottle neck
 
 import tensorflow as tf
 import numpy as np
