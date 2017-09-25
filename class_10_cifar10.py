@@ -1,4 +1,4 @@
-from model_kkc_cifar10 import Model
+from resnet_20layers_cifar10 import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,7 +8,6 @@ import time
 from scipy import ndimage
 from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
-
 
 
 def monitorTrainCost(pltSave=False):
@@ -61,7 +60,6 @@ def loadInputData():
 
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
-
 
 def loadRandomMiniBatch(lines):
     """
@@ -180,42 +178,10 @@ def loadBatch(lines, START_BATCH_INDEX):
     label = np.array(label_list)
     return data, label, START_BATCH_INDEX
 
-def loadAllTestLabel(lines):
-    labels = [line.split(',')[-2] for line in lines]
-    labels = np.array(labels, dtype=np.uint8)
-    label_list = []
-
-    for label in labels:
-        if label == 0:
-            label_list.append([1, 0, 0, 0, 0, 0, 0, 0, 0, 0])
-        elif label == 1:
-            label_list.append([0, 1, 0, 0, 0, 0, 0, 0, 0, 0])
-        elif label == 2:
-            label_list.append([0, 0, 1, 0, 0, 0, 0, 0, 0, 0])
-        elif label == 3:
-            label_list.append([0, 0, 0, 1, 0, 0, 0, 0, 0, 0])
-        elif label == 4:
-            label_list.append([0, 0, 0, 0, 1, 0, 0, 0, 0, 0])
-        elif label == 5:
-            label_list.append([0, 0, 0, 0, 0, 1, 0, 0, 0, 0])
-        elif label == 6:
-            label_list.append([0, 0, 0, 0, 0, 0, 1, 0, 0, 0])
-        elif label == 7:
-            label_list.append([0, 0, 0, 0, 0, 0, 0, 1, 0, 0])
-        elif label == 8:
-            label_list.append([0, 0, 0, 0, 0, 0, 0, 0, 1, 0])
-        elif label == 9:
-            label_list.append([0, 0, 0, 0, 0, 0, 0, 0, 0, 1])
-
-    label = np.array(label_list)
-    return label
-
 def onehot2label(label_array):
 
     label_list = np.argmax(label_array, axis=1)
     return label_list.tolist()
-
-
 
 def shuffleLines(lines):
     lines = random.sample(lines, len(lines))
@@ -236,6 +202,19 @@ def predictConsumtionTime(epoch_num):
 
 def distortImage(images):
     return ndimage.uniform_filter(images, size=11)
+
+def randomCrop(image_array):
+    origin_size = image_array.shape
+    rnd_width = random.randint(0,4)
+    rnd_height = random.randint(0,4)
+    image_array = np.pad(image_array, (2,2), "constant")
+    width = image_array.shape[0]
+    height = image_array.shape[1]
+
+    image_array = image_array[rnd_width:origin_size[0]+rnd_width,rnd_height:origin_size[1]+rnd_height]
+    return image_array
+
+
 
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
@@ -362,6 +341,11 @@ with tf.Session() as sess:
                     train_x_batch, train_y_batch = loadRandomMiniBatch(TRAIN_DATA)
 
             # Train each model
+
+            cropped_train_x_batch = []
+            for i in train_x_batch:
+                cropped_train_x_batch.append(randomCrop(i))
+            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32,32)
 
             for m_idx, m in enumerate(models):
                 c, _ = m.train(train_x_batch, train_y_batch)
