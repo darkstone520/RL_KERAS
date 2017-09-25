@@ -342,8 +342,10 @@ with tf.Session() as sess:
             # crop data augmentation
             cropped_train_x_batch = []
             for i in train_x_batch:
-                cropped_train_x_batch.append(randomCrop(i))
-            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32,32)
+                image = i.reshape(32,32)
+                image = randomCrop(image)
+                cropped_train_x_batch.append(image.flatten())
+            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
 
             # Train each model
             for m_idx, m in enumerate(models):
