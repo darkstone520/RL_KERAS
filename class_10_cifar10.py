@@ -376,12 +376,12 @@ with tf.Session() as sess:
 
 
             # crop data augmentation
-            cropped_train_x_batch = []
-            for i in train_x_batch:
-                image = i.reshape(32,32)
-                image = randomCrop(image)
-                cropped_train_x_batch.append(image.flatten())
-            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
+            # cropped_train_x_batch = []
+            # for i in train_x_batch:
+            #     image = i.reshape(32,32)
+            #     image = randomCrop(image)
+            #     cropped_train_x_batch.append(image.flatten())
+            # train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
 
             # Train each model
             for m_idx, m in enumerate(models):
@@ -390,7 +390,7 @@ with tf.Session() as sess:
                 avg_accuracy_list[m_idx] += a / total_batch_num
                 avg_cost_list[m_idx] += c / total_batch_num
 
-        print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
+        # print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
         START_BATCH_INDEX = 0
         LAST_EPOCH = epoch+1
 
@@ -421,7 +421,7 @@ with tf.Session() as sess:
             predictions = np.zeros(test_total_batch_num * BATCH_SIZE * CLASS_NUM)\
                 .reshape(-1,CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
 
-            print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
+            # print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
             # 모델 검증
             # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
 
@@ -448,19 +448,22 @@ with tf.Session() as sess:
 
             START_BATCH_INDEX = 0
 
-            for i in range(len(MODEL_ACCURACY)):
-                print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+            # for i in range(len(MODEL_ACCURACY)):
+            #     print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
-            print('Ensemble Accuracy : ', TEST_ACCURACY)
-            print('Testing Finished!')
+            print(TEST_ACCURACY)
+            # print('Ensemble Accuracy : ', TEST_ACCURACY)
+            # print('Testing Finished!')
             mon_acuuracy_list[len(mon_acuuracy_list)-1].append(round((1.0-TEST_ACCURACY)*100,3))
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
             drawnow(monitorAccuracy, epoch_num=epoch)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
-            confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
-            confusion_matrix.print_stats()
+            if epoch%50 == 0:
+                confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
+                print(confusion_matrix)
+            # confusion_matrix.print_stats()
 
             # 모델 저장이 필요할 때만 활성화 함
             # TEST_ACCURACY_LIST.append(TEST_ACCURACY)
