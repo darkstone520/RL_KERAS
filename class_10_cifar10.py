@@ -26,7 +26,7 @@ def monitorTrainCost(pltSave=False):
 def monitorAccuracy(pltSave=False):
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.figure(1)
+    plt.subplot(1)
     plt.title('Cost Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -34,11 +34,11 @@ def monitorAccuracy(pltSave=False):
     plt.grid(True)
 
     if pltSave:
-        plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+        plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
     for cost, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.figure(2)
+    plt.subplot(2)
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -453,7 +453,6 @@ with tf.Session() as sess:
             mon_acuuracy_list[len(mon_acuuracy_list)-1].append((1.0-TEST_ACCURACY)*100)
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
             drawnow(monitorAccuracy)
-            drawnow(monitorTrainCost)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
