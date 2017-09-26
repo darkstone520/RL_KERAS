@@ -25,10 +25,11 @@ from pandas_ml import ConfusionMatrix
 
 def monitorAccuracy(pltSave=False):
 
-    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.figure(1).set_size_inches(10,20)
     plt.subplot(211)
+
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.title('Cost Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -37,10 +38,9 @@ def monitorAccuracy(pltSave=False):
     if pltSave:
         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
-
+    plt.subplot(212)
     for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
         plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.subplot(212)
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
