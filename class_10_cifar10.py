@@ -308,7 +308,7 @@ with tf.Session() as sess:
     # for epoch in range(TRAIN_EPOCHS):
     while True:
         avg_cost_list = np.zeros(len(models))
-        avg_accuracy_list = np.zeros(len(models)+1)
+        avg_accuracy_list = np.zeros(len(models))
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
