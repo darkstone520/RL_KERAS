@@ -439,7 +439,7 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
-            mon_acuuracy_list.appned(ENSEMBLE_ACCURACY)
+            mon_acuuracy_list.appned(TEST_ACCURACY)
             drawnow(monitorAccuracy)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
