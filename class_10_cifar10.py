@@ -399,7 +399,7 @@ with tf.Session() as sess:
             mon_cost_list[idx].append(cost)
         for idx, accuracy in enumerate(avg_accuracy_list):
             if idx != len(avg_accuracy_list)-1:
-                mon_acuuracy_list[idx].append((1.0-accuracy)*100)
+                mon_acuuracy_list[idx].append(round((1.0-accuracy)*100,3))
         # drawnow(monitorTrainCost)
 
         epoch += 1
@@ -453,7 +453,7 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
-            mon_acuuracy_list[len(mon_acuuracy_list)-1].append((1.0-TEST_ACCURACY)*100)
+            mon_acuuracy_list[len(mon_acuuracy_list)-1].append(round((1.0-TEST_ACCURACY)*100,3))
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
             drawnow(monitorAccuracy, epoch_num=epoch)
 
