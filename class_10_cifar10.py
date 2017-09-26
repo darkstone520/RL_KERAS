@@ -11,7 +11,7 @@ from pandas_ml import ConfusionMatrix
 
 
 def monitorTrainCost(pltSave=False):
-    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.figure(1)
     plt.title('Cost Graph per Epoch')
@@ -263,6 +263,7 @@ LAST_EPOCH = None
 # monitoring 관련 parameter
 mon_epoch_list = []
 mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
+mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
 mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
 mon_cost_list = [[] for m in range(NUM_MODELS)]
