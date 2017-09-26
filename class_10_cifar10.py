@@ -42,7 +42,7 @@ def monitorAccuracy(epoch_num, pltSave=False):
 
     plt.figure(2)
     for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+        plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
