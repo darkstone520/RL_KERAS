@@ -440,6 +440,7 @@ with tf.Session() as sess:
             mon_acuuracy_list[len(mon_acuuracy_list)-1].append((1.0-TEST_ACCURACY)*100)
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
             drawnow(monitorAccuracy)
+            drawnow(monitorTrainCost)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
