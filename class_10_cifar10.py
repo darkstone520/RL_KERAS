@@ -10,40 +10,44 @@ from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
 
 
-def monitorTrainCost(pltSave=False):
-    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
-        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.figure(1)
-    plt.title('Cost Graph per Epoch')
-    plt.legend(loc=1)
-    plt.xlabel('Epoch')
-    plt.ylabel('Cost')
-    plt.grid(True)
-    if pltSave:
-        plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+# def monitorTrainCost(pltSave=False):
+#     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
+#         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+#     plt.figure(1)
+#     plt.title('Cost Graph per Epoch')
+#     plt.legend(loc=1)
+#     plt.xlabel('Epoch')
+#     plt.ylabel('Cost')
+#     plt.grid(True)
+#     if pltSave:
+#         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
 
 def monitorAccuracy(pltSave=False):
+
     for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.subplot(1)
+    plt.figure(1, figsize=(10,10))
+    plt.subplot(211)
     plt.title('Cost Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
     plt.ylabel('Cost')
     plt.grid(True)
-
     if pltSave:
         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
+
     for cost, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.subplot(2)
+    plt.subplot(212)
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
     plt.ylabel('Error %')
     plt.grid(True)
+
+    plt.tight_layout()
 
     if pltSave:
         plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
@@ -83,10 +87,10 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        # return lines[:5], lines[5:10]
+        return lines[:5], lines[5:10]
 
         # return 시 데이터를 섞어서 return 한다.
-        return lines[:train_last_index], lines[train_last_index:]
+        # return lines[:train_last_index], lines[train_last_index:]
 
 def loadRandomMiniBatch(lines):
     """
@@ -476,7 +480,7 @@ with tf.Session() as sess:
             #         print("학습을 계속 진행합니다.")
 
     # drawnow(monitorTrainCost, pltSave=True)
-    drawnow(monitorAccuracy, pltSave=True)
+    # drawnow(monitorAccuracy, pltSave=True)
 
     print('Learning Finished!')
 
