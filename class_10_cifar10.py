@@ -28,7 +28,7 @@ def monitorAccuracy(pltSave=False):
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
-    plt.ylabel('Error')
+    plt.ylabel('Error %')
     plt.grid(True)
     if pltSave:
         plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
@@ -380,7 +380,7 @@ with tf.Session() as sess:
             mon_cost_list[idx].append(cost)
         for idx, accuracy in enumerate(avg_accuracy_list):
             if idx != len(avg_accuracy_list)-1:
-                mon_acuuracy_list[idx].append(1.0-accuracy)
+                mon_acuuracy_list[idx].append((1.0-accuracy)*100)
         # drawnow(monitorTrainCost)
         # drawnow(monitorAccuracy)
 
@@ -410,7 +410,6 @@ with tf.Session() as sess:
             for i in range(test_total_batch_num):
 
                 # print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
-
                 # test_x_batch, test_y_batch = loadMiniBatch(TEST_DATA)
                 test_x_batch, test_y_batch, START_BATCH_INDEX = loadBatch(TEST_DATA, START_BATCH_INDEX) # 리턴 시 START_BATCH_INDEX는 + BATCH_SZIE 되어 있음
                 ALL_TEST_LABELS.append(test_y_batch)
@@ -436,9 +435,8 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
-            mon_acuuracy_list[len(mon_acuuracy_list)-1].append(1.0-TEST_ACCURACY)
+            mon_acuuracy_list[len(mon_acuuracy_list)-1].append((1.0-TEST_ACCURACY)*100)
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
-            print(mon_acuuracy_list, mon_label_list)
             drawnow(monitorAccuracy)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
@@ -447,19 +445,20 @@ with tf.Session() as sess:
             confusion_matrix.print_stats()
 
 
-            TEST_ACCURACY_LIST.append(TEST_ACCURACY)
-            if len(TEST_ACCURACY_LIST) != 1:
-                if float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]) :
-                    print("이전 정확도: {}, 현재 정확도:{} ".format(TEST_ACCURACY_LIST[0], TEST_ACCURACY_LIST[1]))
-                    print("Ealry Stop 으로 학습을 중단합니다.")
-                    print("최고정확도 {}".format(TEST_ACCURACY_LIST[0]))
-                    break
-                else:
-                    print("이전 정확도: {}, 현재 정확도:{} ".format(TEST_ACCURACY_LIST[0], TEST_ACCURACY_LIST[1]))
-                    TEST_ACCURACY_LIST[0] = TEST_ACCURACY_LIST[1]
-                    TEST_ACCURACY_LIST.pop()
-                    saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
-                    print("학습을 계속 진행합니다.")
+            # 모델 저장이 필요할 때만 활성화 함
+            # TEST_ACCURACY_LIST.append(TEST_ACCURACY)
+            # if len(TEST_ACCURACY_LIST) != 1:
+            #     if float(TEST_ACCURACY_LIST[0]) >= float(TEST_ACCURACY_LIST[1]) :
+            #         print("이전 정확도: {}, 현재 정확도:{} ".format(TEST_ACCURACY_LIST[0], TEST_ACCURACY_LIST[1]))
+            #         print("Ealry Stop 으로 학습을 중단합니다.")
+            #         print("최고정확도 {}".format(TEST_ACCURACY_LIST[0]))
+            #         break
+            #     else:
+            #         print("이전 정확도: {}, 현재 정확도:{} ".format(TEST_ACCURACY_LIST[0], TEST_ACCURACY_LIST[1]))
+            #         TEST_ACCURACY_LIST[0] = TEST_ACCURACY_LIST[1]
+            #         TEST_ACCURACY_LIST.pop()
+            #         saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
+            #         print("학습을 계속 진행합니다.")
 
     # drawnow(monitorTrainCost, pltSave=True)
     drawnow(monitorAccuracy, pltSave=True)
