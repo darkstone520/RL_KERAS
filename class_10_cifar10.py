@@ -23,13 +23,15 @@ from pandas_ml import ConfusionMatrix
 #         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
 
-def monitorAccuracy(pltSave=False):
+def monitorAccuracy(epoch_num, pltSave=False):
 
-    plt.figure(1).set_size_inches(10,20)
-    plt.subplot(211)
+    plt.figure(1)
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
+        if epoch_num == 1:
+            plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+        else:
+            plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label="_nolegend_")
 
-    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.title('Cost Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -38,17 +40,14 @@ def monitorAccuracy(pltSave=False):
     if pltSave:
         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
-    plt.subplot(212)
-    for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
-        plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
+    plt.figure(2)
+    for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
     plt.ylabel('Error %')
     plt.grid(True)
-
-    plt.tight_layout()
-
     if pltSave:
         plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
@@ -87,7 +86,7 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        # return lines[:50], lines[50:10]
+        # return lines[:2], lines[2:4]
 
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
@@ -456,7 +455,7 @@ with tf.Session() as sess:
             print('Testing Finished!')
             mon_acuuracy_list[len(mon_acuuracy_list)-1].append((1.0-TEST_ACCURACY)*100)
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
-            drawnow(monitorAccuracy)
+            drawnow(monitorAccuracy, epoch_num=epoch)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
