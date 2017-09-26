@@ -25,9 +25,9 @@ from pandas_ml import ConfusionMatrix
 
 def monitorAccuracy(pltSave=False):
 
-    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.figure(1, figsize=(12,12))
+    plt.figure(1).set_size_inches(10,20)
     plt.subplot(211)
     plt.title('Cost Graph per Epoch')
     plt.legend(loc=1)
@@ -38,8 +38,8 @@ def monitorAccuracy(pltSave=False):
         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
 
-    for cost, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+    for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
+        plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
     plt.subplot(212)
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
@@ -87,7 +87,7 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        # return lines[:5], lines[5:10]
+        # return lines[:50], lines[50:10]
 
         # return 시 데이터를 섞어서 return 한다.
         return lines[:train_last_index], lines[train_last_index:]
