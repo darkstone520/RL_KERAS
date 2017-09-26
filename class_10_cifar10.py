@@ -25,13 +25,13 @@ def monitorTrainCost(pltSave=False):
 def monitorAccuracy(pltSave=False):
     for cost, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
-    plt.title('Accuracy Graph per Epoch')
+    plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
-    plt.ylabel('Accuracy')
+    plt.ylabel('Error')
     plt.grid(True)
     if pltSave:
-        plt.savefig('Accuracy Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+        plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
@@ -68,10 +68,10 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        return lines[:5], lines[5:10]
+        # return lines[:5], lines[5:10]
 
         # return 시 데이터를 섞어서 return 한다.
-        # return lines[:train_last_index], lines[train_last_index:]
+        return lines[:train_last_index], lines[train_last_index:]
 
 def loadRandomMiniBatch(lines):
     """
@@ -229,7 +229,7 @@ def randomCrop(image_array):
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (32, 32)
-BATCH_SIZE = 5
+BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
@@ -265,7 +265,7 @@ mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
 mon_cost_list = [[] for m in range(NUM_MODELS)]
 # accuracy monitoring 관련
-mon_acuuracy_list = [[] for m in range(NUM_MODELS)]
+mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
 
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
@@ -380,7 +380,7 @@ with tf.Session() as sess:
             mon_cost_list[idx].append(cost)
         for idx, accuracy in enumerate(avg_accuracy_list):
             if idx != len(avg_accuracy_list)-1:
-                mon_acuuracy_list[idx].append(accuracy)
+                mon_acuuracy_list[idx].append(1.0-accuracy)
         # drawnow(monitorTrainCost)
         # drawnow(monitorAccuracy)
 
@@ -436,7 +436,7 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
-            mon_acuuracy_list[len(mon_acuuracy_list)-1].append(TEST_ACCURACY)
+            mon_acuuracy_list[len(mon_acuuracy_list)-1].append(1.0-TEST_ACCURACY)
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
             print(mon_acuuracy_list, mon_label_list)
             drawnow(monitorAccuracy)
