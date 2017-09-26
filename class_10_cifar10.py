@@ -23,7 +23,7 @@ def monitorTrainCost(pltSave=False):
 
 
 def monitorAccuracy(pltSave=False):
-    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+    for cost, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.title('Accuracy Graph per Epoch')
     plt.legend(loc=1)
