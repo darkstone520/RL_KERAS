@@ -68,7 +68,7 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        return lines[:100], lines[100:200]
+        return lines[:1], lines[1:2]
 
         # return 시 데이터를 섞어서 return 한다.
         # return lines[:train_last_index], lines[train_last_index:]
@@ -259,16 +259,13 @@ NORMAL_BATCH = False # 일반배치
 LAST_EPOCH = None
 
 # monitoring 관련 parameter
-# mon_epoch_list = []
-# mon_cost_list = [[] for m in range(NUM_MODELS)]
-# mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
-# mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
-
-# monitoring 관련 parameter
 mon_epoch_list = []
-mon_acuuracy_list = [[] for m in range(NUM_MODELS)]
 mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
-mon_label_list = [ 'model'+str(m+1) for m in range(NUM_MODELS)]
+mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
+# cost monitoring 관련
+mon_cost_list = [[] for m in range(NUM_MODELS)]
+# accuracy monitoring 관련
+mon_acuuracy_list = [[] for m in range(NUM_MODELS)]
 
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
@@ -372,15 +369,15 @@ with tf.Session() as sess:
                 c, _ = m.train(train_x_batch, train_y_batch)
                 a    = m.get_accuracy(train_x_batch, train_y_batch)
                 avg_accuracy_list[m_idx] += a / total_batch_num
-                # avg_cost_list[m_idx] += c / total_batch_num
+                avg_cost_list[m_idx] += c / total_batch_num
 
         print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
         START_BATCH_INDEX = 0
         LAST_EPOCH = epoch+1
 
         mon_epoch_list.append(epoch + 1)
-        # for idx, cost in enumerate(avg_cost_list):
-        #     mon_cost_list[idx].append(cost)
+        for idx, cost in enumerate(avg_cost_list):
+            mon_cost_list[idx].append(cost)
         for idx, accuracy in enumerate(avg_accuracy_list):
             mon_acuuracy_list[idx].append(accuracy)
         # drawnow(monitorTrainCost)
@@ -439,7 +436,8 @@ with tf.Session() as sess:
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
             mon_acuuracy_list.append([TEST_ACCURACY])
-            print(mon_label_list, mon_acuuracy_list)
+            # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
+            print(mon_acuuracy_list, mon_label_list)
             drawnow(monitorAccuracy)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
