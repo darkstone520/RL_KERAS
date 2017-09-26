@@ -31,7 +31,7 @@ def monitorAccuracy(pltSave=False):
     plt.ylabel('Accuracy')
     plt.grid(True)
     if pltSave:
-        plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+        plt.savefig('Accuracy Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
@@ -68,10 +68,10 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        # return lines[:100], lines[100:200]
+        return lines[:100], lines[100:200]
 
         # return 시 데이터를 섞어서 return 한다.
-        return lines[:train_last_index], lines[train_last_index:]
+        # return lines[:train_last_index], lines[train_last_index:]
 
 def loadRandomMiniBatch(lines):
     """
