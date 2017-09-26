@@ -266,9 +266,9 @@ LAST_EPOCH = None
 
 # monitoring 관련 parameter
 mon_epoch_list = []
-mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
+mon_acuuracy_list = [[] for m in range(NUM_MODELS)]
 mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
-mon_label_list = [ 'model'+str(m+1) if m != NUM_MODELS else 'test'+str(m+1)  for m in range(NUM_MODELS+1)]
+mon_label_list = [ 'model'+str(m+1) for m in range(NUM_MODELS)]
 
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
@@ -392,6 +392,8 @@ with tf.Session() as sess:
         ## Early Stop, Test 검증
         ################################################################################
         if (epoch >= START_EARLY_STOP_EPOCH) and float(np.mean(avg_cost_list)) < START_EARLY_STOP_COST:
+            if epoch == 1:
+                mon_label_list.append("Test")
             # Test 수행 시 마다 초기화가 필요한 변수들
             MODEL_ACCURACY = np.zeros(NUM_MODELS).tolist()
             CNT = 0
