@@ -24,6 +24,18 @@ def monitorTrainCost(pltSave=False):
 
 
 def monitorAccuracy(pltSave=False):
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list_for_cost)], mon_label_list_for_cost):
+        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+    plt.figure(1)
+    plt.title('Cost Graph per Epoch')
+    plt.legend(loc=1)
+    plt.xlabel('Epoch')
+    plt.ylabel('Cost')
+    plt.grid(True)
+
+    if pltSave:
+        plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+
     for cost, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
     plt.figure(2)
@@ -32,6 +44,7 @@ def monitorAccuracy(pltSave=False):
     plt.xlabel('Epoch')
     plt.ylabel('Error %')
     plt.grid(True)
+
     if pltSave:
         plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
@@ -384,7 +397,7 @@ with tf.Session() as sess:
         for idx, accuracy in enumerate(avg_accuracy_list):
             if idx != len(avg_accuracy_list)-1:
                 mon_acuuracy_list[idx].append((1.0-accuracy)*100)
-        drawnow(monitorTrainCost)
+        # drawnow(monitorTrainCost)
 
         epoch += 1
 
@@ -465,7 +478,6 @@ with tf.Session() as sess:
 
     # drawnow(monitorTrainCost, pltSave=True)
     drawnow(monitorAccuracy, pltSave=True)
-    drawnow(monitorTrainCost, pltSave=True)
 
     print('Learning Finished!')
 
