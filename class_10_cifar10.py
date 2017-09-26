@@ -21,6 +21,18 @@ def monitorTrainCost(pltSave=False):
     if pltSave:
         plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
+
+def monitorAccuracy(pltSave=False):
+    for cost, color, label in zip(mon_cost_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+        plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label=label)
+    plt.title('Accuracy Graph per Epoch')
+    plt.legend(loc=1)
+    plt.xlabel('Epoch')
+    plt.ylabel('Accuracy')
+    plt.grid(True)
+    if pltSave:
+        plt.savefig('Cost Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
     Args:
@@ -224,8 +236,8 @@ START_BATCH_INDEX = 0
 IMAGE_DISTORT_RATE = 0
 
 # EARLY_STOP 시작하는 에폭 시점
-START_EARLY_STOP_EPOCH = 5
-START_EARLY_STOP_COST = 0.01
+START_EARLY_STOP_EPOCH = 1
+START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 0.8
 NUM_MODELS = 3
@@ -251,6 +263,13 @@ mon_epoch_list = []
 mon_cost_list = [[] for m in range(NUM_MODELS)]
 mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
+
+# monitoring 관련 parameter
+mon_epoch_list = []
+mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
+mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
+mon_label_list = [ 'model'+str(m+1) if m != NUM_MODELS else 'test'  for m in range(NUM_MODELS+1)]
+
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
@@ -292,6 +311,7 @@ with tf.Session() as sess:
     # for epoch in range(TRAIN_EPOCHS):
     while True:
         avg_cost_list = np.zeros(len(models))
+        avg_accuracy_list = np.zeros(len(models))
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
@@ -350,6 +370,8 @@ with tf.Session() as sess:
             # Train each model
             for m_idx, m in enumerate(models):
                 c, _ = m.train(train_x_batch, train_y_batch)
+                a    = m.get_accuracy(train_x_batch, train_y_batch)
+                avg_accuracy_list[m_idx] += a / total_batch_num
                 avg_cost_list[m_idx] += c / total_batch_num
 
         print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
@@ -359,7 +381,10 @@ with tf.Session() as sess:
         mon_epoch_list.append(epoch + 1)
         for idx, cost in enumerate(avg_cost_list):
             mon_cost_list[idx].append(cost)
-        drawnow(monitorTrainCost)
+        for idx, accuracy in enumerate(avg_accuracy_list):
+            mon_acuuracy_list[idx].append(accuracy)
+        # drawnow(monitorTrainCost)
+        drawnow(monitorAccuracy)
 
         epoch += 1
 
@@ -411,6 +436,7 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
+            mon_acuuracy_list.append(ENSEMBLE_ACCURACY)
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
@@ -432,7 +458,9 @@ with tf.Session() as sess:
                     saver.save(sess, 'log/epoch_' + str(LAST_EPOCH) + '.ckpt')
                     print("학습을 계속 진행합니다.")
 
-    drawnow(monitorTrainCost, pltSave=True)
+    # drawnow(monitorTrainCost, pltSave=True)
+    drawnow(monitorAccuracy, pltSave=True)
+
     print('Learning Finished!')
 
     # 종료 시간 체크
