@@ -68,10 +68,10 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        return lines[:1], lines[1:2]
+        # return lines[:1], lines[1:2]
 
         # return 시 데이터를 섞어서 return 한다.
-        # return lines[:train_last_index], lines[train_last_index:]
+        return lines[:train_last_index], lines[train_last_index:]
 
 def loadRandomMiniBatch(lines):
     """
