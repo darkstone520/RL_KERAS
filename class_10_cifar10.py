@@ -68,10 +68,10 @@ def loadInputData():
         file.close()
 
         # 테스트용 리턴값
-        # return lines[:1], lines[1:2]
+        return lines[:5], lines[5:10]
 
         # return 시 데이터를 섞어서 return 한다.
-        return lines[:train_last_index], lines[train_last_index:]
+        # return lines[:train_last_index], lines[train_last_index:]
 
 def loadRandomMiniBatch(lines):
     """
@@ -229,7 +229,7 @@ def randomCrop(image_array):
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (32, 32)
-BATCH_SIZE = 100
+BATCH_SIZE = 5
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
@@ -308,7 +308,7 @@ with tf.Session() as sess:
     # for epoch in range(TRAIN_EPOCHS):
     while True:
         avg_cost_list = np.zeros(len(models))
-        avg_accuracy_list = np.zeros(len(models))
+        avg_accuracy_list = np.zeros(len(models)+1)
 
         # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
         total_batch_num = math.trunc(int(len(TRAIN_DATA) / BATCH_SIZE))
@@ -379,7 +379,8 @@ with tf.Session() as sess:
         for idx, cost in enumerate(avg_cost_list):
             mon_cost_list[idx].append(cost)
         for idx, accuracy in enumerate(avg_accuracy_list):
-            mon_acuuracy_list[idx].append(accuracy)
+            if idx != len(avg_accuracy_list)-1:
+                mon_acuuracy_list[idx].append(accuracy)
         # drawnow(monitorTrainCost)
         # drawnow(monitorAccuracy)
 
@@ -435,7 +436,7 @@ with tf.Session() as sess:
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             print('Testing Finished!')
-            mon_acuuracy_list.append([TEST_ACCURACY])
+            mon_acuuracy_list[len(mon_acuuracy_list)-1].append(TEST_ACCURACY)
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
             print(mon_acuuracy_list, mon_label_list)
             drawnow(monitorAccuracy)
