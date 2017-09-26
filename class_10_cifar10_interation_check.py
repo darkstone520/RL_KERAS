@@ -425,6 +425,7 @@ with tf.Session() as sess:
                                                           test_y_batch)  # 모델의 정확도가 각 인덱스에 들어감 [0.92, 0.82, 0.91]
                     p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
                     mon_acuuracy_list[len(mon_acuuracy_list) - 1].append(1.0 - np.mean(MODEL_ACCURACY))
+                    drawnow(monitorAccuracy)
                     # 위에서 load배치 함수를 호출하면 START_BATCH_INDEX가 BATCH_SIZE만큼 증가하기 때문에 다시 빼준다.
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
 
