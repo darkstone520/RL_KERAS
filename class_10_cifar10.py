@@ -1,4 +1,4 @@
-from resnet_32layers_cifar10 import Model
+from resnet_20layers_cifar10 import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -461,7 +461,6 @@ with tf.Session() as sess:
             prediction_confusionMatrix = onehot2label(predictions)
             confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
             confusion_matrix.print_stats()
-
 
             # 모델 저장이 필요할 때만 활성화 함
             # TEST_ACCURACY_LIST.append(TEST_ACCURACY)
