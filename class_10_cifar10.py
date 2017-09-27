@@ -472,8 +472,12 @@ with tf.Session() as sess:
                     p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
                     # 위에서 load배치 함수를 호출하면 START_BATCH_INDEX가 BATCH_SIZE만큼 증가하기 때문에 다시 빼준다.
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
+                print(START_BATCH_INDEX, BATCH_SIZE)
+                print(predictions)
+                print(test_y_batch)
                 ensemble_batch_correct_prediciton = tf.equal(tf.argmax(predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:], 1),
-                                                             tf.argmax(test_y_batch[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX]))
+                                                             tf.argmax(test_y_batch[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:],1))
+
                 ensemble_batch_correct_prediciton = tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32))
                 mon_iteration_acuuracy_list[len(mon_label_list)-1].append(sess.run(ensemble_batch_correct_prediciton))
                 CNT += 1
