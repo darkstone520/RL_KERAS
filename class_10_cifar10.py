@@ -8,6 +8,7 @@ import time
 from scipy import ndimage
 from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
+from collections import deque
 
 
 # def monitorTrainCost(pltSave=False):
@@ -56,8 +57,9 @@ def monitorAccuracy(epoch_num, pltSave=False):
 
 
     plt.figure(3)
-    for accuracy, color, label in zip(mon_iteration_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_iteration_list, accuracy, c=color, lw=2, ls="--", marker="None", label=label)
+    for idx, accuracy, color, label in enumerate(zip(mon_iteration_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list)):
+        if idx%2 ==1:
+            plt.plot(mon_iteration_list, accuracy, c=color, lw=2, ls="--", marker="None", label=label)
     plt.title('Error Graph per Iteration')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -303,7 +305,7 @@ mon_cost_list = [[] for m in range(NUM_MODELS)]
 # accuracy monitoring 관련
 mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
 # Iteration accuracy monitoring 관련
-mon_iteration_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
+mon_iteration_acuuracy_list = [ [] for m in range(NUM_MODELS+1)]
 
 
 
@@ -474,6 +476,7 @@ with tf.Session() as sess:
                                                              tf.argmax(test_y_batch,1))
 
                 ensemble_batch_correct_prediciton = tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32))
+                print(round(sess.run(ensemble_batch_correct_prediciton),3))
                 mon_iteration_acuuracy_list[len(mon_iteration_acuuracy_list)-1].append(round(sess.run(ensemble_batch_correct_prediciton),3))
                 CNT += 1
 
