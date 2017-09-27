@@ -251,7 +251,7 @@ BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
-IMAGE_DISTORT_RATE = 0
+IMAGE_DISTORT_RATE = 0.3
 
 # EARLY_STOP 시작하는 에폭 시점
 START_EARLY_STOP_EPOCH = 1
@@ -270,8 +270,8 @@ START_BATCH_INDEX = 0
 RANDOM_MINI_BATCH_NO_ORDER = False # 중복
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
-RANDOM_MINI_BATCH_ORDER = True # 중복없는 랜덤 미니배치
-NORMAL_BATCH = False # 일반배치
+RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
+NORMAL_BATCH = True # 일반배치
 
 
 LAST_EPOCH = None
