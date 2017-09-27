@@ -42,7 +42,10 @@ def monitorAccuracy(epoch_num, pltSave=False):
 
     plt.figure(2)
     for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
+        if epoch_num == 1:
+            plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
+        else:
+            plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label="_nolegend_")
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -50,6 +53,21 @@ def monitorAccuracy(epoch_num, pltSave=False):
     plt.grid(True)
     if pltSave:
         plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
+
+
+    plt.figure(3)
+    for accuracy, color, label in zip(mon_iteration_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
+        plt.plot(mon_iteration_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
+    plt.title('Error Graph per Iteration')
+    plt.legend(loc=1)
+    plt.xlabel('Epoch')
+    plt.ylabel('Error %')
+    plt.grid(True)
+    if pltSave:
+        plt.savefig('Error Graph per Iteration {}_{}'.format(CLASS_NUM,time.asctime()))
+
+    print(mon_iteration_list)
+    print(mon_epoch_list)
 
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
@@ -257,7 +275,7 @@ IMAGE_DISTORT_RATE = 0
 START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
-TRAIN_RATE = 0.83
+TRAIN_RATE = 0.8333333333333334 #
 NUM_MODELS = 3
 CLASS_NUM = 10
 TEST_ACCURACY_LIST = []
@@ -278,6 +296,7 @@ LAST_EPOCH = None
 
 # monitoring 관련 parameter
 mon_epoch_list = []
+mon_iteration_list = []
 mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
 mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
@@ -285,6 +304,10 @@ mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 mon_cost_list = [[] for m in range(NUM_MODELS)]
 # accuracy monitoring 관련
 mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
+# Iteration accuracy monitoring 관련
+mon_iteration_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
+
+
 
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
@@ -314,6 +337,8 @@ with tf.Session() as sess:
     models = []
     valid_result = []
     epoch = 0
+    iteration = 0
+
     # initialize
     for m in range(NUM_MODELS):
         models.append(Model(sess, "model" + str(m), CLASS_NUM))
@@ -326,6 +351,7 @@ with tf.Session() as sess:
     # train my model
     # for epoch in range(TRAIN_EPOCHS):
     while True:
+        BATCH_SIZE = 100
         avg_cost_list = np.zeros(len(models))
         avg_accuracy_list = np.zeros(len(models)+1)
 
@@ -347,7 +373,8 @@ with tf.Session() as sess:
         #     print("랜덤 미니배치(중복허용)를 수행합니다.")
 
         for i in range(total_batch_num):
-
+            iteration += 1
+            mon_iteration_list.append(iteration)
             # MINI_BATCH 여부에 따라 나뉜다.
             # 중복 없는 Random Mini Batch
             if RANDOM_MINI_BATCH_ORDER:
@@ -391,6 +418,7 @@ with tf.Session() as sess:
             for m_idx, m in enumerate(models):
                 c, _ = m.train(train_x_batch, train_y_batch)
                 a    = m.get_accuracy(train_x_batch, train_y_batch)
+                mon_iteration_acuuracy_list[m_idx].append(round((1.0-a)*100,3))
                 avg_accuracy_list[m_idx] += a / total_batch_num
                 avg_cost_list[m_idx] += c / total_batch_num
 
@@ -411,6 +439,7 @@ with tf.Session() as sess:
         ###################################################################################
         ## Early Stop, Test 검증
         ################################################################################
+        BATCH_SIZE = 20
         if (epoch >= START_EARLY_STOP_EPOCH) and float(np.mean(avg_cost_list)) < START_EARLY_STOP_COST:
             if epoch == 1:
                 mon_label_list.append("Test")
@@ -443,10 +472,13 @@ with tf.Session() as sess:
                     p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
                     # 위에서 load배치 함수를 호출하면 START_BATCH_INDEX가 BATCH_SIZE만큼 증가하기 때문에 다시 빼준다.
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
-
+                ensemble_batch_correct_prediciton = tf.equal(tf.argmax(predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:], 1),
+                                                             tf.argmax(test_y_batch[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:], 1))
+                ensemble_batch_correct_prediciton = tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32))
+                mon_iteration_acuuracy_list[len(mon_label_list)-1].append(sess.run(ensemble_batch_correct_prediciton))
                 CNT += 1
-            ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
 
+            ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
