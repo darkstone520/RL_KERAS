@@ -43,9 +43,9 @@ def monitorAccuracy(epoch_num, pltSave=False):
     plt.figure(2)
     for accuracy, color, label in zip(mon_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
         if epoch_num == 1:
-            plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
+            plt.plot(mon_epoch_list, accuracy, c=color, lw=2, ls="--", marker="None", label=label)
         else:
-            plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="o", label="_nolegend_")
+            plt.plot(mon_epoch_list, cost, c=color, lw=2, ls="--", marker="None", label="_nolegend_")
     plt.title('Error Graph per Epoch')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -57,7 +57,7 @@ def monitorAccuracy(epoch_num, pltSave=False):
 
     plt.figure(3)
     for accuracy, color, label in zip(mon_iteration_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list):
-        plt.plot(mon_iteration_list, accuracy, c=color, lw=2, ls="--", marker="o", label=label)
+        plt.plot(mon_iteration_list, accuracy, c=color, lw=2, ls="--", marker="None", label=label)
     plt.title('Error Graph per Iteration')
     plt.legend(loc=1)
     plt.xlabel('Epoch')
@@ -66,8 +66,6 @@ def monitorAccuracy(epoch_num, pltSave=False):
     if pltSave:
         plt.savefig('Error Graph per Iteration {}_{}'.format(CLASS_NUM,time.asctime()))
 
-    print(mon_iteration_list)
-    print(mon_epoch_list)
 
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
@@ -476,7 +474,8 @@ with tf.Session() as sess:
                                                              tf.argmax(test_y_batch,1))
 
                 ensemble_batch_correct_prediciton = tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32))
-                mon_iteration_acuuracy_list[len(mon_label_list)-1].append(sess.run(ensemble_batch_correct_prediciton))
+                mon_iteration_acuuracy_list[len(mon_label_list)-1].append(float(sess.run(ensemble_batch_correct_prediciton)))
+                print(float(sess.run(ensemble_batch_correct_prediciton)))
                 CNT += 1
 
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
