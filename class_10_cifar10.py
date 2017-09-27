@@ -270,8 +270,8 @@ START_BATCH_INDEX = 0
 RANDOM_MINI_BATCH_NO_ORDER = False
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
-RANDOM_MINI_BATCH_ORDER = True # 중복없는 랜덤 미니배치
-NORMAL_BATCH = False # 일반배치
+RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
+NORMAL_BATCH = True # 일반배치
 
 
 LAST_EPOCH = None
@@ -376,12 +376,12 @@ with tf.Session() as sess:
 
 
             # crop data augmentation
-            # cropped_train_x_batch = []
-            # for i in train_x_batch:
-            #     image = i.reshape(32,32)
-            #     image = randomCrop(image)
-            #     cropped_train_x_batch.append(image.flatten())
-            # train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
+            cropped_train_x_batch = []
+            for i in train_x_batch:
+                image = i.reshape(32,32)
+                image = randomCrop(image)
+                cropped_train_x_batch.append(image.flatten())
+            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
 
             # 이미지 왜곡
             # if IMAGE_DISTORT_RATE > random.random():
