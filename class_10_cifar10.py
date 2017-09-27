@@ -475,9 +475,8 @@ with tf.Session() as sess:
                 ensemble_batch_correct_prediciton = tf.equal(tf.argmax(predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:], 1),
                                                              tf.argmax(test_y_batch,1))
 
-                ensemble_batch_correct_prediciton = tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32))
-                print(round(sess.run(ensemble_batch_correct_prediciton),3))
-                mon_iteration_acuuracy_list[len(mon_iteration_acuuracy_list)-1].append(round(sess.run(ensemble_batch_correct_prediciton),3))
+                ensemble_batch_correct_prediciton = sess.run(tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32)))
+                mon_iteration_acuuracy_list[len(mon_iteration_acuuracy_list)-1].append(round(1.0-ensemble_batch_correct_prediciton,3))
                 CNT += 1
 
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
