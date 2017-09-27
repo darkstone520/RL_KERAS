@@ -474,8 +474,7 @@ with tf.Session() as sess:
                                                              tf.argmax(test_y_batch,1))
 
                 ensemble_batch_correct_prediciton = tf.reduce_mean(tf.cast(ensemble_batch_correct_prediciton, tf.float32))
-                mon_iteration_acuuracy_list[len(mon_iteration_acuuracy_list)-1].append(float(sess.run(ensemble_batch_correct_prediciton)))
-                print(float(sess.run(ensemble_batch_correct_prediciton)))
+                mon_iteration_acuuracy_list[len(mon_iteration_acuuracy_list)-1].append(round(sess.run(ensemble_batch_correct_prediciton),3))
                 CNT += 1
 
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
