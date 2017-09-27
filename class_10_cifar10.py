@@ -376,12 +376,12 @@ with tf.Session() as sess:
 
 
             # crop data augmentation
-            cropped_train_x_batch = []
-            for i in train_x_batch:
-                image = i.reshape(32,32)
-                image = randomCrop(image)
-                cropped_train_x_batch.append(image.flatten())
-            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
+            # cropped_train_x_batch = []
+            # for i in train_x_batch:
+            #     image = i.reshape(32,32)
+            #     image = randomCrop(image)
+            #     cropped_train_x_batch.append(image.flatten())
+            # train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
 
             # 이미지 왜곡
             if IMAGE_DISTORT_RATE > random.random():
