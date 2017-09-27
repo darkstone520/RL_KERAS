@@ -58,7 +58,7 @@ def monitorAccuracy(epoch_num, pltSave=False):
 
     plt.figure(3)
     for idx, accuracy, color, label in enumerate(zip(mon_iteration_acuuracy_list, mon_color_list[0:len(mon_label_list)], mon_label_list)):
-        if idx%2 ==1:
+        if idx == 0 or idx == len(mon_label_list)-1 :
             plt.plot(mon_iteration_list, accuracy, c=color, lw=2, ls="--", marker="None", label=label)
     plt.title('Error Graph per Iteration')
     plt.legend(loc=1)
