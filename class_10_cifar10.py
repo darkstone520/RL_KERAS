@@ -384,8 +384,8 @@ with tf.Session() as sess:
             train_x_batch = np.array(cropped_train_x_batch).reshape(-1,32*32)
 
             # 이미지 왜곡
-            # if IMAGE_DISTORT_RATE > random.random():
-            #     train_x_batch = distortImage(train_x_batch)
+            if IMAGE_DISTORT_RATE > random.random():
+                train_x_batch = distortImage(train_x_batch)
 
             # Train each model
             for m_idx, m in enumerate(models):
