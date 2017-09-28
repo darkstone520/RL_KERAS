@@ -1,4 +1,4 @@
-from resnet_20layers_cifar10 import Model
+from resnet_32layers_cifar10 import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
