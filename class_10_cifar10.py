@@ -273,16 +273,16 @@ START_BATCH_INDEX = 0
 # Random Mini Batch의 데이터 중복 허용 여부를 정한다. 순서(Order)가 True 경우 중복이 허용되지 않는다.
 # 둘다 False 일 경우 : Random mini batch no order(데이터 중복허용)을 수행
 
-RANDOM_MINI_BATCH_NO_ORDER = False # 중복
+RANDOM_MINI_BATCH_NO_ORDER = True # 중복
 MIN_ORDER_BATCH_EPCHO = 0 # Random mini batch 시 Normal Batch를 몇 회 수행 후 미니배치를 수행할 것인지 정하는 변수
 
-RANDOM_MINI_BATCH_ORDER = True # 중복없는 랜덤 미니배치
+RANDOM_MINI_BATCH_ORDER = False # 중복없는 랜덤 미니배치
 NORMAL_BATCH = False # 일반배치
-
-
 LAST_EPOCH = None
 
-# monitoring 관련 parameter
+################################
+## monitoring 관련 parameter
+################################
 mon_epoch_list = []
 mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
