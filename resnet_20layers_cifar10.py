@@ -195,7 +195,7 @@ class Model:
         #                                            momentum=0.9, decay=0.99,
         #                                            epsilon=0.01).minimize(self.cost)
 
-        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.05).minimize(self.cost)
+        self.optimizer = tf.train.AdamOptimizer(learning_rate=0.01).minimize(self.cost)
 
         self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(self.logits, 1), tf.arg_max(self.Y, 1)), dtype=tf.float32))
 
