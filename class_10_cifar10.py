@@ -474,7 +474,7 @@ with tf.Session() as sess:
                 confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
                 print(confusion_matrix)
 
-        if epoch == 200:
+        if epoch == 300:
             drawnow(monitorAccuracy, epoch_num=epoch, pltSave=True)
             break
             # confusion_matrix.print_stats()
