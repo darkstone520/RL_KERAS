@@ -128,14 +128,14 @@ class Model:
                 ## Output: 32x32
                 ####################################################################################################
                 # 2-1
-                self.L3_sub_1 = tf.nn.conv2d(input=self.L2_sub_10_r, filter=self.W3_sub, strides=[1,2,2,1], padding='SAME')
+                self.L3_sub_1 = tf.nn.conv2d(input=self.L2_sub_14_r, filter=self.W3_sub, strides=[1,2,2,1], padding='SAME')
                 self.L3_sub_1 = self.BN(input=self.L3_sub_1, scale=True, training=self.training, name='Conv3_sub_BN_1')
                 self.L3_sub_1_r = self.parametric_relu(self.L3_sub_1, 'R_conv3_1')
 
                 # Projection With Shortcut
                 self.L3_sub_2 = tf.nn.conv2d(input=self.L3_sub_1_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_2 = self.BN(input=self.L3_sub_2, scale=True, training=self.training, name='Conv3_sub_BN_2')
-                input_x = tf.layers.conv2d(inputs=self.L2_sub_10_r, kernel_size=(1,1), strides=(2,2), padding='SAME', filters=32)
+                input_x = tf.layers.conv2d(inputs=self.L2_sub_14_r, kernel_size=(1,1), strides=(2,2), padding='SAME', filters=32)
                 self.L3_sub_2_r = self.parametric_relu(self.L3_sub_2 + input_x, 'R_conv3_2')
 
                 # 2-2
@@ -212,14 +212,14 @@ class Model:
                 ## Output: 16x16
                 ####################################################################################################
                 # 2-1
-                self.L4_sub_1 = tf.nn.conv2d(input=self.L3_sub_10_r, filter=self.W4_sub, strides=[1,2,2,1], padding='SAME')
+                self.L4_sub_1 = tf.nn.conv2d(input=self.L3_sub_14_r, filter=self.W4_sub, strides=[1,2,2,1], padding='SAME')
                 self.L4_sub_1 = self.BN(input=self.L4_sub_1, scale=True, training=self.training, name='Conv4_sub_BN_1')
                 self.L4_sub_1_r = self.parametric_relu(self.L4_sub_1, 'R_conv4_1')
 
                 # Projection With Shortcut
                 self.L4_sub_2 = tf.nn.conv2d(input=self.L4_sub_1_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_2 = self.BN(input=self.L4_sub_2, scale=True, training=self.training, name='Conv4_sub_BN_2')
-                input_x = tf.layers.conv2d(self.L3_sub_10_r, kernel_size=(1,1), strides=(2,2), filters=64, padding='SAME')
+                input_x = tf.layers.conv2d(self.L3_sub_14_r, kernel_size=(1,1), strides=(2,2), filters=64, padding='SAME')
                 self.L4_sub_2_r = self.parametric_relu(self.L4_sub_2 + input_x, 'R_conv4_2')
 
 
