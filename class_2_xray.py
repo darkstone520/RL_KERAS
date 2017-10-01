@@ -1,5 +1,5 @@
-from resnet_no_bottle_34layers import Model_34
-from resnet_no_bottle_18layers import Model_18
+from resnet_no_bottle_34layers import Model as Model_34
+from resnet_no_bottle_18layers import Model as Model_18
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
