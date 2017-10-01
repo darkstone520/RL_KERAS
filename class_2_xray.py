@@ -1,4 +1,5 @@
-from resnet_no_bottle_34layers import Model
+from resnet_no_bottle_34layers import Model_34
+from resnet_no_bottle_18layers import Model_18
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -193,7 +194,7 @@ START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 0.7015915119363395
-NUM_MODELS = 5
+NUM_MODELS = 2
 CLASS_NUM = 2
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
@@ -243,8 +244,15 @@ with tf.Session() as sess:
     valid_result = []
     epoch = 0
     # initialize
-    for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m), CLASS_NUM))
+
+    # initialize
+    # for m in range(NUM_MODELS):
+    #     models.append(Model(sess, "model" + str(m), CLASS_NUM))
+
+    for m in range(1):
+        models.append(Model_34(sess, "ResNet_34", CLASS_NUM))
+    for m in range(1):
+        models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
