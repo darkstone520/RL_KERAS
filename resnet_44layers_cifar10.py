@@ -96,23 +96,23 @@ class Model:
 
                 # 2-6
                 self.L2_sub_11 = tf.nn.conv2d(input=self.L2_sub_10_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
-                self.L2_sub_11 = self.BN(input=self.L2_sub_11, scale=True, training=self.training, name='Conv2_sub_BN_9')
-                self.L2_sub_11_r = self.parametric_relu(self.L2_sub_11, 'R_conv2_9')
+                self.L2_sub_11 = self.BN(input=self.L2_sub_11, scale=True, training=self.training, name='Conv2_sub_BN_11')
+                self.L2_sub_11_r = self.parametric_relu(self.L2_sub_11, 'R_conv2_11')
 
                 # With Shortcut
                 self.L2_sub_12 = tf.nn.conv2d(input=self.L2_sub_11_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
-                self.L2_sub_12 = self.BN(input=self.L2_sub_12, scale=True, training=self.training, name='Conv2_sub_BN_10')
-                self.L2_sub_12_r = self.parametric_relu(self.L2_sub_12 + self.L2_sub_10_r , 'R_conv2_10')
+                self.L2_sub_12 = self.BN(input=self.L2_sub_12, scale=True, training=self.training, name='Conv2_sub_BN_12')
+                self.L2_sub_12_r = self.parametric_relu(self.L2_sub_12 + self.L2_sub_10_r , 'R_conv2_12')
 
                 # 2-7
                 self.L2_sub_13 = tf.nn.conv2d(input=self.L2_sub_12_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
-                self.L2_sub_13 = self.BN(input=self.L2_sub_13, scale=True, training=self.training, name='Conv2_sub_BN_9')
-                self.L2_sub_13_r = self.parametric_relu(self.L2_sub_13, 'R_conv2_9')
+                self.L2_sub_13 = self.BN(input=self.L2_sub_13, scale=True, training=self.training, name='Conv2_sub_BN_13')
+                self.L2_sub_13_r = self.parametric_relu(self.L2_sub_13, 'R_conv2_13')
 
                 # With Shortcut
                 self.L2_sub_14 = tf.nn.conv2d(input=self.L2_sub_13_r, filter=self.W2_sub, strides=[1,1,1,1], padding='SAME')
-                self.L2_sub_14 = self.BN(input=self.L2_sub_14, scale=True, training=self.training, name='Conv2_sub_BN_10')
-                self.L2_sub_14_r = self.parametric_relu(self.L2_sub_14 + self.L2_sub_12_r , 'R_conv2_10')
+                self.L2_sub_14 = self.BN(input=self.L2_sub_14, scale=True, training=self.training, name='Conv2_sub_BN_14')
+                self.L2_sub_14_r = self.parametric_relu(self.L2_sub_14 + self.L2_sub_12_r , 'R_conv2_14')
 
 
 
@@ -181,23 +181,23 @@ class Model:
 
                 # 2-6
                 self.L3_sub_11 = tf.nn.conv2d(input=self.L3_sub_10_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
-                self.L3_sub_11 = self.BN(input=self.L3_sub_11, scale=True, training=self.training, name='Conv3_sub_BN_9')
-                self.L3_sub_11_r = self.parametric_relu(self.L3_sub_11, 'R_conv3_9')
+                self.L3_sub_11 = self.BN(input=self.L3_sub_11, scale=True, training=self.training, name='Conv3_sub_BN_11')
+                self.L3_sub_11_r = self.parametric_relu(self.L3_sub_11, 'R_conv3_11')
 
                 # Shortcut
                 self.L3_sub_12 = tf.nn.conv2d(input=self.L3_sub_11_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
-                self.L3_sub_12 = self.BN(input=self.L3_sub_12, scale=True, training=self.training, name='Conv3_sub_BN_10')
-                self.L3_sub_12_r = self.parametric_relu(self.L3_sub_12 + self.L3_sub_10_r, 'R_conv3_10')
+                self.L3_sub_12 = self.BN(input=self.L3_sub_12, scale=True, training=self.training, name='Conv3_sub_BN_12')
+                self.L3_sub_12_r = self.parametric_relu(self.L3_sub_12 + self.L3_sub_10_r, 'R_conv3_12')
 
                 # 2-7
                 self.L3_sub_13 = tf.nn.conv2d(input=self.L3_sub_12_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
-                self.L3_sub_13 = self.BN(input=self.L3_sub_13, scale=True, training=self.training, name='Conv3_sub_BN_9')
-                self.L3_sub_13_r = self.parametric_relu(self.L3_sub_13, 'R_conv3_9')
+                self.L3_sub_13 = self.BN(input=self.L3_sub_13, scale=True, training=self.training, name='Conv3_sub_BN_13')
+                self.L3_sub_13_r = self.parametric_relu(self.L3_sub_13, 'R_conv3_13')
 
                 # Shortcut
                 self.L3_sub_14 = tf.nn.conv2d(input=self.L3_sub_13_r, filter=self.W3_sub_1, strides=[1, 1, 1, 1], padding='SAME')
-                self.L3_sub_14 = self.BN(input=self.L3_sub_14, scale=True, training=self.training, name='Conv3_sub_BN_10')
-                self.L3_sub_14_r = self.parametric_relu(self.L3_sub_14 + self.L3_sub_12_r, 'R_conv3_10')
+                self.L3_sub_14 = self.BN(input=self.L3_sub_14, scale=True, training=self.training, name='Conv3_sub_BN_14')
+                self.L3_sub_14_r = self.parametric_relu(self.L3_sub_14 + self.L3_sub_12_r, 'R_conv3_14')
 
             with tf.name_scope('conv4_x'):
 
@@ -266,23 +266,23 @@ class Model:
 
                 # 2-6
                 self.L4_sub_11 = tf.nn.conv2d(input=self.L4_sub_10_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
-                self.L4_sub_11 = self.BN(input=self.L4_sub_11, scale=True, training=self.training, name='Conv4_sub_BN_9')
-                self.L4_sub_11_r = self.parametric_relu(self.L4_sub_11, 'R_conv4_9')
+                self.L4_sub_11 = self.BN(input=self.L4_sub_11, scale=True, training=self.training, name='Conv4_sub_BN_11')
+                self.L4_sub_11_r = self.parametric_relu(self.L4_sub_11, 'R_conv4_11')
 
                 # With Shortcut
                 self.L4_sub_12 = tf.nn.conv2d(input=self.L4_sub_11_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
-                self.L4_sub_12 = self.BN(input=self.L4_sub_12, scale=True, training=self.training, name='Conv4_sub_BN_10')
-                self.L4_sub_12_r = self.parametric_relu(self.L4_sub_12 + self.L4_sub_10_r, 'R_conv4_10')
+                self.L4_sub_12 = self.BN(input=self.L4_sub_12, scale=True, training=self.training, name='Conv4_sub_BN_12')
+                self.L4_sub_12_r = self.parametric_relu(self.L4_sub_12 + self.L4_sub_10_r, 'R_conv4_12')
 
                 # 2-7
                 self.L4_sub_13 = tf.nn.conv2d(input=self.L4_sub_12_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
-                self.L4_sub_13 = self.BN(input=self.L4_sub_13, scale=True, training=self.training, name='Conv4_sub_BN_9')
-                self.L4_sub_13_r = self.parametric_relu(self.L4_sub_13, 'R_conv4_9')
+                self.L4_sub_13 = self.BN(input=self.L4_sub_13, scale=True, training=self.training, name='Conv4_sub_BN_13')
+                self.L4_sub_13_r = self.parametric_relu(self.L4_sub_13, 'R_conv4_13')
 
                 # With Shortcut
                 self.L4_sub_14 = tf.nn.conv2d(input=self.L4_sub_13_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
-                self.L4_sub_14 = self.BN(input=self.L4_sub_14, scale=True, training=self.training, name='Conv4_sub_BN_10')
-                self.L4_sub_14_r = self.parametric_relu(self.L4_sub_14 + self.L4_sub_12_r, 'R_conv4_10')
+                self.L4_sub_14 = self.BN(input=self.L4_sub_14, scale=True, training=self.training, name='Conv4_sub_BN_14')
+                self.L4_sub_14_r = self.parametric_relu(self.L4_sub_14 + self.L4_sub_12_r, 'R_conv4_14')
 
 
 
