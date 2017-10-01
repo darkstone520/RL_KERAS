@@ -216,8 +216,8 @@ LAST_EPOCH = None
 mon_epoch_list = []
 # mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 mon_color_list = ['cyan','red', 'black']
-mon_label_list_for_cost = ['ResNet_18','ResNet_24']
-mon_label_list = ['ResNet_18','ResNet_24']
+mon_label_list_for_cost = ['ResNet_18','ResNet_26']
+mon_label_list = ['ResNet_18','ResNet_26']
 # mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
@@ -255,7 +255,7 @@ with tf.Session() as sess:
     for m in range(1):
         models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
     for m in range(1):
-        models.append(Model_34(sess, "ResNet_24", CLASS_NUM))
+        models.append(Model_34(sess, "ResNet_26", CLASS_NUM))
 
 
     sess.run(tf.global_variables_initializer())
