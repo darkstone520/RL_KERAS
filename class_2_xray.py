@@ -330,7 +330,7 @@ with tf.Session() as sess:
                 avg_accuracy_list[m_idx] += a / total_batch_num
                 avg_cost_list[m_idx] += c / total_batch_num
 
-        # print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
+        print('Epoch:', '%04d' % (epoch + 1), 'cost =', avg_cost_list)
         START_BATCH_INDEX = 0
         LAST_EPOCH = epoch+1
 
@@ -388,11 +388,11 @@ with tf.Session() as sess:
 
             START_BATCH_INDEX = 0
 
-            # for i in range(len(MODEL_ACCURACY)):
-            #     print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
+            for i in range(len(MODEL_ACCURACY)):
+                print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
-            print(TEST_ACCURACY)
-            # print('Ensemble Accuracy : ', TEST_ACCURACY)
+            # print(TEST_ACCURACY)
+            print('Ensemble Accuracy : ', TEST_ACCURACY)
             # print('Testing Finished!')
             mon_acuuracy_list[len(mon_acuuracy_list)-1].append(round((1.0-TEST_ACCURACY)*100,3))
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
