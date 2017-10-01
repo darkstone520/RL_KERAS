@@ -237,15 +237,15 @@ class Model:
                 self.L5_sub_4 = self.BN(input=self.L5_sub_4, scale=True, training=self.training, name='Conv5_sub_BN_4')
                 self.L5_sub_4_r = self.parametric_relu(self.L5_sub_4 + self.L5_sub_2_r, 'R_conv5_4')
 
-                # # 2-3
-                # self.L5_sub_5 = tf.nn.conv2d(input=self.L5_sub_4_r, filter=self.W5_sub_1, strides=[1,1,1,1], padding='SAME')
-                # self.L5_sub_5 = self.BN(input=self.L5_sub_5, scale=True, training=self.training, name='Conv5_sub_BN_5')
-                # self.L5_sub_5_r = self.parametric_relu(self.L5_sub_5, 'R_conv5_5')
-                #
-                # # With Shortcut
-                # self.L5_sub_6 = tf.nn.conv2d(input=self.L5_sub_5_r, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
-                # self.L5_sub_6 = self.BN(input=self.L5_sub_6, scale=True, training=self.training, name='Conv5_sub_BN_6')
-                # self.L5_sub_6_r = self.parametric_relu(self.L5_sub_6 + self.L5_sub_4_r, 'R_conv5_6')
+                # 2-3
+                self.L5_sub_5 = tf.nn.conv2d(input=self.L5_sub_4_r, filter=self.W5_sub_1, strides=[1,1,1,1], padding='SAME')
+                self.L5_sub_5 = self.BN(input=self.L5_sub_5, scale=True, training=self.training, name='Conv5_sub_BN_5')
+                self.L5_sub_5_r = self.parametric_relu(self.L5_sub_5, 'R_conv5_5')
+
+                # With Shortcut
+                self.L5_sub_6 = tf.nn.conv2d(input=self.L5_sub_5_r, filter=self.W5_sub_1, strides=[1, 1, 1, 1], padding='SAME')
+                self.L5_sub_6 = self.BN(input=self.L5_sub_6, scale=True, training=self.training, name='Conv5_sub_BN_6')
+                self.L5_sub_6_r = self.parametric_relu(self.L5_sub_6 + self.L5_sub_4_r, 'R_conv5_6')
 
 
 
@@ -254,7 +254,7 @@ class Model:
                 ####################################################################################################
                 ## Global Average Pooling
                 ####################################################################################################
-                self.global_avg_pool = tflearn.layers.conv.global_avg_pool(self.L5_sub_4_r, name='global_avg')
+                self.global_avg_pool = tflearn.layers.conv.global_avg_pool(self.L5_sub_6_r, name='global_avg')
 
             with tf.name_scope('fc_layer1'):
                 self.W_fc1 = tf.get_variable(name='W_fc1', shape=[512, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
