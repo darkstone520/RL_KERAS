@@ -404,7 +404,7 @@ with tf.Session() as sess:
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
-            if epoch%50 == 0:
+            if TEST_ACCURACY > 0.98:
                 confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
                 print(confusion_matrix)
 
