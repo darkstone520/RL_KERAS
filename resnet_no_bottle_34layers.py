@@ -182,7 +182,9 @@ class Model:
                 # With Shortcut
                 self.L4_sub_8 = tf.nn.conv2d(input=self.L4_sub_7_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_8 = self.BN(input=self.L4_sub_8, scale=True, training=self.training, name='Conv4_sub_BN_8')
-                self.L4_sub_8_r = self.parametric_relu(self.L4_sub_8 + self.L4_sub_6_r, 'R_conv4_8')
+                self.L4_sub_8_r = self.parametric_relu(self.L4_sub_8, 'R_conv4_8')
+                # self.L4_sub_8_r = self.parametric_relu(self.L4_sub_8 + self.L4_sub_6_r, 'R_conv4_8')
+
 
                 # 2-5
                 self.L4_sub_9 = tf.nn.conv2d(input=self.L4_sub_8_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
@@ -192,7 +194,8 @@ class Model:
                 # With Shortcut
                 self.L4_sub_10 = tf.nn.conv2d(input=self.L4_sub_9_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_10 = self.BN(input=self.L4_sub_10, scale=True, training=self.training, name='Conv4_sub_BN_10')
-                self.L4_sub_10_r = self.parametric_relu(self.L4_sub_10 + self.L4_sub_8_r, 'R_conv4_10')
+                self.L4_sub_10_r = self.parametric_relu(self.L4_sub_10, 'R_conv4_10')
+                # self.L4_sub_10_r = self.parametric_relu(self.L4_sub_10 + self.L4_sub_8_r, 'R_conv4_10')
 
                 # 2-6
                 self.L4_sub_11 = tf.nn.conv2d(input=self.L4_sub_10_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
@@ -202,7 +205,9 @@ class Model:
                 # With Shortcut
                 self.L4_sub_12 = tf.nn.conv2d(input=self.L4_sub_11_r, filter=self.W4_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L4_sub_12 = self.BN(input=self.L4_sub_12, scale=True, training=self.training, name='Conv4_sub_BN_12')
-                self.L4_sub_12_r = self.parametric_relu(self.L4_sub_12 + self.L4_sub_10_r, 'R_conv4_12')
+                self.L4_sub_12_r = self.parametric_relu(self.L4_sub_12, 'R_conv4_12')
+
+                # self.L4_sub_12_r = self.parametric_relu(self.L4_sub_12 + self.L4_sub_10_r, 'R_conv4_12')
 
 
 
