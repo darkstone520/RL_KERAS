@@ -167,7 +167,7 @@ class Model:
             ############################################################################################################
             with tf.name_scope('conv_layer4') as scope:
                 self.W4 = tf.get_variable(name='W4', shape=[3, 3, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L4 = tf.nn.conv2d(input=self.L3, filter=self.W4, strides=[1, 1, 1, 1], padding='VALID')
+                self.L4 = tf.nn.conv2d(input=self.L3, filter=self.W4, strides=[1, 1, 1, 1], padding='SAME')
                 self.L4 = self.BN(input=self.L4, scale=True, training=self.training, name='Conv4_sub_BN')
                 self.L4 = self.parametric_relu(self.L4, 'R4')
                 self.L4 = tf.nn.max_pool(value=self.L4, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 7x7
