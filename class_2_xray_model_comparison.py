@@ -1,4 +1,4 @@
-from resnet_no_bottle_26layers import Model as Model_34
+from resnet_no_bottle_26layers import Model as Model_26
 from resnet_no_bottle_18layers import Model as Model_18
 from model_kkc_xray import Model as My
 import tensorflow as tf
@@ -259,7 +259,7 @@ with tf.Session() as sess:
     for m in range(1):
         models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
     for m in range(1):
-        models.append(Model_34(sess, "ResNet_26", CLASS_NUM))
+        models.append(Model_26(sess, "ResNet_26", CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
