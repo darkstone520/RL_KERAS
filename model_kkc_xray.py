@@ -99,18 +99,18 @@ class Model:
             ## tf.contrib.layers.xavier_initializer_conv2d()
             ############################################################################################################
             with tf.name_scope('conv_layer1') as scope:
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[3, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 1, 1, 1], padding='VALID')  # 224x224
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[7, 7, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
                 self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
 
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='VALID')  #
+                self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
                 self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R2_sub')
 
                 self.W3_sub = tf.get_variable(name='W3_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='VALID')  #
+                self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
                 self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R3_sub')
                 ###################################################################################################################
@@ -119,7 +119,7 @@ class Model:
                 ##  ⊙ depth_radius = conv layer 총 개수 , bias / alpha / beta 값은 임의의 파라미터(AlexNet 의 파라미터로 임시 지정)
                 ###################################################################################################################
                 # self.L1 = tf.nn.lrn(self.L3_sub, depth_radius=5, bias=2, alpha=0.0001, beta=0.75, name='LRN1')
-                self.L1 = tf.nn.max_pool(value=self.L3_sub, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 112x112
+                self.L1 = tf.nn.max_pool(value=self.L3_sub, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 56x56
                 # self.L1 = tf.layers.dropout(inputs=self.L1, rate=self.dropout_rate, training=self.training)
 
             ############################################################################################################
@@ -131,7 +131,7 @@ class Model:
             ############################################################################################################
             with tf.name_scope('conv_layer2') as scope:
                 self.W2 = tf.get_variable(name='W2', shape=[3, 3, 20, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L2 = tf.nn.conv2d(input=self.L1, filter=self.W2, strides=[1, 1, 1, 1], padding='SAME') # 112x112
+                self.L2 = tf.nn.conv2d(input=self.L1, filter=self.W2, strides=[1, 1, 1, 1], padding='SAME') # 56x56
                 self.L2 = self.BN(input=self.L2, scale=True, training=self.training, name='Conv2_BN')
                 self.L2 = self.parametric_relu(self.L2, 'R2')
                 ###################################################################################################################
@@ -140,7 +140,7 @@ class Model:
                 ##  ⊙ depth_radius = conv layer 총 개수 , bias / alpha / beta 값은 임의의 파라미터(AlexNet 의 파라미터로 임시 지정)
                 ###################################################################################################################
                 # self.L2 = tf.nn.lrn(self.L2, depth_radius=5, bias=2, alpha=0.0001, beta=0.75, name='LRN2') # Local Response Normalization 구현
-                self.L2 = tf.nn.max_pool(value=self.L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 56x56
+                self.L2 = tf.nn.max_pool(value=self.L2, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 28x28
                 # self.L2 = tf.layers.dropout(inputs=self.L2, rate=self.dropout_rate, training=self.training)
 
             ############################################################################################################
@@ -155,7 +155,7 @@ class Model:
                 self.L3 = tf.nn.conv2d(input=self.L2, filter=self.W3, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3 = self.BN(input=self.L3, scale=True, training=self.training, name='Conv3_BN')
                 self.L3 = self.parametric_relu(self.L3, 'R3')
-                self.L3 = tf.nn.max_pool(value=self.L3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 28x28
+                self.L3 = tf.nn.max_pool(value=self.L3, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 14x14
                 # self.L3 = tf.layers.dropout(inputs=self.L3, rate=self.dropout_rate, training=self.training)
 
             ############################################################################################################
@@ -166,11 +166,11 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer4') as scope:
-                self.W4 = tf.get_variable(name='W4', shape=[2, 2, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W4 = tf.get_variable(name='W4', shape=[3, 3, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L4 = tf.nn.conv2d(input=self.L3, filter=self.W4, strides=[1, 1, 1, 1], padding='VALID')
                 self.L4 = self.BN(input=self.L4, scale=True, training=self.training, name='Conv4_sub_BN')
                 self.L4 = self.parametric_relu(self.L4, 'R4')
-                self.L4 = tf.nn.max_pool(value=self.L4, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 14x14
+                self.L4 = tf.nn.max_pool(value=self.L4, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 7x7
                 # self.L4 = tf.layers.dropout(inputs=self.L4, rate=self.dropout_rate, training=self.training)
                 # self.L4 = tf.reshape(self.L4, shape=[-1, 8 * 8 * 160])
 
@@ -182,11 +182,11 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer5') as scope:
-                self.W5 = tf.get_variable(name='W5', shape=[7, 7, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W5 = tf.get_variable(name='W5', shape=[3, 3, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L5 = tf.nn.conv2d(input=self.L4, filter=self.W5, strides=[1, 1, 1, 1], padding='SAME')
                 self.L5 = self.BN(input=self.L5, scale=True, training=self.training, name='Conv5_sub_BN')
                 self.L5 = self.parametric_relu(self.L5, 'R5')
-                self.L5 = tf.nn.max_pool(value=self.L5, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 7x7
+                # self.L5 = tf.nn.max_pool(value=self.L5, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 5x5
                 # self.L5 = tf.layers.dropout(inputs=self.L5, rate=self.dropout_rate, training=self.training)
                 self.L5 = tf.reshape(self.L5, shape=[-1, 7 * 7 * 320])
 
