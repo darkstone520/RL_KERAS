@@ -1,5 +1,4 @@
-from resnet_no_bottle_34layers import Model as Model_34
-from resnet_no_bottle_18layers import Model as Model_18
+from resnet_BNK_50layers import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,6 +8,7 @@ import time
 from scipy import ndimage
 from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
+from collections import deque
 
 
 def monitorAccuracy(epoch_num, pltSave=False):
@@ -194,7 +194,7 @@ START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 0.7015915119363395
-NUM_MODELS = 2
+NUM_MODELS = 3
 CLASS_NUM = 2
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
@@ -214,12 +214,9 @@ LAST_EPOCH = None
 ## monitoring 관련 parameter
 ################################
 mon_epoch_list = []
-# mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
-mon_color_list = ['cyan','red', 'black']
-mon_label_list_for_cost = ['ResNet_18','ResNet_26']
-mon_label_list = ['ResNet_18','ResNet_26']
-# mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
-# mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
+mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'gold', 'black']
+mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
+mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
 mon_cost_list = [[] for m in range(NUM_MODELS)]
 # accuracy monitoring 관련
@@ -246,16 +243,12 @@ with tf.Session() as sess:
     models = []
     valid_result = []
     epoch = 0
+    temp = deque(maxlen=2)
     # initialize
 
     # initialize
-    # for m in range(NUM_MODELS):
-    #     models.append(Model(sess, "model" + str(m), CLASS_NUM))
-
-    for m in range(1):
-        models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
-    for m in range(1):
-        models.append(Model_34(sess, "ResNet_26", CLASS_NUM))
+    for m in range(NUM_MODELS):
+        models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
 
     sess.run(tf.global_variables_initializer())
@@ -395,6 +388,7 @@ with tf.Session() as sess:
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
+            temp.append(TEST_ACCURACY)
             # print(TEST_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             # print('Testing Finished!')
@@ -404,11 +398,11 @@ with tf.Session() as sess:
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
-            if TEST_ACCURACY > 0.98:
+            if len(temp) == 2 and temp[1] > temp[0] and temp[1] > 0.90:
                 confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
                 print(confusion_matrix)
 
-        if epoch == 200:
+        if epoch == 70:
             drawnow(monitorAccuracy, epoch_num=epoch, pltSave=True)
             break
             # confusion_matrix.print_stats()
