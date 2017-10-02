@@ -60,7 +60,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "normal_nodule_chest_noblur_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "normal_nodule_chest_data3", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -166,9 +166,9 @@ def distortImage(images):
 
 def randomCrop(image_array):
     origin_size = image_array.shape
-    rnd_width = random.randint(0,8)
-    rnd_height = random.randint(0,8)
-    image_array = np.pad(image_array, (4,4), "constant")
+    rnd_width = random.randint(0,12)
+    rnd_height = random.randint(0,12)
+    image_array = np.pad(image_array, (6,6), "constant")
 
     # Image Crop 단계
     image_array = image_array[
