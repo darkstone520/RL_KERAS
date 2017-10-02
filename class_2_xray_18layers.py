@@ -1,4 +1,4 @@
-from resnet_no_bottle_18layers import Model
+from resnet_no_bottle_34layers import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,6 +8,7 @@ import time
 from scipy import ndimage
 from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
+from collections import deque
 
 
 def monitorAccuracy(epoch_num, pltSave=False):
@@ -242,6 +243,7 @@ with tf.Session() as sess:
     models = []
     valid_result = []
     epoch = 0
+    temp = deque(maxlen=2)
     # initialize
 
     # initialize
@@ -386,6 +388,7 @@ with tf.Session() as sess:
             for i in range(len(MODEL_ACCURACY)):
                 print('Model ' + str(i) + ' : ', MODEL_ACCURACY[i] / CNT)
             TEST_ACCURACY = sess.run(ENSEMBLE_ACCURACY)
+            temp.append(TEST_ACCURACY)
             # print(TEST_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
             # print('Testing Finished!')
@@ -395,11 +398,11 @@ with tf.Session() as sess:
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
-            if TEST_ACCURACY > 0.98:
+            if len(temp) == 2 and temp[1] > temp[0] and temp[1] > 0.90:
                 confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
                 print(confusion_matrix)
 
-        if epoch == 200:
+        if epoch == 100:
             drawnow(monitorAccuracy, epoch_num=epoch, pltSave=True)
             break
             # confusion_matrix.print_stats()
