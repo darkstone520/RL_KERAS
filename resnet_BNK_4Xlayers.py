@@ -79,20 +79,6 @@ class Model:
                 self.L2_sub_6 = self.BN(input=self.L2_sub_6, scale=True, training=self.training, name='Conv2_sub_BN_6')
                 self.L2_sub_6_r = self.parametric_relu(self.L2_sub_6 + self.L2_sub_3_r , 'R_conv2_6')
 
-                # 3-7 bottle neck in in
-                self.L2_sub_7 = tf.nn.conv2d(input=self.L2_sub_6_r, filter=self.bottle_neck_in_in, strides=[1, 1, 1, 1], padding='SAME')
-                self.L2_sub_7 = self.BN(input=self.L2_sub_7, scale=True, training=self.training, name='Conv2_sub_BN_7')
-                self.L2_sub_7_r = self.parametric_relu(self.L2_sub_7, 'R_conv2_7')
-
-                # 3-8
-                self.L2_sub_8 = tf.nn.conv2d(input=self.L2_sub_7_r, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')
-                self.L2_sub_8 = self.BN(input=self.L2_sub_8, scale=True, training=self.training, name='Conv2_sub_BN_8')
-                self.L2_sub_8_r = self.parametric_relu(self.L2_sub_8, 'R_conv2_8')
-
-                # 3-9 bottle neck out
-                self.L2_sub_9 = tf.nn.conv2d(input=self.L2_sub_8_r, filter=self.bottle_neck_out, strides=[1, 1, 1, 1], padding='SAME')
-                self.L2_sub_9 = self.BN(input=self.L2_sub_9, scale=True, training=self.training, name='Conv2_sub_BN_9')
-                self.L2_sub_9_r = self.parametric_relu(self.L2_sub_9 + self.L2_sub_6_r, 'R_conv2_9')
 
 
 
