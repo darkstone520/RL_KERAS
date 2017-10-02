@@ -183,12 +183,12 @@ class Model:
             ############################################################################################################
             with tf.name_scope('conv_layer5') as scope:
                 self.W5 = tf.get_variable(name='W5', shape=[3, 3, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L5 = tf.nn.conv2d(input=self.L4, filter=self.W5, strides=[1, 1, 1, 1], padding='SAME')
+                self.L5 = tf.nn.conv2d(input=self.L4, filter=self.W5, strides=[1, 1, 1, 1], padding='VALID')
                 self.L5 = self.BN(input=self.L5, scale=True, training=self.training, name='Conv5_sub_BN')
                 self.L5 = self.parametric_relu(self.L5, 'R5')
                 # self.L5 = tf.nn.max_pool(value=self.L5, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 5x5
                 # self.L5 = tf.layers.dropout(inputs=self.L5, rate=self.dropout_rate, training=self.training)
-                self.L5 = tf.reshape(self.L5, shape=[-1, 7 * 7 * 320])
+                self.L5 = tf.reshape(self.L5, shape=[-1, 5 * 5 * 320])
 
             ############################################################################################################
             ## ▣ fully connected 계층 - 1
@@ -198,7 +198,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('fc_layer1') as scope:
-                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[7 * 7 * 320, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[5 * 5 * 320, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.b_fc1 = tf.Variable(tf.constant(value=0.001, shape=[1000], name='b_fc1'))
                 self.L6 = tf.matmul(self.L5, self.W_fc1) + self.b_fc1
                 self.L6 = self.BN(input=self.L6, scale=True, training=self.training, name='Conv6_sub_BN')
