@@ -98,7 +98,7 @@ class Model:
                 ####################################################################################################
 
                 # 3-1 bottle neck in
-                self.L3_sub_1 = tf.nn.conv2d(input=self.L2_sub_9_r, filter=self.bottle_neck_in, strides=[1, 2, 2, 1], padding='SAME')
+                self.L3_sub_1 = tf.nn.conv2d(input=self.L2_sub_6_r, filter=self.bottle_neck_in, strides=[1, 2, 2, 1], padding='SAME')
                 self.L3_sub_1 = self.BN(input=self.L3_sub_1, scale=True, training=self.training, name='Conv3_sub_BN_1')
                 self.L3_sub_1_r = self.parametric_relu(self.L3_sub_1, 'R_conv3_1')
 
@@ -110,7 +110,7 @@ class Model:
                 # 3-3 bottle neck out with projection
                 self.L3_sub_3 = tf.nn.conv2d(input=self.L3_sub_2_r, filter=self.bottle_neck_out, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_3 = self.BN(input=self.L3_sub_3, scale=True, training=self.training, name='Conv3_sub_BN_3')
-                input_x = tf.layers.conv2d(inputs=self.L2_sub_9_r, kernel_size=(1, 1), strides=(2, 2), padding='SAME', filters=512)
+                input_x = tf.layers.conv2d(inputs=self.L2_sub_6_r, kernel_size=(1, 1), strides=(2, 2), padding='SAME', filters=512)
                 self.L3_sub_3_r = self.parametric_relu(self.L3_sub_3 + input_x, 'R_conv3_3')
 
                 # 3-4 bottle neck in in
