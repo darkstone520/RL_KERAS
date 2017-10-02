@@ -1,4 +1,6 @@
-from resnet_no_bottle_34layers import Model
+from resnet_no_bottle_26layers import Model as Model_34
+from resnet_no_bottle_18layers import Model as Model_18
+from model_kkc_xray import Model as My
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +11,6 @@ from scipy import ndimage
 from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
 from collections import deque
-
 
 def monitorAccuracy(epoch_num, pltSave=False):
 
@@ -194,7 +195,7 @@ START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 0.7015915119363395
-NUM_MODELS = 5
+NUM_MODELS = 3
 CLASS_NUM = 2
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
@@ -214,9 +215,12 @@ LAST_EPOCH = None
 ## monitoring 관련 parameter
 ################################
 mon_epoch_list = []
-mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'gold', 'black']
-mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
-mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
+# mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
+mon_color_list = ['cyan','red', 'blue', 'gold']
+mon_label_list_for_cost = ['ResNet_18','ResNet_26','My Model']
+mon_label_list = ['ResNet_18','ResNet_26', 'My Model']
+# mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
+# mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
 mon_cost_list = [[] for m in range(NUM_MODELS)]
 # accuracy monitoring 관련
@@ -247,9 +251,15 @@ with tf.Session() as sess:
     # initialize
 
     # initialize
-    for m in range(NUM_MODELS):
-        models.append(Model(sess, "model" + str(m), CLASS_NUM))
+    # for m in range(NUM_MODELS):
+    #     models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
+    for m in range(1):
+        models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
+    for m in range(1):
+        models.append(Model_34(sess, "ResNet_26", CLASS_NUM))
+    for m in range(1):
+        models.append(My(sess, "My_Model", CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
