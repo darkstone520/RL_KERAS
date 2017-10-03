@@ -1,4 +1,4 @@
-from resnet_no_bottle_26layers import Model
+from model_kkc_xray import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
