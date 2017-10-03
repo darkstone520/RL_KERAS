@@ -99,27 +99,43 @@ class Model:
             ## tf.contrib.layers.xavier_initializer_conv2d()
             ############################################################################################################
             with tf.name_scope('conv_layer1') as scope:
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[7, 7, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
                 self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
 
-                self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 1, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN')
+                self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv1_sub_BN_2')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R2_sub')
 
-                self.W3_sub = tf.get_variable(name='W3_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W3_sub = tf.get_variable(name='W3_sub', shape=[1, 3, 20, 30], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN')
+                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv1_sub_BN_3')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R3_sub')
+
+                self.W4_sub = tf.get_variable(name='W4_sub', shape=[3, 1, 30, 30], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.L4_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W4_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
+                self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv1_sub_BN_4')
+                self.L4_sub = self.parametric_relu(self.L4_sub, 'R4_sub')
+
+                self.W5_sub = tf.get_variable(name='W5_sub', shape=[1, 3, 30, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.L5_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W5_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
+                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv1_sub_BN_5')
+                self.L5_sub = self.parametric_relu(self.L5_sub, 'R5_sub')
+
+                self.W6_sub = tf.get_variable(name='W6_sub', shape=[3, 1, 40, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.L6_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W6_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
+                self.L6_sub = self.BN(input=self.L6_sub, scale=True, training=self.training, name='Conv1_sub_BN_6')
+                self.L6_sub = self.parametric_relu(self.L6_sub, 'R6_sub')
+
                 ###################################################################################################################
                 ## ▣ Local Response Normalization 구현
                 ##  ⊙ conv 계층과 pool 계층 사이에 넣는 정규화 기법
                 ##  ⊙ depth_radius = conv layer 총 개수 , bias / alpha / beta 값은 임의의 파라미터(AlexNet 의 파라미터로 임시 지정)
                 ###################################################################################################################
                 # self.L1 = tf.nn.lrn(self.L3_sub, depth_radius=5, bias=2, alpha=0.0001, beta=0.75, name='LRN1')
-                self.L1 = tf.nn.max_pool(value=self.L3_sub, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 56x56
+                self.L1 = tf.nn.max_pool(value=self.L6_sub, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 56x56
                 # self.L1 = tf.layers.dropout(inputs=self.L1, rate=self.dropout_rate, training=self.training)
 
             ############################################################################################################
@@ -130,7 +146,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer2') as scope:
-                self.W2 = tf.get_variable(name='W2', shape=[3, 3, 20, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W2 = tf.get_variable(name='W2', shape=[3, 3, 40, 80], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L2 = tf.nn.conv2d(input=self.L1, filter=self.W2, strides=[1, 1, 1, 1], padding='SAME') # 56x56
                 self.L2 = self.BN(input=self.L2, scale=True, training=self.training, name='Conv2_BN')
                 self.L2 = self.parametric_relu(self.L2, 'R2')
@@ -151,7 +167,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer3') as scope:
-                self.W3 = tf.get_variable(name='W3', shape=[3, 3, 40, 80], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W3 = tf.get_variable(name='W3', shape=[3, 3, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L3 = tf.nn.conv2d(input=self.L2, filter=self.W3, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3 = self.BN(input=self.L3, scale=True, training=self.training, name='Conv3_BN')
                 self.L3 = self.parametric_relu(self.L3, 'R3')
@@ -166,7 +182,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer4') as scope:
-                self.W4 = tf.get_variable(name='W4', shape=[3, 3, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W4 = tf.get_variable(name='W4', shape=[3, 3, 160, 256], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L4 = tf.nn.conv2d(input=self.L3, filter=self.W4, strides=[1, 1, 1, 1], padding='SAME')
                 self.L4 = self.BN(input=self.L4, scale=True, training=self.training, name='Conv4_sub_BN')
                 self.L4 = self.parametric_relu(self.L4, 'R4')
@@ -182,13 +198,13 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer5') as scope:
-                self.W5 = tf.get_variable(name='W5', shape=[3, 3, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W5 = tf.get_variable(name='W5', shape=[3, 3, 256, 512], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L5 = tf.nn.conv2d(input=self.L4, filter=self.W5, strides=[1, 1, 1, 1], padding='VALID')
                 self.L5 = self.BN(input=self.L5, scale=True, training=self.training, name='Conv5_sub_BN')
                 self.L5 = self.parametric_relu(self.L5, 'R5')
                 # self.L5 = tf.nn.max_pool(value=self.L5, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 5x5
                 # self.L5 = tf.layers.dropout(inputs=self.L5, rate=self.dropout_rate, training=self.training)
-                self.L5 = tf.reshape(self.L5, shape=[-1, 5 * 5 * 320])
+                self.L5 = tf.reshape(self.L5, shape=[-1, 5 * 5 * 512])
 
             ############################################################################################################
             ## ▣ fully connected 계층 - 1
@@ -198,7 +214,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('fc_layer1') as scope:
-                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[5 * 5 * 320, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[5 * 5 * 512, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.b_fc1 = tf.Variable(tf.constant(value=0.001, shape=[1000], name='b_fc1'))
                 self.L6 = tf.matmul(self.L5, self.W_fc1) + self.b_fc1
                 self.L6 = self.BN(input=self.L6, scale=True, training=self.training, name='Conv6_sub_BN')
