@@ -1,4 +1,4 @@
-from model_kkc_xray import Model
+from resnet_BNK_4Xlayers import Model
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
