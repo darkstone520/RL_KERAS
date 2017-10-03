@@ -59,7 +59,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "normal_nodule_chest_data3", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "normal_nodule_chest_noblur_data", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -193,7 +193,7 @@ IMAGE_DISTORT_RATE = 0
 START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
-TRAIN_RATE = 0.78457561
+TRAIN_RATE = 0.87218814
 NUM_MODELS = 3
 CLASS_NUM = 2
 TEST_ACCURACY_LIST = []
