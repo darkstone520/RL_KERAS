@@ -34,9 +34,9 @@ class Model:
             with tf.name_scope('conv2_x'):
 
                 self.bottle_neck_in = tf.get_variable(name='bnk_2_in', shape=[1,1,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_in_in = tf.get_variable(name='bnk_2_in_in', shape=[1,1,256,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in_in = tf.get_variable(name='bnk_2_in_in', shape=[1,1,128,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_out = tf.get_variable(name='bnk_2_out', shape=[1,1,64,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_out = tf.get_variable(name='bnk_2_out', shape=[1,1,64,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 # Pooling /2
                 self.L2_sub = tf.nn.max_pool(value=self.L1_sub, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
@@ -79,16 +79,30 @@ class Model:
                 self.L2_sub_6 = self.BN(input=self.L2_sub_6, scale=True, training=self.training, name='Conv2_sub_BN_6')
                 self.L2_sub_6_r = self.parametric_relu(self.L2_sub_6 + self.L2_sub_3_r , 'R_conv2_6')
 
+                # 3-7 bottle neck in in
+                self.L2_sub_7 = tf.nn.conv2d(input=self.L2_sub_6_r, filter=self.bottle_neck_in_in, strides=[1, 1, 1, 1], padding='SAME')
+                self.L2_sub_7 = self.BN(input=self.L2_sub_7, scale=True, training=self.training, name='Conv2_sub_BN_7')
+                self.L2_sub_7_r = self.parametric_relu(self.L2_sub_7, 'R_conv2_7')
+
+                # 3-8
+                self.L2_sub_8 = tf.nn.conv2d(input=self.L2_sub_7_r, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')
+                self.L2_sub_8 = self.BN(input=self.L2_sub_8, scale=True, training=self.training, name='Conv2_sub_BN_8')
+                self.L2_sub_8_r = self.parametric_relu(self.L2_sub_8, 'R_conv2_8')
+
+                # 3-9 bottle neck out
+                self.L2_sub_9 = tf.nn.conv2d(input=self.L2_sub_8_r, filter=self.bottle_neck_out, strides=[1, 1, 1, 1], padding='SAME')
+                self.L2_sub_9 = self.BN(input=self.L2_sub_9, scale=True, training=self.training, name='Conv2_sub_BN_9')
+                self.L2_sub_9_r = self.parametric_relu(self.L2_sub_9 + self.L2_sub_6_r, 'R_conv2_9')
 
 
 
             with tf.name_scope('conv3_x'):
 
 
-                self.bottle_neck_in = tf.get_variable(name='bnk_3_in', shape=[1,1,256,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_in_in = tf.get_variable(name='bnk_3_in_in', shape=[1,1,512,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.W3_sub = tf.get_variable(name='W3_sub', shape=[3,3,128,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_out = tf.get_variable(name='bnk_3_out', shape=[1,1,128,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in = tf.get_variable(name='bnk_3_in', shape=[1,1,128,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in_in = tf.get_variable(name='bnk_3_in_in', shape=[1,1,256,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W3_sub = tf.get_variable(name='W3_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_out = tf.get_variable(name='bnk_3_out', shape=[1,1,64,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 ####################################################################################################
                 ## 2N개 Layer  : (1 Layer + 1 Shortcut Connection layer) x N개
@@ -98,7 +112,7 @@ class Model:
                 ####################################################################################################
 
                 # 3-1 bottle neck in
-                self.L3_sub_1 = tf.nn.conv2d(input=self.L2_sub_6_r, filter=self.bottle_neck_in, strides=[1, 2, 2, 1], padding='SAME')
+                self.L3_sub_1 = tf.nn.conv2d(input=self.L2_sub_9_r, filter=self.bottle_neck_in, strides=[1, 2, 2, 1], padding='SAME')
                 self.L3_sub_1 = self.BN(input=self.L3_sub_1, scale=True, training=self.training, name='Conv3_sub_BN_1')
                 self.L3_sub_1_r = self.parametric_relu(self.L3_sub_1, 'R_conv3_1')
 
@@ -110,7 +124,7 @@ class Model:
                 # 3-3 bottle neck out with projection
                 self.L3_sub_3 = tf.nn.conv2d(input=self.L3_sub_2_r, filter=self.bottle_neck_out, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3_sub_3 = self.BN(input=self.L3_sub_3, scale=True, training=self.training, name='Conv3_sub_BN_3')
-                input_x = tf.layers.conv2d(inputs=self.L2_sub_6_r, kernel_size=(1, 1), strides=(2, 2), padding='SAME', filters=512)
+                input_x = tf.layers.conv2d(inputs=self.L2_sub_9_r, kernel_size=(1, 1), strides=(2, 2), padding='SAME', filters=512)
                 self.L3_sub_3_r = self.parametric_relu(self.L3_sub_3 + input_x, 'R_conv3_3')
 
                 # 3-4 bottle neck in in
@@ -132,10 +146,10 @@ class Model:
 
             with tf.name_scope('conv4_x'):
 
-                self.bottle_neck_in = tf.get_variable(name='bnk_4_in', shape=[1,1,512,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_in_in = tf.get_variable(name='bnk_4_in_in', shape=[1,1,1024,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.W4_sub = tf.get_variable(name='W4_sub', shape=[3,3,256,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_out = tf.get_variable(name='bnk_4_out', shape=[1,1,256,1024], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in = tf.get_variable(name='bnk_4_in', shape=[1,1,256,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in_in = tf.get_variable(name='bnk_4_in_in', shape=[1,1,512,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W4_sub = tf.get_variable(name='W4_sub', shape=[3,3,128,128], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_out = tf.get_variable(name='bnk_4_out', shape=[1,1,128,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 ####################################################################################################
                 ## 2N개 Layer  : (1 Layer + 1 Shortcut Connection layer) x N개
@@ -179,10 +193,10 @@ class Model:
 
             with tf.name_scope('conv5_x'):
 
-                self.bottle_neck_in = tf.get_variable(name='bnk_5_in', shape=[1,1,1024,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_in_in = tf.get_variable(name='bnk_5_in_in', shape=[1,1,2048,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.W5_sub = tf.get_variable(name='W5_sub', shape=[3,3,512,512], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.bottle_neck_out = tf.get_variable(name='bnk_5_out', shape=[1,1,512,2048], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in = tf.get_variable(name='bnk_5_in', shape=[1,1,512,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_in_in = tf.get_variable(name='bnk_5_in_in', shape=[1,1,1024,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W5_sub = tf.get_variable(name='W5_sub', shape=[3,3,256,256], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.bottle_neck_out = tf.get_variable(name='bnk_5_out', shape=[1,1,256,1024], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 ####################################################################################################
                 ## 2N개 Layer  : (1 Layer + 1 Shortcut Connection layer) x N개
@@ -232,7 +246,7 @@ class Model:
                 self.global_avg_pool = tflearn.layers.conv.global_avg_pool(self.L5_sub_6_r, name='global_avg')
 
             with tf.name_scope('fc_layer1'):
-                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[2048, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W_fc1 = tf.get_variable(name='W_fc1', shape=[1024, 1000], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.b_fc1 = tf.Variable(tf.constant(value=0.001, shape=[1000], name='b_fc1'))
                 self.L6 = tf.matmul(self.global_avg_pool, self.W_fc1) + self.b_fc1
                 self.L6 = self.BN(input=self.L6, scale=True, training=self.training, name='Conv6_sub_BN')
