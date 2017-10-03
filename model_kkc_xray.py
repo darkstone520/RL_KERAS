@@ -100,7 +100,7 @@ class Model:
             ############################################################################################################
             with tf.name_scope('conv_layer1') as scope:
                 self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
+                self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
                 self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
 
@@ -125,7 +125,7 @@ class Model:
                 self.L5_sub = self.parametric_relu(self.L5_sub, 'R5_sub')
 
                 self.W6_sub = tf.get_variable(name='W6_sub', shape=[3, 1, 40, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L6_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W6_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
+                self.L6_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W6_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
                 self.L6_sub = self.BN(input=self.L6_sub, scale=True, training=self.training, name='Conv1_sub_BN_6')
                 self.L6_sub = self.parametric_relu(self.L6_sub, 'R6_sub')
 
