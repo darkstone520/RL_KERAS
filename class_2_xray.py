@@ -165,9 +165,9 @@ def distortImage(images):
 
 def randomCrop(image_array):
     origin_size = image_array.shape
-    rnd_width = random.randint(0,8)
-    rnd_height = random.randint(0,8)
-    image_array = np.pad(image_array, (4,4), "constant")
+    rnd_width = random.randint(0,12)
+    rnd_height = random.randint(0,12)
+    image_array = np.pad(image_array, (6,6), "constant")
 
     # Image Crop 단계
     image_array = image_array[
