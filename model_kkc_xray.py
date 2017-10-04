@@ -163,7 +163,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer2') as scope:
-                self.W2 = tf.get_variable(name='W2', shape=[3, 3, 40, 80], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W2 = tf.get_variable(name='W2', shape=[3, 3, 20, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L2 = tf.nn.conv2d(input=self.L1, filter=self.W2, strides=[1, 1, 1, 1], padding='SAME') # 56x56
                 self.L2 = self.BN(input=self.L2, scale=True, training=self.training, name='Conv2_BN')
                 self.L2 = self.parametric_relu(self.L2, 'R2')
@@ -184,7 +184,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer3') as scope:
-                self.W3 = tf.get_variable(name='W3', shape=[3, 3, 80, 120], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W3 = tf.get_variable(name='W3', shape=[3, 3, 40, 80], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L3 = tf.nn.conv2d(input=self.L2, filter=self.W3, strides=[1, 1, 1, 1], padding='SAME')
                 self.L3 = self.BN(input=self.L3, scale=True, training=self.training, name='Conv3_BN')
                 self.L3 = self.parametric_relu(self.L3, 'R3')
@@ -199,7 +199,7 @@ class Model:
             ##  ⊙ 드롭 아웃 구현
             ############################################################################################################
             with tf.name_scope('conv_layer4') as scope:
-                self.W4 = tf.get_variable(name='W4', shape=[3, 3, 120, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W4 = tf.get_variable(name='W4', shape=[3, 3, 80, 160], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L4 = tf.nn.conv2d(input=self.L3, filter=self.W4, strides=[1, 1, 1, 1], padding='SAME')
                 self.L4 = self.BN(input=self.L4, scale=True, training=self.training, name='Conv4_sub_BN')
                 self.L4 = self.parametric_relu(self.L4, 'R4')
