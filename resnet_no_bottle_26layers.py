@@ -28,7 +28,7 @@ class Model:
                 ## Output: 112x112
                 ####################################################################################################
                 self.W1_sub_1 = tf.get_variable(name='W1_sub_1', shape=[1,3,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.L1_sub_1 = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,2,2,1], padding='SAME')
+                self.L1_sub_1 = tf.nn.conv2d(input=X_img, filter=self.W1_sub_1, strides=[1,2,2,1], padding='SAME')
                 self.L1_sub_1 = self.BN(input=self.L1_sub_1, scale=True, training=self.training, name='Conv1_sub_BN_1')
                 self.L1_sub_1 = self.parametric_relu(self.L1_sub_1, 'R_conv1_1')
 
