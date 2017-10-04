@@ -31,40 +31,42 @@ class Model:
                 # self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1,2,2,1], padding='SAME')
                 # self.L1_sub = self.parametric_relu(self.L1_sub, 'R_conv1_1')
 
+
+                # 7x7 -> 1x1, 1x3, 3x1, 1x3, 3x1, 1x3, 3x1
                 self.W1_sub_0 = tf.get_variable(name='W1_sub_0', shape=[1,1,1,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub_0 = tf.nn.conv2d(input=X_img, filter=self.W1_sub_0, strides=[1,2,2,1], padding='SAME')
                 self.L1_sub_0 = self.BN(input=self.L1_sub_0, scale=True, training=self.training, name='Conv1_sub_BN_0')
                 self.L1_sub_0 = self.parametric_relu(self.L1_sub_0, 'R_conv1_0')
 
-                self.W1_sub_1 = tf.get_variable(name='W1_sub_1', shape=[1,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W1_sub_1 = tf.get_variable(name='W1_sub_1', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub_1 = tf.nn.conv2d(input=self.L1_sub_0, filter=self.W1_sub_1, strides=[1,1,1,1], padding='SAME')
                 self.L1_sub_1 = self.BN(input=self.L1_sub_1, scale=True, training=self.training, name='Conv1_sub_BN_1')
                 self.L1_sub_1 = self.parametric_relu(self.L1_sub_1, 'R_conv1_1')
 
-                self.W1_sub_2 = tf.get_variable(name='W1_sub_2', shape=[3,1,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W1_sub_2 = tf.get_variable(name='W1_sub_2', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub_2 = tf.nn.conv2d(input=self.L1_sub_1, filter=self.W1_sub_2, strides=[1,1,1,1], padding='SAME')
                 self.L1_sub_2 = self.BN(input=self.L1_sub_2, scale=True, training=self.training, name='Conv1_sub_BN_2')
                 self.L1_sub_2 = self.parametric_relu(self.L1_sub_2, 'R_conv1_2')
 
-                self.W1_sub_3 = tf.get_variable(name='W1_sub_3', shape=[1,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                self.W1_sub_3 = tf.get_variable(name='W1_sub_3', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
                 self.L1_sub_3 = tf.nn.conv2d(input=self.L1_sub_2, filter=self.W1_sub_3, strides=[1,1,1,1], padding='SAME')
                 self.L1_sub_3 = self.BN(input=self.L1_sub_3, scale=True, training=self.training, name='Conv1_sub_BN_3')
                 self.L1_sub_3 = self.parametric_relu(self.L1_sub_3, 'R_conv1_3')
 
-                self.W1_sub_4 = tf.get_variable(name='W1_sub_4', shape=[3,1,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.L1_sub_4 = tf.nn.conv2d(input=self.L1_sub_3, filter=self.W1_sub_4, strides=[1,1,1,1], padding='SAME')
-                self.L1_sub_4 = self.BN(input=self.L1_sub_4, scale=True, training=self.training, name='Conv1_sub_BN_4')
-                self.L1_sub_4 = self.parametric_relu(self.L1_sub_4, 'R_conv1_4')
-
-                self.W1_sub_5 = tf.get_variable(name='W1_sub_5', shape=[1,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.L1_sub_5 = tf.nn.conv2d(input=self.L1_sub_4, filter=self.W1_sub_5, strides=[1,1,1,1], padding='SAME')
-                self.L1_sub_5 = self.BN(input=self.L1_sub_5, scale=True, training=self.training, name='Conv1_sub_BN_5')
-                self.L1_sub_5 = self.parametric_relu(self.L1_sub_5, 'R_conv1_5')
-
-                self.W1_sub_6 = tf.get_variable(name='W1_sub_6', shape=[3,1,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
-                self.L1_sub_6 = tf.nn.conv2d(input=self.L1_sub_5, filter=self.W1_sub_6, strides=[1,1,1,1], padding='SAME')
-                self.L1_sub_6 = self.BN(input=self.L1_sub_6, scale=True, training=self.training, name='Conv1_sub_BN_6')
-                self.L1_sub_6 = self.parametric_relu(self.L1_sub_6, 'R_conv1_6')
+                # self.W1_sub_4 = tf.get_variable(name='W1_sub_4', shape=[3,1,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                # self.L1_sub_4 = tf.nn.conv2d(input=self.L1_sub_3, filter=self.W1_sub_4, strides=[1,1,1,1], padding='SAME')
+                # self.L1_sub_4 = self.BN(input=self.L1_sub_4, scale=True, training=self.training, name='Conv1_sub_BN_4')
+                # self.L1_sub_4 = self.parametric_relu(self.L1_sub_4, 'R_conv1_4')
+                #
+                # self.W1_sub_5 = tf.get_variable(name='W1_sub_5', shape=[1,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                # self.L1_sub_5 = tf.nn.conv2d(input=self.L1_sub_4, filter=self.W1_sub_5, strides=[1,1,1,1], padding='SAME')
+                # self.L1_sub_5 = self.BN(input=self.L1_sub_5, scale=True, training=self.training, name='Conv1_sub_BN_5')
+                # self.L1_sub_5 = self.parametric_relu(self.L1_sub_5, 'R_conv1_5')
+                #
+                # self.W1_sub_6 = tf.get_variable(name='W1_sub_6', shape=[3,1,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
+                # self.L1_sub_6 = tf.nn.conv2d(input=self.L1_sub_5, filter=self.W1_sub_6, strides=[1,1,1,1], padding='SAME')
+                # self.L1_sub_6 = self.BN(input=self.L1_sub_6, scale=True, training=self.training, name='Conv1_sub_BN_6')
+                # self.L1_sub_6 = self.parametric_relu(self.L1_sub_6, 'R_conv1_6')
 
             with tf.name_scope('conv2_x'):
 
