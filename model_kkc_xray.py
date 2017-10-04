@@ -152,7 +152,7 @@ class Model:
                 ##  ⊙ depth_radius = conv layer 총 개수 , bias / alpha / beta 값은 임의의 파라미터(AlexNet 의 파라미터로 임시 지정)
                 ###################################################################################################################
                 # self.L1 = tf.nn.lrn(self.L3_sub, depth_radius=5, bias=2, alpha=0.0001, beta=0.75, name='LRN1')
-                self.L1 = tf.nn.max_pool(value=self.L6_sub, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 56x56
+                self.L1 = tf.nn.max_pool(value=self.L3_sub, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 56x56
                 # self.L1 = tf.layers.dropout(inputs=self.L1, rate=self.dropout_rate, training=self.training)
 
             ############################################################################################################
