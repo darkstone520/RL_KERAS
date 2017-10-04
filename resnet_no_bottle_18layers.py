@@ -73,7 +73,7 @@ class Model:
                 self.W2_sub = tf.get_variable(name='W2_sub', shape=[3,3,64,64], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
 
                 # Pooling /2
-                self.L2_sub = tf.nn.max_pool(value=self.L1_sub_6, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
+                self.L2_sub = tf.nn.max_pool(value=self.L1_sub_3, ksize=[1,3,3,1], strides=[1,2,2,1], padding='SAME')
 
                 ####################################################################################################
                 ## 2N개 Layer  : (1 Layer + 1 Shortcut Connection layer) x N개
