@@ -99,35 +99,52 @@ class Model:
             ## tf.contrib.layers.xavier_initializer_conv2d()
             ############################################################################################################
             with tf.name_scope('conv_layer1') as scope:
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[7, 7, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
                 self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
 
-                self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 1, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv1_sub_BN_2')
+                self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN')
                 self.L2_sub = self.parametric_relu(self.L2_sub, 'R2_sub')
 
-                self.W3_sub = tf.get_variable(name='W3_sub', shape=[1, 3, 20, 30], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W3_sub = tf.get_variable(name='W3_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv1_sub_BN_3')
+                self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN')
                 self.L3_sub = self.parametric_relu(self.L3_sub, 'R3_sub')
 
-                self.W4_sub = tf.get_variable(name='W4_sub', shape=[3, 1, 30, 30], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L4_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W4_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv1_sub_BN_4')
-                self.L4_sub = self.parametric_relu(self.L4_sub, 'R4_sub')
-
-                self.W5_sub = tf.get_variable(name='W5_sub', shape=[1, 3, 30, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L5_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W5_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
-                self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv1_sub_BN_5')
-                self.L5_sub = self.parametric_relu(self.L5_sub, 'R5_sub')
-
-                self.W6_sub = tf.get_variable(name='W6_sub', shape=[3, 1, 40, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                self.L6_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W6_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
-                self.L6_sub = self.BN(input=self.L6_sub, scale=True, training=self.training, name='Conv1_sub_BN_6')
-                self.L6_sub = self.parametric_relu(self.L6_sub, 'R6_sub')
+                # Fatorized
+                # self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                # self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
+                # self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
+                # self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
+                #
+                # self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 1, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                # self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
+                # self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv1_sub_BN_2')
+                # self.L2_sub = self.parametric_relu(self.L2_sub, 'R2_sub')
+                #
+                # self.W3_sub = tf.get_variable(name='W3_sub', shape=[1, 3, 20, 30], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                # self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
+                # self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv1_sub_BN_3')
+                # self.L3_sub = self.parametric_relu(self.L3_sub, 'R3_sub')
+                #
+                # self.W4_sub = tf.get_variable(name='W4_sub', shape=[3, 1, 30, 30], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                # self.L4_sub = tf.nn.conv2d(input=self.L3_sub, filter=self.W4_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
+                # self.L4_sub = self.BN(input=self.L4_sub, scale=True, training=self.training, name='Conv1_sub_BN_4')
+                # self.L4_sub = self.parametric_relu(self.L4_sub, 'R4_sub')
+                #
+                # self.W5_sub = tf.get_variable(name='W5_sub', shape=[1, 3, 30, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                # self.L5_sub = tf.nn.conv2d(input=self.L4_sub, filter=self.W5_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
+                # self.L5_sub = self.BN(input=self.L5_sub, scale=True, training=self.training, name='Conv1_sub_BN_5')
+                # self.L5_sub = self.parametric_relu(self.L5_sub, 'R5_sub')
+                #
+                # self.W6_sub = tf.get_variable(name='W6_sub', shape=[3, 1, 40, 40], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                # self.L6_sub = tf.nn.conv2d(input=self.L5_sub, filter=self.W6_sub, strides=[1, 1, 1, 1], padding='SAME')  # 112 x 112
+                # self.L6_sub = self.BN(input=self.L6_sub, scale=True, training=self.training, name='Conv1_sub_BN_6')
+                # self.L6_sub = self.parametric_relu(self.L6_sub, 'R6_sub')
 
                 ###################################################################################################################
                 ## ▣ Local Response Normalization 구현
