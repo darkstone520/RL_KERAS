@@ -60,7 +60,7 @@ def loadInputData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "Iris_Normal_Diabetic_Train", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "Chest_Normal_Nodule_Train", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -84,7 +84,7 @@ def loadTestInputData():
         :return: TRAIN_DATA, TEST_DATA
         """
     print("Loading Data")
-    with open(__DATA_PATH + "Iris_Normal_Diabetic_Test", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "Chest_Normal_Nodule_Test", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
