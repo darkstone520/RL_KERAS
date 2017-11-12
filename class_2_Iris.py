@@ -273,7 +273,8 @@ mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
-TRAIN_DATA, TEST_DATA = loadInputData()
+TRAIN_DATA = loadInputData()
+TEST_DATA = loadTestInputData()
 #loadAllTestLabel(TEST_DATA)
 
 print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))
