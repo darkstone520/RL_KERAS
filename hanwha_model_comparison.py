@@ -225,7 +225,7 @@ START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 1.0
-NUM_MODELS = 3
+NUM_MODELS = 1
 CLASS_NUM = 3
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
@@ -259,7 +259,8 @@ mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
-TRAIN_DATA, TEST_DATA = loadTrainData()
+TRAIN_DATA = loadTrainData()
+TEST_DATA = loadTestData()
 #loadAllTestLabel(TEST_DATA)
 
 print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))

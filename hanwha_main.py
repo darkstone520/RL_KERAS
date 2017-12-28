@@ -52,13 +52,13 @@ def plotImage(image):
         plt.imshow(image)
     plt.show()
 
-def loadInputData():
+def loadTrainData():
     """
     텍스트화된 이미지 txt파일을 로드하는 함수
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "normal_nodule_chest_data", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "car_door_norm_scr_broken_train_6000", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -76,7 +76,33 @@ def loadInputData():
         # return lines[:2], lines[2:4]
 
         # return 시 데이터를 섞어서 return 한다.
-        return lines[:train_last_index], lines[train_last_index:]
+        return lines
+
+def loadTestData():
+    """
+    텍스트화된 이미지 txt파일을 로드하는 함수
+    :return: TRAIN_DATA, TEST_DATA
+    """
+    print("Loading Data")
+    with open(__DATA_PATH + "car_door_norm_scr_broken_test_150", "r", encoding="utf-8") as file:
+        # lines : 모든 lines(데이터행)을 불러온다.
+        lines = file.readlines()
+
+        # 불러온 전체 lines를 셔플한다.
+        lines = random.sample(lines, len(lines))
+        lines = random.sample(lines, len(lines))
+        lines = random.sample(lines, len(lines))
+
+        # train data를 일정 rate 만큼 뽑아오기 위한 단계
+        train_last_index = round(TRAIN_RATE * len(lines))
+
+        file.close()
+
+        # 테스트용 리턴값
+        # return lines[:2], lines[2:4]
+
+        # return 시 데이터를 섞어서 return 한다.
+        return lines
 
 def loadRandomMiniBatch(lines):
     """
@@ -99,9 +125,11 @@ def loadRandomMiniBatch(lines):
 
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0])
-        else:
-            label_list.append([0,1])
+            label_list.append([1,0,0])
+        elif label == 1:
+            label_list.append([0,1,0])
+        elif label == 2:
+            label_list.append([0,0,1])
 
 
     label = np.array(label_list)
@@ -129,9 +157,11 @@ def loadBatch(lines, START_BATCH_INDEX):
 
     for label in label.tolist():
         if label == 0:
-            label_list.append([1,0])
-        else:
-            label_list.append([0,1])
+            label_list.append([1,0,0])
+        elif label == 1:
+            label_list.append([0,1,0])
+        elif label == 2:
+            label_list.append([0,0,1])
 
 
     label = np.array(label_list)
@@ -192,9 +222,10 @@ IMAGE_DISTORT_RATE = 0
 START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
-TRAIN_RATE = 0.77895668
-NUM_MODELS = 5
-CLASS_NUM = 2
+
+TRAIN_RATE = 1.0
+NUM_MODELS = 1
+CLASS_NUM = 3
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
 
@@ -224,7 +255,8 @@ mon_acuuracy_list = [[] for m in range(NUM_MODELS+1)]
 
 # TRAIN_DATA와 TEST_DATA를 셋팅, 실제 각 변수에는 txt파일의 각 line 별 주소 값이 리스트로 담긴다.
 stime = time.time()
-TRAIN_DATA, TEST_DATA = loadInputData()
+TRAIN_DATA = loadTrainData()
+TEST_DATA = loadTestData()
 #loadAllTestLabel(TEST_DATA)
 
 print("Train Data {}개 , Test Data {}개 ".format(len(TRAIN_DATA), len(TEST_DATA)))
