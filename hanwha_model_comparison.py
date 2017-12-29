@@ -60,7 +60,7 @@ def loadTrainData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "car_door_norm_scr_broken_train_6000", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "car_door_norm_scr_broken_train_13000", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -225,7 +225,7 @@ START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 1.0
-NUM_MODELS = 1
+NUM_MODELS = 3
 CLASS_NUM = 3
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
@@ -285,12 +285,12 @@ with tf.Session() as sess:
     # for m in range(NUM_MODELS):
     #     models.append(Model(sess, "model" + str(m), CLASS_NUM))
 
-    for m in range(1):
-        models.append(My(sess, "My_Model", CLASS_NUM))
-    for m in range(1):
-        models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
-    for m in range(1):
-        models.append(Model_26(sess, "ResNet_26", CLASS_NUM))
+    # for m in range(1):
+    #     models.append(My(sess, "My_Model", CLASS_NUM))
+    # for m in range(1):
+    #     models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
+    for m in range(3):
+        models.append(My(sess, "My_" + str(m), CLASS_NUM))
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
@@ -439,7 +439,7 @@ with tf.Session() as sess:
 
             actual_confusionMatrix = onehot2label(ALL_TEST_LABELS)
             prediction_confusionMatrix = onehot2label(predictions)
-            if len(temp) == 2 and temp[1] > temp[0] and temp[1] > 0.90:
+            if len(temp) == 2 and temp[1] > temp[0] and temp[1] > 0.4:
                 confusion_matrix = ConfusionMatrix(actual_confusionMatrix, prediction_confusionMatrix)
                 print(confusion_matrix)
 
