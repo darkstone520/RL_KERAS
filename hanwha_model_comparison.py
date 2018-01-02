@@ -1,6 +1,7 @@
 from resnet_no_bottle_26layers import Model as Model_26
 from resnet_no_bottle_18layers import Model as Model_18
-from model_kkc_xray import Model as My
+from resnet_BNK_50layers import Model as My
+# from model_kkc_hanwha import Model as My
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -11,6 +12,9 @@ from scipy import ndimage
 from drawnow import drawnow
 from pandas_ml import ConfusionMatrix
 from collections import deque
+from PIL import Image
+import scipy.misc as sc
+import os
 
 def monitorAccuracy(epoch_num, pltSave=False):
 
@@ -40,6 +44,22 @@ def monitorAccuracy(epoch_num, pltSave=False):
     if pltSave:
         plt.savefig('Error Graph per Epoch {}_{}'.format(CLASS_NUM,time.asctime()))
 
+def ImageSave(image, filename):
+    """image array를 plot으로 보여주는 함수
+    Args:
+        image (2-D or 3-D array): (H, W) or (H, W, C)
+    """
+    image = np.squeeze(image)
+    shape = image.shape
+    fig = plt.gcf()
+    if len(shape) == 2:
+        plt.imshow(image, cmap="gray")
+    else:
+        plt.imshow(image)
+    fig.savefig(filename +'.jpg')
+
+
+
 def plotImage(image):
     """image array를 plot으로 보여주는 함수
     Args:
@@ -60,7 +80,7 @@ def loadTrainData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "car_door_norm_scr_broken_train_13000", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "car_door_norm_scr_broken_train_3000", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -86,7 +106,7 @@ def loadTestData():
     :return: TRAIN_DATA, TEST_DATA
     """
     print("Loading Data")
-    with open(__DATA_PATH + "car_door_norm_scr_broken_test_150", "r", encoding="utf-8") as file:
+    with open(__DATA_PATH + "car_door_norm_scr_broken_test_120", "r", encoding="utf-8") as file:
         # lines : 모든 lines(데이터행)을 불러온다.
         lines = file.readlines()
 
@@ -398,11 +418,12 @@ with tf.Session() as sess:
             ALL_TEST_LABELS = []
             predictions = np.zeros(test_total_batch_num * BATCH_SIZE * CLASS_NUM)\
                 .reshape(-1,CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
+            softmax_predictions = np.zeros(test_total_batch_num * BATCH_SIZE * CLASS_NUM)\
+                .reshape(-1,CLASS_NUM)  # [[0.0, 0.0], [0.0, 0.0] ...]
 
             # print("{} Epoch 모델에 대한 검증을 시작합니다.".format(epoch))
             # 모델 검증
             # 총 데이터의 갯수가 배치사이즈로 나누어지지 않을 경우 버림한다
-
             for i in range(test_total_batch_num):
 
                 # print("Test Batch Data Reading {}/{}, DATA INDEX : {}".format(i + 1, test_total_batch_num, START_BATCH_INDEX))
@@ -417,11 +438,16 @@ with tf.Session() as sess:
                     p = m.predict(test_x_batch)  # 모델이 분류한 라벨 값
                     # 위에서 load배치 함수를 호출하면 START_BATCH_INDEX가 BATCH_SIZE만큼 증가하기 때문에 다시 빼준다.
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
+                    s_p = m.predict_softmax(test_x_batch)
+                    softmax_predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += s_p
+
 
                 CNT += 1
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
-
+            # softmax값이 앙상블 모델별로 누적되어있으니깐 모델갯수로 나누어 평균을 구한다.
+            softmax_predictions = softmax_predictions/NUM_MODELS
             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
+
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
 
             START_BATCH_INDEX = 0
@@ -432,6 +458,30 @@ with tf.Session() as sess:
             temp.append(TEST_ACCURACY)
             # print(TEST_ACCURACY)
             print('Ensemble Accuracy : ', TEST_ACCURACY)
+
+
+            if TEST_ACCURACY > 0.5:
+                # 오답 이미지 분류하기 위함
+                predict_label = sess.run(tf.argmax(predictions,1))
+                actual_label = sess.run(tf.argmax(ALL_TEST_LABELS, 1))
+                test_result = sess.run(ensemble_correct_prediction)
+                false_index = np.squeeze(np.argwhere(test_result == False))
+                # print("총 False의 갯수는 {}".format(len(false_index)))
+                for i,f_index in enumerate(false_index,1):
+                    # print("실제 라벨은: {}, 예측라벨은: {} => {}".format(actual_label[f_index], predict_label[f_index], actual_label[f_index] == predict_label[f_index]))
+
+                    img = test_x_batch[f_index]*255
+                    img = np.uint8(img)
+                    img = img.reshape(224,224)
+                    img = Image.fromarray(img)
+                    os.makedirs("test_image_result/false/{}/actual_{}".format(epoch, actual_label[f_index]), exist_ok=True)
+
+                    ImageSave(img,filename="test_image_result/false/{}/actual_{}/{}_actual_{}_predict_{}_softmax_{}"
+                              .format(epoch, actual_label[f_index], i,
+                                      actual_label[f_index],
+                                      predict_label[f_index],
+                                      softmax_predictions[f_index]))
+
             # print('Testing Finished!')
             mon_acuuracy_list[len(mon_acuuracy_list)-1].append(round((1.0-TEST_ACCURACY)*100,3))
             # [[2.4027903079986572, 2.4005317687988281, 2.3938455581665039, 2.3831737041473389]]['model1']
