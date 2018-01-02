@@ -234,7 +234,7 @@ def randomCrop(image_array):
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (224, 224)
-BATCH_SIZE = 32
+BATCH_SIZE = 16
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
