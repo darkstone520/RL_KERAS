@@ -370,7 +370,7 @@ class Model:
 
         # self.optimizer = tf.train.AdamOptimizer(learning_rate=0.0025).minimize(self.cost)
 
-        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.arg_max(self.logits, 1), tf.arg_max(self.Y, 1)), dtype=tf.float32))
+        self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.argmax(self.logits, 1), tf.argmax(self.Y, 1)), dtype=tf.float32))
 
         # self.tensorflow_summary()
 
