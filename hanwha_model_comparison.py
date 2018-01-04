@@ -217,6 +217,8 @@ def distortImage(images):
 def randomCrop(image_array, multi_scaling=True):
     if multi_scaling:
         scale_range = random.sample([32,160,288], k=1)[0]
+    else:
+        scale_range = 32
     origin_size = image_array.shape
     rnd_width = random.randint(0,scale_range)
     rnd_height = random.randint(0,scale_range)
