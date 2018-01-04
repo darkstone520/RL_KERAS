@@ -85,7 +85,7 @@ class Model:
                 self.dropout_rate = tf.Variable(tf.constant(value=0.5), name='dropout_rate')
                 self.training = tf.placeholder(tf.bool, name='training')
 
-                self.X = tf.placeholder(tf.float32, [None, 224*224], name='x_data')
+                self.X = tf.placeholder(tf.float32, [None, 224*224*1], name='x_data')
                 X_img = tf.reshape(self.X, shape=[-1, 224, 224, 1])
                 self.Y = tf.placeholder(tf.float32, [None, self.class_num], name='y_data')
 
@@ -262,6 +262,7 @@ class Model:
             self.W_out = tf.get_variable(name='W_out', shape=[1000, self.class_num], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
             self.b_out = tf.Variable(tf.constant(value=0.001, shape=[self.class_num], name='b_out'))
             self.logits = tf.matmul(self.L_fc2, self.W_out) + self.b_out
+            self.softmax = tf.nn.softmax(self.logits)
 
         ################################################################################################################
         ## ▣ L2-Regularization
@@ -329,6 +330,9 @@ class Model:
 
     def predict(self, x_test):
         return self.sess.run(self.logits, feed_dict={self.X: x_test, self.training: False})
+
+    def predict_softmax(self, x_test):
+        return self.sess.run(self.softmax, feed_dict={self.X: x_test, self.training: False})
 
     def get_accuracy(self, x_test, y_test):
         return self.sess.run(self.accuracy, feed_dict={self.X: x_test, self.Y: y_test, self.training: False})
