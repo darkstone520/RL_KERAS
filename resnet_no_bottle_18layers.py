@@ -187,6 +187,7 @@ class Model:
             self.W_out = tf.get_variable(name='W_out', shape=[1000, self.class_num], dtype=tf.float32, initializer=tf.contrib.layers.variance_scaling_initializer())
             self.b_out = tf.Variable(tf.constant(value=0.001, shape=[self.class_num], name='b_out'))
             self.logits = tf.matmul(self.L_fc1, self.W_out) + self.b_out
+            self.softmax = tf.nn.softmax(self.logits)
 
         ################################################################################################################
         ## ▣ L2-Regularization
@@ -252,6 +253,9 @@ class Model:
                                         self.W_fc1_hist, self.b_fc1_hist, self.L_fc1_hist,
                                         self.W_fc2_hist, self.b_fc2_hist, self.L_fc2_hist,
                                         self.cost_hist, self.accuracy_hist])
+
+    def predict_softmax(self, x_test):
+        return self.sess.run(self.softmax, feed_dict={self.X: x_test, self.training: False})
 
     def predict(self, x_test):
         return self.sess.run(self.logits, feed_dict={self.X: x_test, self.training: False})
