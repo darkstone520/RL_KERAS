@@ -467,7 +467,7 @@ with tf.Session() as sess:
             print('Ensemble Accuracy : ', TEST_ACCURACY)
 
 
-            if TEST_ACCURACY > 0.5:
+            if TEST_ACCURACY > 1:
                 # 오답 이미지 분류하기 위함
                 predict_label = sess.run(tf.argmax(predictions,1))
                 actual_label = sess.run(tf.argmax(ALL_TEST_LABELS, 1))
