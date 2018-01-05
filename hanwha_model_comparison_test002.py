@@ -97,7 +97,7 @@ def loadTrainData():
         # return lines[:2], lines[2:4]
 
         # return 시 데이터를 섞어서 return 한다.
-        return lines
+        return lines[:40]
 
 def loadTestData():
     """
@@ -123,7 +123,7 @@ def loadTestData():
         # return lines[:2], lines[2:4]
 
         # return 시 데이터를 섞어서 return 한다.
-        return lines[:40]
+        return lines
 
 def loadRandomMiniBatch(lines):
     """
