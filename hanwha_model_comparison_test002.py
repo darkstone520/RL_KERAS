@@ -437,7 +437,7 @@ with tf.Session() as sess:
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
                     s_p = m.predict_softmax(test_x_batch)
                     softmax_predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += s_p
-                    m.Grad_CAM(img=test_x_batch[0], plotImage=plotImage())
+                    m.Grad_CAM(img=test_x_batch[0])
 
                 CNT += 1
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
