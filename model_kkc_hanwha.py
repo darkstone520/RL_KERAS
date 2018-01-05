@@ -100,21 +100,6 @@ class Model:
             ############################################################################################################
             with tf.name_scope('conv_layer1') as scope:
 
-                # self.W1_sub = tf.get_variable(name='W1_sub', shape=[7, 7, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                # self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
-                # self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
-                # self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
-                #
-                # self.W2_sub = tf.get_variable(name='W2_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                # self.L2_sub = tf.nn.conv2d(input=self.L1_sub, filter=self.W2_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                # self.L3_sub = self.BN(input=self.L2_sub, scale=True, training=self.training, name='Conv2_sub_BN')
-                # self.L2_sub = self.parametric_relu(self.L2_sub, 'R2_sub')
-
-                # self.W3_sub = tf.get_variable(name='W3_sub', shape=[3, 3, 20, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
-                # self.L3_sub = tf.nn.conv2d(input=self.L2_sub, filter=self.W3_sub, strides=[1, 1, 1, 1], padding='SAME')  #112 x 112
-                # self.L3_sub = self.BN(input=self.L3_sub, scale=True, training=self.training, name='Conv3_sub_BN')
-                # self.L3_sub = self.parametric_relu(self.L3_sub, 'R3_sub')
-
                 # Fatorized
                 self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
