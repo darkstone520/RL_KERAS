@@ -85,7 +85,7 @@ class Model:
                 self.dropout_rate = tf.Variable(tf.constant(value=0.5), name='dropout_rate')
                 self.training = tf.placeholder(tf.bool, name='training')
 
-                self.X = tf.placeholder(tf.float32, [None, 224*224*1], name='x_data')
+                self.X = tf.placeholder(tf.float32, [None, 224*224], name='x_data')
                 X_img = tf.reshape(self.X, shape=[-1, 224, 224, 1])
                 self.Y = tf.placeholder(tf.float32, [None, self.class_num], name='y_data')
 

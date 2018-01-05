@@ -1,6 +1,6 @@
-# non factorized, (224,224,2)-병선씨필터, no scale jittering
+# factorized, (224,224,1), no scale jittering
 
-from model_kkc_hanwha_nonfac import Model as My
+from model_kkc_hanwha import Model as My
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,8 +14,6 @@ from collections import deque
 from PIL import Image
 import scipy.misc as sc
 import os
-import cv2
-
 
 def monitorAccuracy(epoch_num, pltSave=False):
 
@@ -154,18 +152,7 @@ def loadRandomMiniBatch(lines):
         elif label == 2:
             label_list.append([0,0,1])
 
-    kernel = np.array([[0, -0.3, 0],
-                       [0.3, 0.7, 0.3],
-                       [-0.7, -0.3, 0]])
 
-    images = []
-    for image in data:
-        image = image.reshape(224,224,1)
-        filtered = cv2.filter2D(image, -1, kernel)
-        concat = np.dstack((image,filtered))
-        images.append(concat.reshape(-1,224,224,2))
-
-    data = np.asarray(images).reshape(-1,224*224*2)
     label = np.array(label_list)
     return data, label
 
@@ -186,6 +173,7 @@ def loadBatch(lines, START_BATCH_INDEX):
     data, label = data[:, :-1], data[:, -1]
     data = data / 255.
 
+
     label_list = []
 
     for label in label.tolist():
@@ -196,17 +184,6 @@ def loadBatch(lines, START_BATCH_INDEX):
         elif label == 2:
             label_list.append([0,0,1])
 
-    kernel = np.array([[0, -0.3, 0],
-                       [0.3, 0.7, 0.3],
-                       [-0.7, -0.3, 0]])
-
-    images = []
-    for image in data:
-        image = image.reshape(224,224,1)
-        filtered = cv2.filter2D(image, -1, kernel)
-        concat = np.dstack((image,filtered))
-        images.append(concat.reshape(-1,224,224,2))
-    data = np.asarray(images).reshape(-1,224*224*2)
 
     label = np.array(label_list)
     return data, label, START_BATCH_INDEX
@@ -236,6 +213,7 @@ def predictConsumtionTime(epoch_num):
 def distortImage(images):
     return ndimage.uniform_filter(images, size=11)
 
+
 def randomCrop(image_array):
     pad = int(16/2)
     origin_size = image_array.shape
@@ -257,7 +235,7 @@ def randomCrop(image_array):
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (224, 224)
-BATCH_SIZE = 100
+BATCH_SIZE = 40
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
@@ -289,7 +267,7 @@ LAST_EPOCH = None
 ################################
 mon_epoch_list = []
 # mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
-mon_color_list = ['blue','cyan', 'magenta','gold']
+mon_color_list = ['blue','cyan', 'magenta', 'gold']
 mon_label_list_for_cost = ['My Model','My Model','My Model']
 mon_label_list = ['My Model','My Model', 'My Model']
 # mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
@@ -325,11 +303,9 @@ with tf.Session() as sess:
     # initialize
 
     # initialize
-    # for m in range(NUM_MODELS):
-    #     models.append(My(sess, "model" + str(m), CLASS_NUM))
-
     for m in range(NUM_MODELS):
-        models.append(My(sess, "My_Model_" + str(m), CLASS_NUM))
+        models.append(My(sess, "My_model_" + str(m), CLASS_NUM))
+
 
 
     sess.run(tf.global_variables_initializer())
@@ -392,14 +368,10 @@ with tf.Session() as sess:
             # crop data augmentation
             cropped_train_x_batch = []
             for i in train_x_batch:
-                image = i.reshape(224,224,2)
-                first = image[:,:,0]
-                second = image[:,:,1]
-                first_cropped = randomCrop(first)
-                second_crropped = randomCrop(second)
-                images = np.dstack((first_cropped, second_crropped))
-                cropped_train_x_batch.append(images)
-            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,224*224*2)
+                image = i.reshape(224,224)
+                image = randomCrop(image)
+                cropped_train_x_batch.append(image.flatten())
+            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,224*224)
 
             # 이미지 왜곡
             # if IMAGE_DISTORT_RATE > random.random():
