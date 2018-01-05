@@ -214,12 +214,12 @@ def predictConsumtionTime(epoch_num):
 def distortImage(images):
     return ndimage.uniform_filter(images, size=11)
 
-def randomCrop(image_array, multi_scaling=True):
-    if multi_scaling:
+def randomCrop(image_array, epoch, multi_scaling=True):
+    if multi_scaling and epoch > 10:
         scale_range = random.sample([32,160,288], k=1)[0]
-        pad = int(scale_range/2)
     else:
-        scale_range = 32
+        scale_range = 160
+    pad = int(scale_range/2)
     origin_size = image_array.shape
     rnd_width = random.randint(0,scale_range)
     rnd_height = random.randint(0,scale_range)
@@ -380,7 +380,7 @@ with tf.Session() as sess:
             cropped_train_x_batch = []
             for i in train_x_batch:
                 image = i.reshape(224,224)
-                image = randomCrop(image)
+                image = randomCrop(image, epoch)
                 cropped_train_x_batch.append(image.flatten())
             train_x_batch = np.array(cropped_train_x_batch).reshape(-1,224*224)
 
