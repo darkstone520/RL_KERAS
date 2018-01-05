@@ -366,7 +366,21 @@ class Model:
 
         plt.show()
 
-    def Grad_CAM(self, x, y_pred, img, conv, grad, sess, plotImage):
+    def plotImage(self, image):
+        """image array를 plot으로 보여주는 함수
+        Args:
+            image (2-D or 3-D array): (H, W) or (H, W, C)
+        """
+        image = np.squeeze(image)
+        shape = image.shape
+
+        if len(shape) == 2:
+            plt.imshow(image, cmap="gray")
+        else:
+            plt.imshow(image)
+        plt.show()
+
+    def Grad_CAM(self, x, y_pred, img, conv, grad, sess):
         """
         :param x : tensor image place holder
         :param y_pred : logit value
@@ -382,7 +396,7 @@ class Model:
         grad = self.softmax
 
         print("Input image")
-        plotImage(img)
+        self.plotImage(img)
 
         for i in range(self.class_num):
             print("'{}' - 판단 근거".format(i))
