@@ -66,6 +66,7 @@ import tensorflow as tf
 import numpy as np
 import time
 
+
 class Model:
     def __init__(self, sess, name, class_num):
         self.sess = sess
