@@ -396,8 +396,7 @@ class Model:
         grad = self.softmax
 
         print("Input image")
-        img = img.reshape(224,224,1)
-        self.plotImage(img)
+        self.plotImage(img.reshape(224,224,1))
 
         for i in range(self.class_num):
             print("'{}' - 판단 근거".format(i))
