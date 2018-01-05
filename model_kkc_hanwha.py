@@ -407,7 +407,7 @@ class Model:
 
             gb_grad = tf.gradients(cost, x)[0]
 
-            prob = session.run(y_pred, feed_dict={x: [img], self.training: False})
+            prob = session.run(y_pred, feed_dict={x: img, self.training: False})
 
             gb_grad_value, target_conv_layer_value, target_conv_layer_grad_value = \
                 session.run([gb_grad, conv, target_conv_layer_grad], \
