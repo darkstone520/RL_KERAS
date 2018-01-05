@@ -380,7 +380,7 @@ class Model:
             plt.imshow(image)
         plt.show()
 
-    def Grad_CAM(self, x, y_pred, img, conv, grad, sess):
+    def Grad_CAM(self, img,):
         """
         :param x : tensor image place holder
         :param y_pred : logit value
