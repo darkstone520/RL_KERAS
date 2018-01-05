@@ -380,7 +380,7 @@ class Model:
             plt.imshow(image)
         plt.show()
 
-    def Grad_CAM(self, img,):
+    def Grad_CAM(self, img):
         """
         :param x : tensor image place holder
         :param y_pred : logit value
@@ -396,6 +396,7 @@ class Model:
         grad = self.softmax
 
         print("Input image")
+        img = img.reshape(224,224,1)
         self.plotImage(img)
 
         for i in range(self.class_num):
