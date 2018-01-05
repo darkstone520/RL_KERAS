@@ -67,6 +67,7 @@ import numpy as np
 import time
 
 
+
 class Model:
     def __init__(self, sess, name, class_num):
         self.sess = sess
@@ -256,6 +257,8 @@ class Model:
     ##  ⊙ tf.summary.histogram : 여러개의 행렬 값을 logging 하는 경우
     ##  ⊙ tf.summary.scalar : 한개의 상수 값을 logging 하는 경우
     ####################################################################################################################
+
+
     def tensorflow_summary(self):
         self.W1_hist = tf.summary.histogram('W1_conv1', self.W1)
         self.b1_hist = tf.summary.histogram('b1_conv1', self.b1)
