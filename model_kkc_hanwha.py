@@ -85,8 +85,8 @@ class Model:
                 self.dropout_rate = tf.Variable(tf.constant(value=0.5), name='dropout_rate')
                 self.training = tf.placeholder(tf.bool, name='training')
 
-                self.X = tf.placeholder(tf.float32, [None, 224*224*1], name='x_data')
-                X_img = tf.reshape(self.X, shape=[-1, 224, 224, 1])
+                self.X = tf.placeholder(tf.float32, [None, 224*224*2], name='x_data')
+                X_img = tf.reshape(self.X, shape=[-1, 224, 224, 2])
                 self.Y = tf.placeholder(tf.float32, [None, self.class_num], name='y_data')
 
             ############################################################################################################
@@ -101,7 +101,7 @@ class Model:
             with tf.name_scope('conv_layer1') as scope:
 
                 # Fatorized
-                self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 1, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
+                self.W1_sub = tf.get_variable(name='W1_sub', shape=[1, 3, 2, 20], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L1_sub = tf.nn.conv2d(input=X_img, filter=self.W1_sub, strides=[1, 2, 2, 1], padding='SAME')  # 112 x 112
                 self.L1_sub = self.BN(input=self.L1_sub, scale= True,  training=self.training, name='Conv1_sub_BN')
                 self.L1_sub = self.parametric_relu(self.L1_sub, 'R1_sub')
