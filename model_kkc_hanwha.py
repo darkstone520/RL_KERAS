@@ -65,6 +65,9 @@
 import tensorflow as tf
 import numpy as np
 import time
+import matplotlib.pyplot as plt
+
+
 
 class Model:
     def __init__(self, sess, name, class_num):
@@ -203,10 +206,10 @@ class Model:
                 self.W5 = tf.get_variable(name='W5', shape=[3, 3, 160, 320], dtype=tf.float32, initializer=tf.contrib.layers.xavier_initializer_conv2d())
                 self.L5 = tf.nn.conv2d(input=self.L4, filter=self.W5, strides=[1, 1, 1, 1], padding='VALID')
                 self.L5 = self.BN(input=self.L5, scale=True, training=self.training, name='Conv5_sub_BN')
-                self.L5 = self.parametric_relu(self.L5, 'R5')
+                self.L5_conv = self.parametric_relu(self.L5, 'R5')
                 # self.L5 = tf.nn.max_pool(value=self.L5, ksize=[1, 2, 2, 1], strides=[1, 2, 2, 1], padding='SAME')  # 5x5
                 # self.L5 = tf.layers.dropout(inputs=self.L5, rate=self.dropout_rate, training=self.training)
-                self.L5 = tf.reshape(self.L5, shape=[-1, 5 * 5 * 320])
+                self.L5 = tf.reshape(self.L5_conv, shape=[-1, 5 * 5 * 320])
 
             ############################################################################################################
             ## ▣ fully connected 계층 - 1
@@ -312,6 +315,96 @@ class Model:
                                         self.W_fc1_hist, self.b_fc1_hist, self.L_fc1_hist,
                                         self.W_fc2_hist, self.b_fc2_hist, self.L_fc2_hist,
                                         self.cost_hist, self.accuracy_hist])
+
+    def visualize(self, img, conv_output, conv_grad, gb_viz, ):
+        weights = np.mean(conv_grad, axis=(0, 1))  # alpha_k, [512]
+        cam = np.zeros(conv_output.shape[0: 2], dtype=np.float32)  # [7,7]
+        session = self.sess
+        # Taking a weighted average
+        for i, w in enumerate(weights):
+            cam += w * conv_output[:, :, i]
+
+        # Passing through ReLU
+        cam = np.maximum(cam, 0)
+        cam = cam / np.max(cam)  # scale 0 to 1.0
+        cam = cam.reshape(12, 12, 1)
+        cam = tf.image.resize_images(cam, [224, 224])
+        cam = session.run(cam)
+        cam = cam.reshape([224, 224])
+        fig = plt.figure(figsize=(10, 20))
+
+        gb_viz = np.dstack((
+            gb_viz[:, :, 0],
+            gb_viz[:, :, 1],
+            gb_viz[:, :, 2],
+        ))
+        gb_viz -= np.min(gb_viz)
+        gb_viz /= gb_viz.max()
+
+        ax = fig.add_subplot(131)
+        imgplot = plt.imshow(gb_viz)
+        ax.set_title('guided backpropagation')
+
+        gd_gb = np.dstack((
+            gb_viz[:, :, 0] * cam,
+            gb_viz[:, :, 1] * cam,
+            gb_viz[:, :, 2] * cam,
+        ))
+        ax = fig.add_subplot(132)
+        imgplot = plt.imshow(gd_gb)
+        ax.set_title('guided Grad-CAM')
+
+        img_cam = np.dstack((
+            img[..., 0] * cam,
+            img[..., 1] * cam,
+            img[..., 2] * cam,
+        ))
+
+        ax = fig.add_subplot(133)
+        imgplot = plt.imshow(img_cam)
+        ax.set_title('Grad-CAM')
+
+        plt.show()
+
+    def Grad_CAM(self, x, y_pred, img, conv, grad, sess, plotImage):
+        """
+        :param x : tensor image place holder
+        :param y_pred : logit value
+        :param img : one of test image (numpy array)
+        :param conv: last conv output through relu
+        :param grad: softmax value
+        :param sess: tensorflow session
+        """
+        x = self.X
+        session = self.sess
+        y_pred = self.logits
+        conv = self.L5_conv
+        grad = self.softmax
+
+        print("Input image")
+        plotImage(img)
+
+        for i in range(self.class_num):
+            print("'{}' - 판단 근거".format(i))
+            one_hot = tf.one_hot(i, self.class_num)
+            cost = -1 * tf.reduce_sum(tf.multiply(y_pred, one_hot), axis=1)
+            y_c = tf.reduce_sum(tf.multiply(grad, one_hot), axis=1)
+            target_conv_layer_grad = tf.gradients(y_c, conv)[0]
+
+            gb_grad = tf.gradients(cost, x)[0]
+
+            prob = session.run(y_pred, feed_dict={x: [img]})
+
+            gb_grad_value, target_conv_layer_value, target_conv_layer_grad_value = \
+                session.run([gb_grad, conv, target_conv_layer_grad], \
+                            {x: [img]})
+
+            self.visualize(
+                img,
+                target_conv_layer_value[0],
+                target_conv_layer_grad_value[0],
+                gb_grad_value[0],
+                session)
 
     def predict(self, x_test):
         return self.sess.run(self.logits, feed_dict={self.X: x_test, self.training: False})

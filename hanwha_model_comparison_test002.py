@@ -232,6 +232,7 @@ def randomCrop(image_array):
 
 
 
+
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (224, 224)
@@ -436,15 +437,16 @@ with tf.Session() as sess:
                     predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += p
                     s_p = m.predict_softmax(test_x_batch)
                     softmax_predictions[START_BATCH_INDEX-BATCH_SIZE:START_BATCH_INDEX,:] += s_p
-
+                    m.Grad_CAM(img=test_x_batch[0], plotImage=plotImage())
 
                 CNT += 1
             ALL_TEST_LABELS = np.array(ALL_TEST_LABELS).reshape(-1,CLASS_NUM)
             # softmax값이 앙상블 모델별로 누적되어있으니깐 모델갯수로 나누어 평균을 구한다.
             softmax_predictions = softmax_predictions/NUM_MODELS
             ensemble_correct_prediction = tf.equal(tf.argmax(predictions, 1), tf.argmax(ALL_TEST_LABELS, 1))
-
             ENSEMBLE_ACCURACY += tf.reduce_mean(tf.cast(ensemble_correct_prediction, tf.float32))
+
+
 
             START_BATCH_INDEX = 0
 
