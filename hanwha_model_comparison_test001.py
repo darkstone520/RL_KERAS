@@ -1,6 +1,6 @@
-# filtered(made by 병선) images model comparison
+# non factorized, (224,224,2)-병선씨필터, no scale jittering
 
-from model_kkc_hanwha import Model as My
+from model_kkc_hanwha_nonfac import Model as My
 import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
@@ -164,8 +164,6 @@ def loadRandomMiniBatch(lines):
         filtered = cv2.filter2D(image, -1, kernel)
         concat = np.dstack((image,filtered))
         images.append(concat.reshape(-1,224,224,2))
-        plotImage(image)
-        plotImage(filtered)
 
     data = np.asarray(images).reshape(-1,224*224*2)
     label = np.array(label_list)
@@ -259,7 +257,7 @@ def randomCrop(image_array):
 # 학습을 위한 기본적인 셋팅
 __DATA_PATH = "preprocessed_data/"
 IMG_SIZE = (224, 224)
-BATCH_SIZE = 40
+BATCH_SIZE = 100
 START_BATCH_INDEX = 0
 
 # 학습 도중 이미지를 Distort하는 데이터의 비중
@@ -291,9 +289,9 @@ LAST_EPOCH = None
 ################################
 mon_epoch_list = []
 # mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
-mon_color_list = ['blue','cyan', 'magenta', 'green', 'gold']
-mon_label_list_for_cost = ['My Model','ResNet_18','ResNet_26', 'ResNet_50']
-mon_label_list = ['My Model','ResNet_18', 'ResNet_26', 'ResNet_50']
+mon_color_list = ['blue','cyan', 'magenta','gold']
+mon_label_list_for_cost = ['My Model','My Model','My Model']
+mon_label_list = ['My Model','My Model', 'My Model']
 # mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
@@ -330,14 +328,9 @@ with tf.Session() as sess:
     # for m in range(NUM_MODELS):
     #     models.append(My(sess, "model" + str(m), CLASS_NUM))
 
-    for m in range(1):
-        models.append(My(sess, "My_Model", CLASS_NUM))
-    for m in range(1):
-        models.append(Model_18(sess, "ResNet_18", CLASS_NUM))
-    for m in range(1):
-        models.append(Model_26(sess, "ResNet_26", CLASS_NUM))
-    for m in range(1):
-        models.append(ResNet_50(sess, "ResNet_50", CLASS_NUM))
+    for m in range(NUM_MODELS):
+        models.append(My(sess, "My_Model_" + str(m), CLASS_NUM))
+
 
     sess.run(tf.global_variables_initializer())
     saver = tf.train.Saver()
@@ -399,10 +392,14 @@ with tf.Session() as sess:
             # crop data augmentation
             cropped_train_x_batch = []
             for i in train_x_batch:
-                image = i.reshape(224,224)
-                image = randomCrop(image, epoch)
-                cropped_train_x_batch.append(image.flatten())
-            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,224*224)
+                image = i.reshape(224,224,2)
+                first = image[:,:,0]
+                second = image[:,:,1]
+                first_cropped = randomCrop(first)
+                second_crropped = randomCrop(second)
+                images = np.dstack((first_cropped, second_crropped))
+                cropped_train_x_batch.append(images)
+            train_x_batch = np.array(cropped_train_x_batch).reshape(-1,224*224*2)
 
             # 이미지 왜곡
             # if IMAGE_DISTORT_RATE > random.random():
