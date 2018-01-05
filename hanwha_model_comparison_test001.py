@@ -1,8 +1,5 @@
-# scale jittering 구현 (randomCrop)
+# filtered(made by 병선) images model comparison
 
-from resnet_no_bottle_26layers import Model as Model_26
-from resnet_no_bottle_18layers import Model as Model_18
-from resnet_BNK_50layers import Model as ResNet_50
 from model_kkc_hanwha import Model as My
 import tensorflow as tf
 import numpy as np
@@ -17,6 +14,8 @@ from collections import deque
 from PIL import Image
 import scipy.misc as sc
 import os
+import cv2
+
 
 def monitorAccuracy(epoch_num, pltSave=False):
 
@@ -155,7 +154,20 @@ def loadRandomMiniBatch(lines):
         elif label == 2:
             label_list.append([0,0,1])
 
+    kernel = np.array([[0, -0.3, 0],
+                       [0.3, 0.7, 0.3],
+                       [-0.7, -0.3, 0]])
 
+    images = []
+    for image in data:
+        image = image.reshape(224,224,1)
+        filtered = cv2.filter2D(image, -1, kernel)
+        concat = np.dstack((image,filtered))
+        images.append(concat.reshape(-1,224,224,2))
+        plotImage(image)
+        plotImage(filtered)
+
+    data = np.asarray(images).reshape(-1,224*224*2)
     label = np.array(label_list)
     return data, label
 
@@ -176,7 +188,6 @@ def loadBatch(lines, START_BATCH_INDEX):
     data, label = data[:, :-1], data[:, -1]
     data = data / 255.
 
-
     label_list = []
 
     for label in label.tolist():
@@ -187,6 +198,17 @@ def loadBatch(lines, START_BATCH_INDEX):
         elif label == 2:
             label_list.append([0,0,1])
 
+    kernel = np.array([[0, -0.3, 0],
+                       [0.3, 0.7, 0.3],
+                       [-0.7, -0.3, 0]])
+
+    images = []
+    for image in data:
+        image = image.reshape(224,224,1)
+        filtered = cv2.filter2D(image, -1, kernel)
+        concat = np.dstack((image,filtered))
+        images.append(concat.reshape(-1,224,224,2))
+    data = np.asarray(images).reshape(-1,224*224*2)
 
     label = np.array(label_list)
     return data, label, START_BATCH_INDEX
@@ -216,15 +238,11 @@ def predictConsumtionTime(epoch_num):
 def distortImage(images):
     return ndimage.uniform_filter(images, size=11)
 
-def randomCrop(image_array, epoch, multi_scaling=True):
-    if multi_scaling and epoch > 10:
-        scale_range = random.sample([32,160,288], k=1)[0]
-    else:
-        scale_range = 160
-    pad = int(scale_range/2)
+def randomCrop(image_array):
+    pad = int(16/2)
     origin_size = image_array.shape
-    rnd_width = random.randint(0,scale_range)
-    rnd_height = random.randint(0,scale_range)
+    rnd_width = random.randint(0,16)
+    rnd_height = random.randint(0,16)
     image_array = np.pad(image_array, (pad,pad), "constant")
 
     # Image Crop 단계
@@ -252,7 +270,7 @@ START_EARLY_STOP_EPOCH = 1
 START_EARLY_STOP_COST = 10
 
 TRAIN_RATE = 1.0
-NUM_MODELS = 4
+NUM_MODELS = 3
 CLASS_NUM = 3
 TEST_ACCURACY_LIST = []
 START_BATCH_INDEX = 0
