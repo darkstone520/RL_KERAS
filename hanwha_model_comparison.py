@@ -1,3 +1,5 @@
+# scale jittering 구현 (randomCrop)
+
 from resnet_no_bottle_26layers import Model as Model_26
 from resnet_no_bottle_18layers import Model as Model_18
 from resnet_BNK_50layers import Model as ResNet_50
@@ -273,7 +275,7 @@ mon_epoch_list = []
 # mon_color_list = ['blue', 'green', 'red', 'cyan', 'magenta', 'yellow', 'black']
 mon_color_list = ['blue','cyan', 'magenta', 'green', 'gold']
 mon_label_list_for_cost = ['My Model','ResNet_18','ResNet_26', 'ResNet_50']
-mon_label_list = ['My Model','ResNet_18', 'ResNet_26', 'ResNet_18']
+mon_label_list = ['My Model','ResNet_18', 'ResNet_26', 'ResNet_50']
 # mon_label_list_for_cost = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # mon_label_list = ['model'+str(m+1) for m in range(NUM_MODELS)]
 # cost monitoring 관련
